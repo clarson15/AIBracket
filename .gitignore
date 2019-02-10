@@ -1,0 +1,11 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/AIBracket.API/obj
+/AIBracket.GameLogic/obj
+/AIBracket.Web/obj
+/AIBracket.Web/bin/Debug/netcoreapp2.2
+/AIBracket.Data/obj
+/AIBracket.API/bin/Debug/netcoreapp2.2
+/.vs/AIBracket

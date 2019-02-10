@@ -48,12 +48,14 @@
 ## Database:
  * Users
     * Username
+    * UID
     * Password
     * Password Salt
-    * AI IDs
     * Created Date
  * AI
     * Name
+    * ID
+    * UID
     * Private Key
     * Associated Game
     * Created date
@@ -64,3 +66,6 @@
     * Outcome (score of pacman)
     * Time elapsed
     * Time created
+
+## Setup
+1. Download [dotnet core 2.2](https://dotnet.microsoft.com/download/thank-you/dotnet-sdk-2.2.103-windows-x64-installer)
