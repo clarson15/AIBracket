@@ -2,7 +2,7 @@
 
 ## Project Architecture
 
-![Project Architecture](https://github.com/sknnywhiteman/AIBracket/Images/Architecture.png "Project Architecture")
+![Project Architecture](https://github.com/sknnywhiteman/AIBracket/blob/master/Images/Architecture.png "Project Architecture")
 
 ## Game Ideas:  
  *Pacman
