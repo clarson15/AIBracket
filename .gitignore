@@ -13,3 +13,4 @@
 **/config/applicationhost.config
 /.vs/ProjectSettings.json
 /.vs
+/AIBracket.Data/bin/Debug/netcoreapp2.2
