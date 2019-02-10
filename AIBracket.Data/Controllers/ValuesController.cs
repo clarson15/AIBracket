@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using System.Data.SQLite;
 
 namespace AIBracket.Data.Controllers
 {
@@ -10,6 +11,18 @@ namespace AIBracket.Data.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
+
+        private static SQLiteConnection _sqliteConn;
+
+        public ValuesController()
+        {
+            if (_sqliteConn == null || (_sqliteConn.State & System.Data.ConnectionState.Open) == 0)
+            {
+                _sqliteConn = new SQLiteConnection("Data Source = database.sqlite");
+                _sqliteConn.Open();
+            }
+        }
+
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
