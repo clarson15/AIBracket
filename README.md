@@ -6,7 +6,7 @@
 
 ## Game Ideas:  
  *Pacman
-  ⋅⋅* Can Program Ghost or Pacman
+   * Can Program Ghost or Pacman
 
 
 ## Architecture:
