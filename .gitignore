@@ -9,4 +9,8 @@
 /AIBracket.Data/obj
 /AIBracket.API/bin/Debug/netcoreapp2.2
 /.vs/AIBracket
+/.vs/slnx.sqlite
+**/config/applicationhost.config
+/.vs/ProjectSettings.json
+/.vs
 /AIBracket.Data/bin/Debug/netcoreapp2.2
