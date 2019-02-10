@@ -5,7 +5,7 @@
 ![Project Architecture](https://github.com/sknnywhiteman/AIBracket/blob/master/Images/Architecture.png "Project Architecture")
 
 ## Game Ideas:  
- *Pacman
+ * Pacman
    * Can Program Ghost or Pacman
 
 
