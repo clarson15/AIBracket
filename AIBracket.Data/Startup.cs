@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Data.SQLite;
 
 namespace AIBracket.Data
 {
@@ -18,6 +19,10 @@ namespace AIBracket.Data
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            if (!System.IO.File.Exists("database.sqlite"))
+            {
+                SQLiteConnection.CreateFile("database.sqlite");
+            }
         }
 
         public IConfiguration Configuration { get; }
