@@ -19,10 +19,7 @@ namespace AIBracket.Data
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            if (!System.IO.File.Exists("database.sqlite"))
-            {
-                SQLiteConnection.CreateFile("database.sqlite");
-            }
+            DBSeeder.SeedDB();
         }
 
         public IConfiguration Configuration { get; }
