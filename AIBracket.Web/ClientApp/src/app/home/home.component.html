@@ -1,44 +1,16 @@
-<h1>Welcome to AIBracket.com!</h1>
-<form [formGroup] ="profileForm" class="login-form">
-  <mat-card class="login-card">
-    <mat-card-title>Please login</mat-card-title>
-    <mat-card-content>
-      <div class="login-credentials">
-        <mat-form-field>
-          <input matInput placeholder="Email" [formControl]="email" />
-        </mat-form-field>
-        <mat-form-field>
-          <input matInput placeholder="Password" [formControl] ="password"/>
-        </mat-form-field>
-        <div class="submit-button">
-          <button mat-raised-button>GO</button>
-        </div>
 
-      </div>
-    </mat-card-content>
-  </mat-card>
-</form>
+<mat-card>
+  <mat-card-title>Welcome to AI Bracket!</mat-card-title>
+  <mat-card-content>
 
-<form [formGroup] ="createForm">
-  <mat-expansion-panel expanded="false">
-    <mat-expansion-panel-header>
-      <mat-panel-title>Don't have an account?</mat-panel-title>
-      <mat-panel-description>Create one here!</mat-panel-description>
-    </mat-expansion-panel-header>
-    <div class="login-credentials">
-      <mat-form-field>
-        <input matInput placeholder="Email" [formControl]="email" />
-      </mat-form-field>
-      <mat-form-field>
-        <input matInput placeholder="Password" [formControl]="password" />
-      </mat-form-field>
-      <mat-form-field>
-        <input matInput placeholder="Password again" />
-      </mat-form-field>
-      <div class="submit-button">
-        <button mat-raised-button>Create</button>
-      </div>
-    </div>
+    AI bracket is a website where players can test their skills
+    with AI! We offer  a free API where you can
+    submit your own game commands and see how it does
+    against other submitted AI. Below you can
+    find information on some of the games
+    that are available to program in and
+    some information regarding our API. <b>Please login to create an ai just sit back and watch as live games are played!</b>
+  </mat-card-content>
+</mat-card>
 
-  </mat-expansion-panel>
-</form>
+

@@ -1,0 +1,22 @@
+<form [formGroup]="createForm" class="login-form">
+  <mat-card class="login-card">
+    <mat-card-title>Create your account</mat-card-title>
+    <mat-card-content>
+      <div class="login-credentials">
+        <mat-form-field>
+          <input matInput placeholder="Email" [formControl]="email" />
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Password" [formControl]="password" />
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Password Confirmation" [formControl]="password" />
+        </mat-form-field>
+        <div class="submit-button">
+          <button mat-raised-button>Create</button>
+        </div>
+
+      </div>
+    </mat-card-content>
+  </mat-card>
+</form>
