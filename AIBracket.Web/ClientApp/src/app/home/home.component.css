@@ -1,0 +1,21 @@
+.login-credentials{
+  display:flex;
+  flex-direction: column;
+}
+
+.login-card{
+  padding: 3em;
+}
+
+.create-card {
+  display: flex;
+  flex-direction: column;
+  padding: 3em;
+  margin-top:2em;
+}
+
+.submit-button {
+  display:flex;
+  justify-content:space-between;
+  
+}
