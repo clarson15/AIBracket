@@ -4,16 +4,17 @@
     <mat-card-content>
       <div class="login-credentials">
         <mat-form-field>
-          <input matInput placeholder="Email" [formControl]="email" />
+          <input matInput placeholder="Email" formControlName="email" />
+          
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="Password" [formControl]="password" />
+          <input matInput placeholder="Password" formControlName="password" />
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="Password Confirmation" [formControl]="password" />
+          <input matInput placeholder="Password Confirmation"  formControlName="password" />
         </mat-form-field>
         <div class="submit-button">
-          <button mat-raised-button>Create</button>
+          <button (click) ="createAccount()" mat-raised-button>Create</button>
         </div>
 
       </div>

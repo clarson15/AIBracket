@@ -18,14 +18,14 @@ namespace AIBracket.Data.Controllers
 
         public LoginController()
         {
-            if ((_conn.State & System.Data.ConnectionState.Open) == 0) {
+            if (_conn == null || (_conn.State & System.Data.ConnectionState.Open) == 0) {
                 var connString = "Data Source = database.sqlite";
                 _conn = new SQLiteConnection(connString);
                 _conn.Open();
             }
         }
 
-        [HttpPost]
+        [HttpPost("[action]")]
         public IActionResult Login([FromBody] LoginObject data)
         {
             var sql = "SELECT password FROM Users WHERE username = '" + data.username + "'";
@@ -41,7 +41,7 @@ namespace AIBracket.Data.Controllers
             return StatusCode(401, "Incorrect username and/or password.");
         }
 
-        [HttpPost]
+        [HttpPost("[action]")]
         public IActionResult CreateAccount([FromBody] LoginObject data)
         {
             var sql = "SELECT username FROM Users WHERE username = '" + data.username + "'";
@@ -54,7 +54,7 @@ namespace AIBracket.Data.Controllers
             var salt = BCrypt.Net.BCrypt.GenerateSalt();
             var password = BCrypt.Net.BCrypt.HashPassword(data.password, salt);
             string created_date = DateTime.Now.ToString();
-            sql = "INSERT INTO Users (username, password, salt, created_date) Values ('" + data.username + "', '" + password + "', '" + salt + "', '" + created_date + "')";
+            sql = "INSERT INTO Users (username, password, salt, create_date) Values ('" + data.username + "', '" + password + "', '" + salt + "', '" + created_date + "')";
             cmd = new SQLiteCommand(sql, _conn);
             cmd.ExecuteNonQuery();
             return StatusCode(200);
