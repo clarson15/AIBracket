@@ -18,15 +18,14 @@ namespace AIBracket.Web.Controllers
         {
             var httpClient = new HttpClient();
             var response = await httpClient.PostAsJsonAsync(BaseUrl + "Login/CreateAccount", data);
-            var responsejr = await response.Content.ReadAsStringAsync();
-            return responsejr;  
+            return await response.Content.ReadAsStringAsync();  
         }
 
         [HttpPost("[action]")]
-        public async Task<string> Login([FromBody] object data)
+        public async Task<string> Authenticate([FromBody] object data)
         {
             var httpClient = new HttpClient();
-            var response = await httpClient.PostAsJsonAsync(BaseUrl + "Login/Login", data);
+            var response = await httpClient.PostAsJsonAsync(BaseUrl + "Login/Authenticate", data);
             return await response.Content.ReadAsStringAsync();
         }
     }
