@@ -15,6 +15,7 @@ import { CounterComponent } from './counter/counter.component';
 import { CreateAccountComponent } from './create-account/create-account.component';
 
 import { CreateService } from './services/createService';
+import { LoginService } from './services/loginService';
 
 @NgModule({
   declarations: [
@@ -46,7 +47,7 @@ import { CreateService } from './services/createService';
       { path: 'login', component: LoginComponent },
     ])
   ],
-  providers: [CreateService],
+  providers: [CreateService, LoginService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
