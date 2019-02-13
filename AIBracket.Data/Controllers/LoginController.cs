@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using AIBracket.Data.DTO;
+using AIBracket.Data.Entity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace AIBracket.Data.Controllers
 {
@@ -14,10 +20,12 @@ namespace AIBracket.Data.Controllers
     public class LoginController : ControllerBase
     {
 
+        private IConfiguration _config;
         private static SQLiteConnection _conn;
 
-        public LoginController()
+        public LoginController(IConfiguration config)
         {
+            _config = config;
             if (_conn == null || (_conn.State & System.Data.ConnectionState.Open) == 0) {
                 var connString = "Data Source = database.sqlite";
                 _conn = new SQLiteConnection(connString);
@@ -26,7 +34,7 @@ namespace AIBracket.Data.Controllers
         }
 
         [HttpPost("[action]")]
-        public IActionResult Login([FromBody] LoginObject data)
+        public IActionResult Authenticate([FromBody] LoginObject data)
         {
             var sql = "SELECT password FROM Users WHERE username = '" + data.username + "'";
             var cmd = new SQLiteCommand(sql, _conn);
@@ -36,9 +44,31 @@ namespace AIBracket.Data.Controllers
             var valid = BCrypt.Net.BCrypt.Verify(data.password, password);
             if (valid)
             {
-               return StatusCode(200);
+                var usersql = "SELECT uid, create_date FROM Users WHERE username = '" + data.username + "'";
+                var usercmd = new SQLiteCommand(usersql, _conn);
+                var userreader = usercmd.ExecuteReader();
+                userreader.Read();
+                var user = new User();
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(_config.GetValue<string>("Private Key"));
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new Claim[]
+                    {
+                    new Claim(ClaimTypes.Name, user.uid.ToString())
+                    }),
+                    Expires = DateTime.UtcNow.AddDays(7),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                var tokenString = tokenHandler.WriteToken(token);
+                user.username = data.username;
+                user.uid = userreader.GetInt32(0);
+                user.create_date = userreader.GetString(1);
+                user.token = tokenString;
+                return Ok(user);
             }
-            return StatusCode(401, "Incorrect username and/or password.");
+            return Unauthorized("Incorrect username and/or password.");
         }
 
         [HttpPost("[action]")]
