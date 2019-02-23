@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Router } from '@angular/router';
+import { ProfileResponseModel } from '../models/ProfileResponseModel';
 
 @Component({
   selector: 'app-nav-menu',
@@ -8,11 +10,18 @@ import { Component } from '@angular/core';
 export class NavMenuComponent {
   isExpanded = false;
 
-  collapse() {
-    this.isExpanded = false;
+  @Input('Account')
+  account: ProfileResponseModel;
+  @Output() logout: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+  constructor(private router: Router) { }
+
+  viewProfile() {
+    this.router.navigate(['/profile']);
   }
 
-  toggle() {
-    this.isExpanded = !this.isExpanded;
+  Logout() {
+    this.logout.emit(true);
+    this.router.navigate(['/login']);
   }
 }

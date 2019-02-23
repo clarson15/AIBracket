@@ -15,3 +15,4 @@
 /.vs
 /AIBracket.Data/bin/Debug/netcoreapp2.2
 *.user
+/AIBracket.GameLogic/bin/Debug/netcoreapp2.2

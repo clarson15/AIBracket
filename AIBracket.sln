@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIBracket.Web", "AIBracket.Web\AIBracket.Web.csproj", "{BCEC194B-FBD6-4E68-A4FD-C807D860AAE4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AIBracket.Web", "AIBracket.Web\AIBracket.Web.csproj", "{BCEC194B-FBD6-4E68-A4FD-C807D860AAE4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIBracket.API", "AIBracket.API\AIBracket.API.csproj", "{E19B21D9-FE81-4C82-8499-C6FADE5E9C71}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AIBracket.API", "AIBracket.API\AIBracket.API.csproj", "{E19B21D9-FE81-4C82-8499-C6FADE5E9C71}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIBracket.GameLogic", "AIBracket.GameLogic\AIBracket.GameLogic.csproj", "{11666E0D-49FA-472B-8BDC-D3A2753BDAE6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AIBracket.GameLogic", "AIBracket.GameLogic\AIBracket.GameLogic.csproj", "{11666E0D-49FA-472B-8BDC-D3A2753BDAE6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIBracket.Data", "AIBracket.Data\AIBracket.Data.csproj", "{41FA8C3A-86B2-4F58-8DE5-298C22B7E54D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AIBracket.Data", "AIBracket.Data\AIBracket.Data.csproj", "{41FA8C3A-86B2-4F58-8DE5-298C22B7E54D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -3,19 +3,16 @@
   flex-direction: column;
 }
 
-.login-card {
-  margin-top: 2em;
-  padding: 3em;
-}
-
 .create-card {
   display: flex;
   flex-direction: column;
   padding: 3em;
   margin-top: 2em;
+  width: 500px;
+  margin-right: auto;
+  margin-left: auto;
 }
 
-.submit-button {
-  display: flex;
-  justify-content: space-between;
+.create-button {
+  float: right;
 }

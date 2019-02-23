@@ -5,16 +5,18 @@
     <mat-card-content>
       <div class="login-credentials">
         <mat-form-field>
-          <input matInput placeholder="Email" formControlName="email" />
+          <input matInput placeholder="Username" formControlName="UserName" required />
+          <mat-error *ngIf="profileForm.get('UserName').hasError('required')">Username is required.</mat-error>
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="Password" formControlName="password"/>
+          <input matInput placeholder="Password" formControlName="Password" type="password" required />
+          <mat-error *ngIf="profileForm.get('Password').hasError('password')">Incorrect username and/or password.</mat-error>
+          <mat-error *ngIf="profileForm.get('Password').hasError('required')">Password is required.</mat-error>
         </mat-form-field>
+        <span>Don't have an account? <a [routerLink]="['/create-account']">Create one!</a></span>
         <div class="submit-button">
-          <button mat-raised-button (click)="login()">GO</button>
-          <button mat-raised-button routerLink ="/create-account">Create</button>
+          <button mat-raised-button (click)="onSubmit()" type="button">GO</button>
         </div>
-
       </div>
     </mat-card-content>
   </mat-card>
