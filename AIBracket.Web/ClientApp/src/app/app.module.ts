@@ -3,8 +3,8 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router'
-import { MatCardModule, MatToolbarModule, MatExpansionModule, MatButtonModule, MatInputModule, MatFormFieldModule, MatFormField} from '@angular/material'
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+import { MatCardModule, MatToolbarModule, MatExpansionModule, MatButtonModule, MatInputModule, MatFormFieldModule, MatIconModule, MatMenuModule } from '@angular/material';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
@@ -39,6 +39,8 @@ import { AccountService } from './services/account.service';
     MatInputModule,
     MatFormFieldModule,
     MatButtonModule,
+    MatIconModule,
+    MatMenuModule,
     //Routes
     RouterModule.forRoot([
       { path: 'home', component: HomeComponent, pathMatch: 'full' },

@@ -15,17 +15,23 @@ export class AppComponent {
 
   constructor(private accountService: AccountService) { }
 
+  onLogout() {
+    this.account = null;
+    localStorage.removeItem('auth_token');
+  }
+
   onActivate($event) {
-    if ($event.constructor.name == "HomeComponent") {
-      if (this.account == null && localStorage.getItem('auth_token') != null) {
-        this.accountService.getProfile().subscribe(
-          data => {
-            this.account = data;
-          },
-          err => {
-            console.log(err);
-          });
-      }
+    console.log($event);
+    console.log(this.account);
+    console.log(localStorage.getItem('auth_token'));
+    if (this.account == null && localStorage.getItem('auth_token') != null) {
+      this.accountService.getProfile().subscribe(
+        data => {
+          this.account = data;
+        },
+        err => {
+          console.log(err);
+        });
     }
   }
 }

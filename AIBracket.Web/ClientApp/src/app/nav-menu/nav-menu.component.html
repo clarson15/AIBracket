@@ -7,13 +7,15 @@
     </div>
     <span class="space"></span>
     <span>
-      <button *ngIf="!isLoggedIn()" color="primary" routerLink="/login" mat-raised-button>Login</button>
-      <div *ngIf="account != null">
-        <span>{{account.firstName}} {{account.lastName}}</span><br />
-        <button color="secondary" (click)="logout()" mat-button class="logout-button">Logout</button>
+      <button *ngIf="account == null" color="primary" routerLink="/login" mat-raised-button>Login</button>
+      <div *ngIf="account != null" class="profile-name">
+        <span>{{account.firstName}} {{account.lastName}}</span>
+        <button mat-icon-button [matMenuTriggerFor]="menu"><mat-icon>person</mat-icon></button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item (click)="viewProfile()">View Profile</button>
+          <button mat-menu-item (click)="Logout()">Logout</button>
+        </mat-menu>
       </div>
     </span>
   </mat-toolbar-row>
- 
-
 </mat-toolbar>

@@ -1,6 +1,6 @@
 <body class="background">
   <div class="background">
-    <app-nav-menu [Account]="account"></app-nav-menu>
+    <app-nav-menu [Account]="account" (logout)="onLogout()"></app-nav-menu>
     <div class="container">
       <router-outlet (activate)='onActivate($event)'></router-outlet>
     </div>

@@ -10,3 +10,9 @@
 .logout-button{
   float: right;
 }
+
+.profile-name {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

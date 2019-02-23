@@ -36,7 +36,19 @@ export class CreateAccountComponent implements OnInit {
       this.createForm.get('Confirm').disable();
       this.createService.createAccount(this.createForm).subscribe(
         data => {
-          this.router.navigate(['/home']);
+          let loginForm = new FormGroup({
+            UserName: this.createForm.get('UserName'),
+            Password: this.createForm.get('Password')
+          })
+          this.createService.login(loginForm).subscribe(
+            data2 => {
+              localStorage.setItem('auth_token', data2.auth_token);
+              this.router.navigate(['/home']);
+            },
+            err => {
+              console.log(err.error);
+              this.router.navigate(['/home']);
+            });
         },
         err => {
           console.log(err.error);

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProfileResponseModel } from '../models/ProfileResponseModel';
 
@@ -12,24 +12,16 @@ export class NavMenuComponent {
 
   @Input('Account')
   account: ProfileResponseModel;
+  @Output() logout: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   constructor(private router: Router) { }
 
-  collapse() {
-    this.isExpanded = false;
+  viewProfile() {
+    this.router.navigate(['/profile']);
   }
 
-  logout() {
-    localStorage.removeItem('auth_token');
-    this.account = null;
+  Logout() {
+    this.logout.emit(true);
     this.router.navigate(['/login']);
-  }
-
-  isLoggedIn() {
-    return localStorage.getItem('auth_token') != null;
-  }
-
-  toggle() {
-    this.isExpanded = !this.isExpanded;
   }
 }
