@@ -7,14 +7,4 @@ import { FormControl, FormGroup } from '@angular/forms';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent {
-
-  profileForm = new FormGroup({
-    email: new FormControl(''),
-    password: new FormControl(''),
-  })
-
-  createForm = new FormGroup({
-    email: new FormControl(''),
-    password: new FormControl('')
-  })
 }

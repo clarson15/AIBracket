@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { Router } from '@angular/router';
+import { ProfileResponseModel } from '../models/ProfileResponseModel';
 
 @Component({
   selector: 'app-nav-menu',
@@ -8,8 +10,23 @@ import { Component } from '@angular/core';
 export class NavMenuComponent {
   isExpanded = false;
 
+  @Input('Account')
+  account: ProfileResponseModel;
+
+  constructor(private router: Router) { }
+
   collapse() {
     this.isExpanded = false;
+  }
+
+  logout() {
+    localStorage.removeItem('auth_token');
+    this.account = null;
+    this.router.navigate(['/login']);
+  }
+
+  isLoggedIn() {
+    return localStorage.getItem('auth_token') != null;
   }
 
   toggle() {

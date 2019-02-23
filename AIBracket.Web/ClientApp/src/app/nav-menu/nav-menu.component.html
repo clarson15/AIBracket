@@ -7,7 +7,11 @@
     </div>
     <span class="space"></span>
     <span>
-      <button color="primary" routerLink="/login" mat-raised-button>Login</button>
+      <button *ngIf="!isLoggedIn()" color="primary" routerLink="/login" mat-raised-button>Login</button>
+      <div *ngIf="account != null">
+        <span>{{account.firstName}} {{account.lastName}}</span><br />
+        <button color="secondary" (click)="logout()" mat-button class="logout-button">Logout</button>
+      </div>
     </span>
   </mat-toolbar-row>
  

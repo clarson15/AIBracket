@@ -1,22 +1,32 @@
 <form [formGroup]="createForm" class="login-form">
-  <mat-card class="login-card">
+  <mat-card class="create-card">
     <mat-card-title>Create your account</mat-card-title>
     <mat-card-content>
       <div class="login-credentials">
         <mat-form-field>
-          <input matInput placeholder="Email" formControlName="email" />
-          
+          <input matInput placeholder="Username" formControlName="UserName" required />
+          <mat-error *ngIf="createForm.get('UserName').hasError('username')">Username is already taken.</mat-error>
+          <mat-error *ngIf="createForm.get('UserName').hasError('required')">Username is required.</mat-error>
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="Password" formControlName="password" />
+          <input matInput placeholder="Password" formControlName="Password" type="password" required />
+          <mat-error *ngIf="createForm.get('Password').hasError('password')">Passwords do not match.</mat-error>
+          <mat-error *ngIf="createForm.get('Password').hasError('required')">Password is required.</mat-error>
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="Password Confirmation"  formControlName="password" />
+          <input matInput placeholder="Password Confirmation" formControlName="Confirm" type="password" required />
+          <mat-error *ngIf="createForm.get('Confirm').hasError('password')">Passwords do not match.</mat-error>
+          <mat-error *ngIf="createForm.get('Confirm').hasError('required')">Password confirmation is required.</mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="First Name" formControlName="FirstName"/>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Last Name" formControlName="LastName" />
         </mat-form-field>
         <div class="submit-button">
-          <button (click) ="onSubmit()" mat-raised-button>Create</button>
+          <button (click)="onSubmit()" type="button" mat-raised-button class="create-button">Create</button>
         </div>
-
       </div>
     </mat-card-content>
   </mat-card>
