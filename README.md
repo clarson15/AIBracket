@@ -12,7 +12,7 @@ This is a live document. Anything on this page is subject to change, and should 
 
 
 ## Architecture:
-  * Central Database (sqlite) 
+  * Central Database (SQL Server) 
   * Data project (Interfacing with database)
   * Game project (handles all games and logic)
   * Web project (displays live games, data viewing)
