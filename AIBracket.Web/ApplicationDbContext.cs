@@ -13,7 +13,7 @@ namespace AIBracket.Web
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
         }
-
-        public DbSet<JobSeeker> JobSeekers { get; set; }
+        
+        public DbSet<Bot> Bots { get; set; }
     }
 }

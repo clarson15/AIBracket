@@ -43,7 +43,8 @@ namespace AIBracket.Web.Migrations
                     AccessFailedCount = table.Column<int>(nullable: false),
                     Discriminator = table.Column<string>(nullable: false),
                     FirstName = table.Column<string>(nullable: true),
-                    LastName = table.Column<string>(nullable: true)
+                    LastName = table.Column<string>(nullable: true),
+                    CreatedAt = table.Column<DateTime>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -157,19 +158,21 @@ namespace AIBracket.Web.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "JobSeekers",
+                name: "Bots",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     IdentityId = table.Column<string>(nullable: true),
-                    Location = table.Column<string>(nullable: true)
+                    PrivateKey = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(nullable: true),
+                    Game = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_JobSeekers", x => x.Id);
+                    table.PrimaryKey("PK_Bots", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_JobSeekers_AspNetUsers_IdentityId",
+                        name: "FK_Bots_AspNetUsers_IdentityId",
                         column: x => x.IdentityId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -216,8 +219,8 @@ namespace AIBracket.Web.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_JobSeekers_IdentityId",
-                table: "JobSeekers",
+                name: "IX_Bots_IdentityId",
+                table: "Bots",
                 column: "IdentityId");
         }
 
@@ -239,7 +242,7 @@ namespace AIBracket.Web.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "JobSeekers");
+                name: "Bots");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

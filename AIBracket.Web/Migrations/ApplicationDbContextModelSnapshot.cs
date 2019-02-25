@@ -19,21 +19,25 @@ namespace AIBracket.Web.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("AIBracket.Web.Entities.JobSeeker", b =>
+            modelBuilder.Entity("AIBracket.Web.Entities.Bot", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("Game");
+
                     b.Property<string>("IdentityId");
 
-                    b.Property<string>("Location");
+                    b.Property<string>("Name");
+
+                    b.Property<string>("PrivateKey");
 
                     b.HasKey("Id");
 
                     b.HasIndex("IdentityId");
 
-                    b.ToTable("JobSeekers");
+                    b.ToTable("Bots");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -206,6 +210,8 @@ namespace AIBracket.Web.Migrations
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
+                    b.Property<DateTime>("CreatedAt");
+
                     b.Property<string>("FirstName");
 
                     b.Property<string>("LastName");
@@ -213,7 +219,7 @@ namespace AIBracket.Web.Migrations
                     b.HasDiscriminator().HasValue("AppUser");
                 });
 
-            modelBuilder.Entity("AIBracket.Web.Entities.JobSeeker", b =>
+            modelBuilder.Entity("AIBracket.Web.Entities.Bot", b =>
                 {
                     b.HasOne("AIBracket.Web.Entities.AppUser", "Identity")
                         .WithMany()
