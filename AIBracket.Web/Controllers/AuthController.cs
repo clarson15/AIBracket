@@ -63,7 +63,6 @@ namespace AIBracket.Web.Controllers
 
             if (!result.Succeeded) return new BadRequestObjectResult(Errors.AddErrorsToModelState(result, ModelState));
 
-            await _appDbContext.JobSeekers.AddAsync(new JobSeeker { IdentityId = userIdentity.Id, Location = model.Location });
             await _appDbContext.SaveChangesAsync();
 
             return new OkResult();
@@ -100,6 +99,10 @@ namespace AIBracket.Web.Controllers
         public async Task<IActionResult> GetProfileData()
         {
             var data = await _userManager.FindByIdAsync(User.Claims.First(x => x.Type == "id").Value);
+            if(data == null)
+            {
+                return Unauthorized();
+            }
             return Ok(new { data.UserName, data.FirstName, data.LastName, Location = "Test"});
         }
 

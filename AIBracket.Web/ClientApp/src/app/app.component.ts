@@ -21,9 +21,6 @@ export class AppComponent {
   }
 
   onActivate($event) {
-    console.log($event);
-    console.log(this.account);
-    console.log(localStorage.getItem('auth_token'));
     if (this.account == null && localStorage.getItem('auth_token') != null) {
       this.accountService.getProfile().subscribe(
         data => {
