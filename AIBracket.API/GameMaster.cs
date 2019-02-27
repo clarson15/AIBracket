@@ -23,13 +23,16 @@ namespace AIBracket.API
         public static void AddPlayer(Object player) {
             players.Add(player);
         }
+
         public static int GetPlayerCount() {
             return players.Count; // for creating a new game
         }
+
         public static void InputCommand(string command)
         {
              // this will parse commands
         }
+
         public static async void Run() {
             isRunning = true;
             while (isRunning) { 

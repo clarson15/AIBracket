@@ -4,6 +4,7 @@ using System.Text;
 using System.Net.Sockets;
 using System.Threading;
 using AIBracket.GameLogic;
+using System.Threading.Tasks;
 namespace AIBracket.API
 {
 
@@ -14,7 +15,7 @@ namespace AIBracket.API
         public static void StartServer(int port) {
             IPAddress address = IPAddress.Parse("127.0.0.1");
             GameMaster.Initialize(); // create game master
-            GameMaster.Run();
+            Task.Run(() => GameMaster.Run());
             /* 
             initialize game master: <- this will handle all of our games and solo queue
                 1.setup up the game types
