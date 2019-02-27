@@ -14,15 +14,15 @@
           <mat-error *ngIf="createForm.get('Password').hasError('required')">Password is required.</mat-error>
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="Password Confirmation" formControlName="Confirm" type="password" required />
+          <input matInput placeholder="Password Confirmation" formControlName="Confirm" type="password" (keydown.enter)="onSubmit()" required />
           <mat-error *ngIf="createForm.get('Confirm').hasError('password')">Passwords do not match.</mat-error>
           <mat-error *ngIf="createForm.get('Confirm').hasError('required')">Password confirmation is required.</mat-error>
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="First Name" formControlName="FirstName"/>
+          <input matInput placeholder="First Name" formControlName="FirstName" (keydown.enter)="onSubmit()" />
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="Last Name" formControlName="LastName" />
+          <input matInput placeholder="Last Name" formControlName="LastName" (keydown.enter)="onSubmit()" />
         </mat-form-field>
         <div class="submit-button">
           <button (click)="onSubmit()" type="button" mat-raised-button class="create-button">Create</button>
