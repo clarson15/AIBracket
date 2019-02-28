@@ -2,9 +2,12 @@
 using System.Net;
 using System.Text;
 using System.Net.Sockets;
-using System.Threading;
-using AIBracket.GameLogic;
+using System.Linq;
 using System.Threading.Tasks;
+using AIBracket.Data;
+using AIBracket.Data.Entities;
+using AIBracket.API.Entities;
+
 namespace AIBracket.API
 {
 
@@ -38,39 +41,59 @@ namespace AIBracket.API
             {
 
                 // Continue listening.  
-                while (true)
+                using (var context = new AIBracketContext())
                 {
-                    Console.WriteLine("Waiting for client...");
-                    var clientTask = listener.AcceptTcpClientAsync(); // Get the client  
-
-                    if (clientTask.Result != null)
+                    while (true)
                     {
-                        // create thread here
-                        Console.WriteLine("Client connected. Waiting for data.");
-                        var client = clientTask.Result;
-                        string message = "";
+                        Console.WriteLine("Waiting for client...");
+                        var clientTask = listener.AcceptTcpClientAsync(); // Get the client  
 
-                        while (message != null && !message.StartsWith("quit"))
+                        if (clientTask.Result != null)
                         {
-                            byte[] data = Encoding.ASCII.GetBytes("Send next data: [enter 'quit' to terminate] ");
-                            client.GetStream().Write(data, 0, data.Length);
-
+                            // create thread here
+                            Console.WriteLine("Client connected. Authenticating.");
+                            var client = clientTask.Result;
+                            string message = "";
+                            
                             byte[] buffer = new byte[1024];
                             client.GetStream().Read(buffer, 0, buffer.Length);
 
                             message = Encoding.ASCII.GetString(buffer);
-                            Console.WriteLine(message); 
+                            var bot = context.Bots.Where(x => x.PrivateKey == message).FirstOrDefault();
+                            if(bot != null)
+                            {
+                                var user = context.Users.Where(x => x.Id == bot.IdentityId).FirstOrDefault();
+                                if(user != null)
+                                {
+                                    Console.WriteLine("Success. Bot " + bot.Name + " connected from User " + user.UserName);
+                                    GameMaster.AddPlayer(new ConnectedClient
+                                    {
+                                        Socket = client,
+                                        User = user,
+                                        Bot = bot
+                                    });
+                                }
+                                else
+                                {
+                                    Console.WriteLine("User not found for bot. This should never happen.");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Bot not found with secret " + message);
+                                message = "Invalid secret";
+                                client.GetStream().Write(Encoding.ASCII.GetBytes(message));
+                                client.Close();
+                            }
                         }
-                        Console.WriteLine("Closing connection.");
-                        client.GetStream().Dispose();
                     }
                 }
             }
         }
+
         public static void Main(string[] args) {
             StartServer(8000);
-
-
+            Listen();
         }
     }
 }  

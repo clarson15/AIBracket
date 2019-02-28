@@ -1,5 +1,6 @@
+using AIBracket.Data;
 using AIBracket.Web.Auth;
-using AIBracket.Web.Entities;
+using AIBracket.Data.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -44,9 +45,7 @@ namespace AIBracket.Web
             services.TryAddTransient<IHttpContextAccessor, HttpContextAccessor>();
 
             // Add framework services.
-            services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
-            b => b.MigrationsAssembly("AIBracket.Web")));
+            services.AddDbContext<AIBracketContext>();
             services.AddSingleton<IJwtFactory, JwtFactory>();
 
             var jwtAppSettingOptions = Configuration.GetSection(nameof(JwtIssuerOptions));
@@ -92,7 +91,7 @@ namespace AIBracket.Web
                 options.AddPolicy("ApiUser", policy => policy.RequireClaim(Constants.Strings.JwtClaimIdentifiers.Rol, Constants.Strings.JwtClaims.ApiAccess));
             });
 
-            services.AddIdentity<AppUser, IdentityRole>
+            services.AddIdentity<AppUser, IdentityRole<Guid>>
                 (o =>
                 {
                     // configure identity options
@@ -102,7 +101,7 @@ namespace AIBracket.Web
                     o.Password.RequireNonAlphanumeric = false;
                     o.Password.RequiredLength = 6;
                 })
-                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddEntityFrameworkStores<AIBracketContext>()
                 .AddDefaultTokenProviders();
             services.AddAutoMapper();
             var config = new MapperConfiguration(mfg => mfg.CreateMap<AppUser, IdentityUser>());
