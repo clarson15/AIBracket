@@ -23,7 +23,7 @@ namespace AIBracket.GameLogic.Pacman.Game
 
         public PacmanGame()
         {
-            PacmanPacman.Lives = 3;
+            PacmanPacman.Lives = 40;
             board = new PacmanBoard();
             pacman = new PacmanPacman();
             ghosts = new PacmanGhost[4]
@@ -34,7 +34,7 @@ namespace AIBracket.GameLogic.Pacman.Game
                 new PacmanGhost()
             };
             score = 0;
-            SpawnGhostCounter = 3;
+            SpawnGhostCounter = 10;
             PoweredUpCounter = 0;
             TimeStarted = DateTime.Now;
             GameRunning = true;
@@ -85,6 +85,24 @@ namespace AIBracket.GameLogic.Pacman.Game
             return false;
         }
 
+        public bool ValidGhostMove(PacmanPacman.Direction d, PacmanCoordinate pos)
+        {
+            switch (d)
+            {
+                case PacmanPacman.Direction.start:
+                    return true;
+                case PacmanPacman.Direction.up:
+                    return board.GetTile(pos.Xpos, pos.Ypos - 1) != PacmanBoard.Tile.wall && board.GetTile(pos.Xpos, pos.Ypos - 1) != PacmanBoard.Tile.portal;
+                case PacmanPacman.Direction.down:
+                    return board.GetTile(pos.Xpos, pos.Ypos + 1) != PacmanBoard.Tile.wall && board.GetTile(pos.Xpos, pos.Ypos + 1) != PacmanBoard.Tile.portal;
+                case PacmanPacman.Direction.left:
+                    return board.GetTile(pos.Xpos - 1, pos.Ypos) != PacmanBoard.Tile.wall && board.GetTile(pos.Xpos - 1, pos.Ypos) != PacmanBoard.Tile.portal;
+                case PacmanPacman.Direction.right:
+                    return board.GetTile(pos.Xpos + 1, pos.Ypos) != PacmanBoard.Tile.wall && board.GetTile(pos.Xpos + 1, pos.Ypos) != PacmanBoard.Tile.portal;
+            }
+            return false;
+        }
+
         /// <summary> This method is called after a move is made by pacman to determine whether or not to update the board.
         /// It also calls update score if a fruit or dot was consumed </summary>
         public void CheckTile(PacmanCoordinate pos) 
@@ -93,13 +111,16 @@ namespace AIBracket.GameLogic.Pacman.Game
             {
                 case PacmanBoard.Tile.portal:
                     pacman.Location = board.GetCorrespondingPortal(pos);
+                     // This counteracts move function
                     if(pacman.Facing == PacmanPacman.Direction.left)
                     {
                         pacman.Facing = PacmanPacman.Direction.right;
+                        pacman.Location.Xpos++;
                     }
                     else
                     {
                         pacman.Facing = PacmanPacman.Direction.left;
+                        pacman.Location.Xpos--;
                     }
                     break;
                 case PacmanBoard.Tile.powerUp:
@@ -108,15 +129,15 @@ namespace AIBracket.GameLogic.Pacman.Game
                         if(!g.IsVulnerable && !g.IsDead)
                         {
                             g.IsVulnerable = true;
-                            PoweredUpCounter = 20;
+                            PoweredUpCounter = 60;
                         }
                     }
                     UpdateScore(board.GetTile(pos));
                     break;
                 case PacmanBoard.Tile.dot:
                 case PacmanBoard.Tile.fruit:
-                    board.UpdateTile(pos);
                     UpdateScore(board.GetTile(pos));
+                    board.UpdateTile(pos);
                     break;
                 default:
                     break;
@@ -126,7 +147,7 @@ namespace AIBracket.GameLogic.Pacman.Game
 
         public void SpawnGhost()
         {
-            if(SpawnGhostCounter == 0)
+            if(SpawnGhostCounter <= 0)
             {
                 foreach (var g in ghosts)
                 {
@@ -156,7 +177,7 @@ namespace AIBracket.GameLogic.Pacman.Game
                         ghosts[i].IsVulnerable = false;
                         ghosts[i].Location.Xpos = 13;
                         ghosts[i].Location.Ypos = 11;
-                        score += 5;
+                        score += 10;
                     }
                     else
                     {
@@ -168,6 +189,7 @@ namespace AIBracket.GameLogic.Pacman.Game
                         {
                             pacman.Location.Xpos = 13;
                             pacman.Location.Ypos = 17;
+                            pacman.Facing = PacmanPacman.Direction.start;
                             PacmanPacman.Lives--;
                         }
                     }
@@ -190,8 +212,26 @@ namespace AIBracket.GameLogic.Pacman.Game
 
             SpawnGhost();
 
+            // Move ghosts
+            for (int i = 0; i < ghosts.Length; i++)
+            {
+                if (!ghosts[i].IsDead)
+                {
+                    if (ValidGhostMove(p[i + 1], ghosts[i].GetPosition()))
+                    {
+                        ghosts[i].Facing = p[i + 1];
+                    }
+                    if (ValidGhostMove(ghosts[i].Facing, ghosts[i].GetPosition()))
+                    {
+                        ghosts[i].Move();
+                    }
+                }
+            }
+
+            PacmanGhostCollide();
+
             // Move Pacman
-            if(ValidMove(p[0], pacman.GetPosition()))
+            if (ValidMove(p[0], pacman.GetPosition()))
             {
                 pacman.Facing = p[0];
             }
@@ -201,20 +241,9 @@ namespace AIBracket.GameLogic.Pacman.Game
                 CheckTile(pacman.GetPosition());
             }            
 
-            // Move ghosts
-            for(int i = 0; i < ghosts.Length; i++)
-            {
-                if(ValidMove(p[i + 1], ghosts[i].GetPosition()))
-                {
-                    ghosts[i].Facing = p[i + 1];
-                }
-                if(ValidMove(ghosts[i].Facing, ghosts[i].GetPosition()))
-                {
-                    ghosts[i].Move();
-                }
-            }
+            
 
-            PacmanGhostCollide();
+            
 
             if (PoweredUpCounter == 0)
             {
@@ -228,51 +257,57 @@ namespace AIBracket.GameLogic.Pacman.Game
 
         public void PrintBoard()
         {
-            char tile;
+            Console.WriteLine("Score: {0} Lives: {1}", score, PacmanPacman.Lives);
+            bool foundGhost;
+            char tile = 'e';
             for (int i = 0; i < 31; i++)
             {
                 for (int j = 0; j < 28; j++)
                 {
+                    foundGhost = false;
                     if (pacman.Location.Xpos == j && pacman.Location.Ypos == i)
                     {
                         tile = '<';
                         Console.Write("{0} ", tile);
                         continue;
-                    }/*
+                    }
                     else
                     {
                         for (int k = 0; k < 4; k++)
                         {
                             if (ghosts[k].Location.Xpos == j && ghosts[k].Location.Ypos == i)
                             {
-                                tile = '~';
-                                Console.Write("{0} ", tile);
-                                continue;
+                                tile = ghosts[k].IsVulnerable ? '~' : '#';
+                                foundGhost = true;
                             }
                         }
-                    }*/
-                    switch (board.GetTile(j, i))
-                    {
-                        case PacmanBoard.Tile.blank:
-                            tile = ' ';
-                            break;
-                        case PacmanBoard.Tile.dot:
-                            tile = '.';
-                            break;
-                        case PacmanBoard.Tile.fruit:
-                            tile = 'F';
-                            break;
-                        case PacmanBoard.Tile.powerUp:
-                            tile = '!';
-                            break;
-                        case PacmanBoard.Tile.wall:
-                            tile = 'X';
-                            break;
-                        default:
-                            tile = 'F';
-                            break;
+
+                        if (!foundGhost)
+                        {
+                            switch (board.GetTile(j, i))
+                            {
+                                case PacmanBoard.Tile.blank:
+                                    tile = ' ';
+                                    break;
+                                case PacmanBoard.Tile.dot:
+                                    tile = '.';
+                                    break;
+                                case PacmanBoard.Tile.fruit:
+                                    tile = 'F';
+                                    break;
+                                case PacmanBoard.Tile.powerUp:
+                                    tile = '!';
+                                    break;
+                                case PacmanBoard.Tile.wall:
+                                    tile = 'X';
+                                    break;
+                                default:
+                                    tile = 'F';
+                                    break;
+                            }
+                        }
+                        Console.Write("{0} ", tile);
                     }
-                    Console.Write("{0} ", tile);
                 }
                 Console.Write("\n");
             }

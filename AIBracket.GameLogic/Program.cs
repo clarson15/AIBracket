@@ -21,16 +21,24 @@ namespace AIBracket.GameLogic
             var game = new PacmanGame();
             var random = new Random();
             var randoms = new PacmanPacman.Direction[5];
-          
-            for(int i = 0; i < 5; i++)
+            var resetDirectionsCounter = 0;
+            for (int i = 0; i < 5; i++)
             {
-                randoms[i] = PacmanPacman.Direction.left;
-                
+                randoms[i] = (PacmanPacman.Direction)random.Next(1, 5);
             }
             while (true)
             {
+                if (resetDirectionsCounter > 3)
+                {
+                    for (int i = 0; i < 5; i++)
+                    {
+                        randoms[i] = (PacmanPacman.Direction)random.Next(1, 5);
+                    }
+                    resetDirectionsCounter = 0;
+                }
                 game.UpdateGame(randoms);
                 game.PrintBoard();
+                resetDirectionsCounter++;
             }
         }
     }
