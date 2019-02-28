@@ -50,6 +50,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AIBracket.Data\AIBracket.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <TypeScriptCompile Include="ClientApp\src\app\models\CreateAccountResponseModel.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\models\BotsResponseModel.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\models\LoginResponseModel.ts" />

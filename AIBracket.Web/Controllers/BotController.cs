@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using AIBracket.Data;
 using AIBracket.Web.Auth;
-using AIBracket.Web.Entities;
+using AIBracket.Data.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -22,13 +23,13 @@ namespace AIBracket.Web.Controllers
     public class BotController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly ApplicationDbContext _appDbContext;
+        private readonly AIBracketContext _appDbContext;
         private readonly UserManager<AppUser> _userManager;
         private readonly IJwtFactory _jwtFactory;
         private readonly JsonSerializerSettings _serializerSettings;
         private readonly JwtIssuerOptions _jwtOptions;
 
-        public BotController(IMapper mapper, ApplicationDbContext appDbContext, UserManager<AppUser> userManager, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions)
+        public BotController(IMapper mapper, AIBracketContext appDbContext, UserManager<AppUser> userManager, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions)
         {
             _mapper = mapper;
             _appDbContext = appDbContext;
