@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AIBracket.GameLogic.Pacman.Coordinate;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,33 +9,121 @@ namespace AIBracket.GameLogic.Pacman.Board
 {
     public class PacmanBoard
     {
-        public enum Tile { wall, blank, dot, fruit, powerUp };
-        private Tile[,] board;
+        public enum Tile { wall, blank, dot, fruit, powerUp, portal };
+        private Tile[,] Board;
+        private readonly int Width, Height;
+        // Portals holds coordinates of corresponding portal on the map
+        private readonly PacmanCoordinate[] Portals;
 
-        //*** New to initialize values to what they are supposed to be depending on the board
-        public PacmanBoard() => board = new Tile[26, 26];
-
-        public Tile getTile(int x, int y)
+        public PacmanBoard(int width = 28, int height = 31)
         {
-            return board[x, y];          
-        }
-
-        // Called after pacman enters a consumable (fruit or dot) tile
-        public void updateTile(int x, int y, Tile t)
-        {
-            if(board[x, y] == Tile.dot || board[x, y] == Tile.fruit)
+            Width = width;
+            Height = height;
+            if (Width == 28 && Height == 31)
             {
-                board[x, y] = Tile.blank;
+                Board = new Tile[,]
+                {
+                    { Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.portal, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.dot, Tile.powerUp, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.blank, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.dot, Tile.powerUp, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.blank, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.blank, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.blank, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.blank, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.blank, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.blank, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.blank, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.blank, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.blank, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.blank, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.dot, Tile.dot, Tile.powerUp, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.blank, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.dot, Tile.dot, Tile.powerUp, Tile.dot, Tile.wall, Tile.wall, Tile.dot, Tile.dot, Tile.dot, Tile.dot, Tile.wall},
+                    { Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.portal, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall, Tile.wall}
+                };
             }
             else
             {
-                Console.Error.WriteLine("Error: PacmanBoard.updateTile tried to update a non consumable tile");
+                Console.Error.WriteLine("Functionality not added for different dimensions");
+            }
+
+            // This finds the portals in the map and initializes the portals array based on the values it found
+            Portals = new PacmanCoordinate[2]
+            {
+                new PacmanCoordinate(),
+                new PacmanCoordinate()
+            };
+
+            int sizeOfPortal = 0;
+            for (int i = 0; i < this.Board.GetLength(1); i++)
+            {
+                for (int j = 0; j < this.Board.GetLength(0); j++)
+                {
+                    if (Board[j, i] == Tile.portal)
+                    {
+                        Portals[sizeOfPortal].Xpos = j;
+                        Portals[sizeOfPortal].Ypos = i;
+                        sizeOfPortal++;
+                        if (sizeOfPortal == 2)
+                        {
+                            return;
+                        }
+                    }
+                }
             }
         }
 
-        public void openSpawn()
+        public Tile GetTile(int x, int y)
         {
-            //*** Change the two tiles that are the spawn doors to blank
+            return Board[x, y];          
         }
+
+        public Tile GetTile(PacmanCoordinate p)
+        {
+            return Board[p.Xpos, p.Ypos];
+        }
+
+        // Called after pacman enters a consumable (fruit or dot) tile
+        public void UpdateTile(PacmanCoordinate pos)
+        {
+            if (Board[pos.Xpos, pos.Ypos] == Tile.dot || Board[pos.Xpos, pos.Ypos] == Tile.fruit)
+            {
+                Board[pos.Xpos, pos.Ypos] = Tile.blank;
+            }
+            else
+            {
+                Console.Error.WriteLine("Error: PacmanBoard.UpdateTile tried to update a non consumable tile");
+            }
+        }
+
+        public PacmanCoordinate GetCorrespondingPortal(PacmanCoordinate p)
+        {
+            if(p == Portals[0])
+            {
+                return Portals[1];
+            }
+            else if(p == Portals[1])
+            {
+                return Portals[0];
+            }
+            else
+            {
+                Console.Error.WriteLine("Error: Coordinate {0}, {1} is not a designated portal");
+                return p;
+            }
+        }
+
+        
     }
 }

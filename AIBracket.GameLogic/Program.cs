@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using AIBracket.GameLogic.Pacman.Game;
+using AIBracket.GameLogic.Pacman.Pacman;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -14,11 +17,21 @@ namespace AIBracket.GameLogic
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            //CreateWebHostBuilder(args).Build().Run();
+            var game = new PacmanGame();
+            var random = new Random();
+            var randoms = new PacmanPacman.Direction[5];
+          
+            for(int i = 0; i < 5; i++)
+            {
+                randoms[i] = PacmanPacman.Direction.left;
+                
+            }
+            while (true)
+            {
+                game.UpdateGame(randoms);
+                game.PrintBoard();
+            }
         }
-
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
     }
 }
