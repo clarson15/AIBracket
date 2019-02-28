@@ -21,7 +21,7 @@ export class LoginComponent implements OnInit {
   profileForm = new FormGroup({
     UserName: new FormControl(''),
     Password: new FormControl(''),
-  })
+  });
 
   onSubmit() {
     this.loginService.login(this.profileForm).subscribe(
