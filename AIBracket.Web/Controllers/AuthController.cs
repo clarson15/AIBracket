@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using AIBracket.Data;
 using AIBracket.Web.Auth;
-using AIBracket.Web.Entities;
+using AIBracket.Data.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -23,13 +24,13 @@ namespace AIBracket.Web.Controllers
     {
 
         private readonly IMapper _mapper;
-        private readonly ApplicationDbContext _appDbContext;
+        private readonly AIBracketContext _appDbContext;
         private readonly UserManager<AppUser> _userManager;
         private readonly IJwtFactory _jwtFactory;
         private readonly JsonSerializerSettings _serializerSettings;
         private readonly JwtIssuerOptions _jwtOptions;
 
-        public AuthController(IMapper mapper, ApplicationDbContext appDbContext, UserManager<AppUser> userManager, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions)
+        public AuthController(IMapper mapper, AIBracketContext appDbContext, UserManager<AppUser> userManager, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions)
         {
             _mapper = mapper;
             _appDbContext = appDbContext;
@@ -63,7 +64,6 @@ namespace AIBracket.Web.Controllers
 
             if (!result.Succeeded) return new BadRequestObjectResult(Errors.AddErrorsToModelState(result, ModelState));
 
-            await _appDbContext.JobSeekers.AddAsync(new JobSeeker { IdentityId = userIdentity.Id, Location = model.Location });
             await _appDbContext.SaveChangesAsync();
 
             return new OkResult();
@@ -100,6 +100,10 @@ namespace AIBracket.Web.Controllers
         public async Task<IActionResult> GetProfileData()
         {
             var data = await _userManager.FindByIdAsync(User.Claims.First(x => x.Type == "id").Value);
+            if(data == null)
+            {
+                return Unauthorized();
+            }
             return Ok(new { data.UserName, data.FirstName, data.LastName, Location = "Test"});
         }
 
@@ -115,7 +119,7 @@ namespace AIBracket.Web.Controllers
                     // check the credentials  
                     if (await _userManager.CheckPasswordAsync(userToVerify, password))
                     {
-                        return await Task.FromResult(_jwtFactory.GenerateClaimsIdentity(userName, userToVerify.Id));
+                        return await Task.FromResult(_jwtFactory.GenerateClaimsIdentity(userName, userToVerify.Id.ToString()));
                     }
                 }
             }

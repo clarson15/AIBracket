@@ -1,0 +1,54 @@
+<mat-card class="profile-card">
+  <div class="section">
+    <h2>Bots</h2>
+    <mat-accordion class="bot-expander">
+      <mat-expansion-panel [expanded]="CreationExpanded === true" (opened)="CreationExpanded = true">
+        <mat-expansion-panel-header style="padding-left: 10px; background-color: #A9F5A9">
+          <mat-panel-title>
+            <div class="add-bot-title">
+              <mat-icon>add</mat-icon><p>New Bot</p>
+            </div>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <form [formGroup]="newBotForm">
+          <mat-form-field style="width:100%;">
+            <input matInput placeholder="Name" formControlName="Name" required />
+          </mat-form-field>
+          <br />
+          <mat-form-field style="width:100%;">
+            <mat-select placeholder="Game" formControlName="Game" required>
+              <mat-option value="1">Pacman</mat-option>
+              <mat-option value="2">Tanks</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <br />
+          <button mat-raised-button (click)="createBot()" type="button" class="create-bot-button">Create</button>
+        </form>
+      </mat-expansion-panel>
+      <mat-expansion-panel *ngFor="let bot of bots">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <p>{{bot.name}}</p>
+          </mat-panel-title>
+          <mat-panel-description>
+            <p>{{mapGameName(bot.game)}}</p>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <p>Private Key: {{bot.privateKey}}</p>
+        <p>
+          <a [routerLink]="['/bot-stats']">View Statistics</a>
+          <button mat-button color="warn" style="float: right;" (click)="deleteBot(bot.id)">Delete</button>
+        </p>
+      </mat-expansion-panel>
+    </mat-accordion>
+    <p></p>
+    <mat-divider></mat-divider>
+  </div>
+  <div class="section">
+    <h2>Groups</h2>
+    <mat-divider></mat-divider>
+  </div>
+  <div class="section">
+    <h2>Account Settings</h2>
+  </div>
+</mat-card>

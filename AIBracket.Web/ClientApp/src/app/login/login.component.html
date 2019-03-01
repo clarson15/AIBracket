@@ -9,7 +9,7 @@
           <mat-error *ngIf="profileForm.get('UserName').hasError('required')">Username is required.</mat-error>
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="Password" formControlName="Password" type="password" required />
+          <input matInput placeholder="Password" formControlName="Password" type="password" (keydown.enter)="onSubmit()" required />
           <mat-error *ngIf="profileForm.get('Password').hasError('password')">Incorrect username and/or password.</mat-error>
           <mat-error *ngIf="profileForm.get('Password').hasError('required')">Password is required.</mat-error>
         </mat-form-field>

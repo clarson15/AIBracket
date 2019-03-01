@@ -1,4 +1,4 @@
-﻿using AIBracket.Web.Entities;
+﻿using AIBracket.Data.Entities;
 
 namespace AIBracket.Web.Controllers
 {
