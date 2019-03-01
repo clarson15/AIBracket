@@ -97,7 +97,7 @@ namespace AIBracket.GameLogic.Pacman.Board
         // Called after pacman enters a consumable (fruit or dot) tile
         public void UpdateTile(PacmanCoordinate pos)
         {
-            if (Board[pos.Xpos, pos.Ypos] == Tile.dot || Board[pos.Xpos, pos.Ypos] == Tile.fruit)
+            if (Board[pos.Xpos, pos.Ypos] == Tile.dot || Board[pos.Xpos, pos.Ypos] == Tile.fruit || Board[pos.Xpos, pos.Ypos] == Tile.powerUp)
             {
                 Board[pos.Xpos, pos.Ypos] = Tile.blank;
             }
