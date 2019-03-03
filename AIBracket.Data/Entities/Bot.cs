@@ -12,6 +12,5 @@ namespace AIBracket.Data.Entities
         public string PrivateKey { get; set; }
         public string Name { get; set; }
         public int Game { get; set; }
-
     }
 }

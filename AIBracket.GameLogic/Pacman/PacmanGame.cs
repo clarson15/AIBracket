@@ -12,12 +12,12 @@ namespace AIBracket.GameLogic.Pacman.Game
    
     public class PacmanGame
     {
-        private PacmanBoard board;
-        private PacmanPacman pacman;
-        private PacmanGhost[] ghosts;
+        public PacmanBoard board { get; private set; }
+        public PacmanPacman pacman { get; private set; }
+        public PacmanGhost[] ghosts { get; private set; }
         public  DateTime TimeStarted { get; private set; }
         public DateTime TimeEnded { get; private set; }
-        private int score;
+        public int score { get; private set; }
         private int SpawnGhostCounter, PoweredUpCounter;
         public bool GameRunning { get; private set; }
 
@@ -67,7 +67,7 @@ namespace AIBracket.GameLogic.Pacman.Game
         /// <param name="d">Direction entity is trying to move towards</param>
         /// <param name="pos">Position of entity currently</param>
         /// <returns>Whether a move is valid</returns>
-        public bool ValidMove(PacmanPacman.Direction d, PacmanCoordinate pos)
+        private bool ValidMove(PacmanPacman.Direction d, PacmanCoordinate pos)
         {
             switch(d)
             {
@@ -87,7 +87,7 @@ namespace AIBracket.GameLogic.Pacman.Game
 
         /// <summary> This method is called after a move is made by pacman to determine whether or not to update the board.
         /// It also calls update score if a fruit or dot was consumed </summary>
-        public void CheckTile(PacmanCoordinate pos) 
+        private void CheckTile(PacmanCoordinate pos) 
         {
             switch (board.GetTile(pos))
             {
@@ -116,7 +116,7 @@ namespace AIBracket.GameLogic.Pacman.Game
             return;
         }
 
-        public void PortalGhost(PacmanCoordinate pos, int i)
+        private void PortalGhost(PacmanCoordinate pos, int i)
         {
             if(board.GetTile(pos) == PacmanBoard.Tile.portal)
             {
@@ -124,7 +124,7 @@ namespace AIBracket.GameLogic.Pacman.Game
             }
         }
 
-        public void SpawnGhost()
+        private void SpawnGhost()
         {
             if(SpawnGhostCounter <= 0)
             {
@@ -144,7 +144,7 @@ namespace AIBracket.GameLogic.Pacman.Game
         /// <summary>
         /// Checks whether a ghost has collided with pacman and handles resetting positions after death
         /// </summary>
-        public void PacmanGhostCollide()
+        private void PacmanGhostCollide()
         {
             for (int i = 0; i < ghosts.Length; i++)
             {
@@ -181,24 +181,20 @@ namespace AIBracket.GameLogic.Pacman.Game
         /// p[0] represents Pacman
         /// p[1] through p[4] represent ghosts in order passed </summary>
         
-        public void UpdateGame(PacmanPacman.Direction[] p)
+        public void UpdateGame(PacmanPacman.Direction p)
         {
-            if (p.Count() != 5)
-            {
-                Console.Error.WriteLine("Error: UpdateGame passed array of {0} length", p.Count());
-                return;
-            }
-
             SpawnGhost();
 
+
+            /*
             // Move ghosts
             for (int i = 0; i < ghosts.Length; i++)
             {
                 if (!ghosts[i].IsDead)
                 {
-                    if (ValidMove(p[i + 1], ghosts[i].GetPosition()))
+                    if (ValidMove(p, ghosts[i].GetPosition()))
                     {
-                        ghosts[i].Facing = p[i + 1];
+                        ghosts[i].Facing = p;
                     }
                     if (ValidMove(ghosts[i].Facing, ghosts[i].GetPosition()))
                     {
@@ -206,14 +202,14 @@ namespace AIBracket.GameLogic.Pacman.Game
                         PortalGhost(ghosts[i].Location, i);
                     }
                 }
-            }
+            }*/
 
             PacmanGhostCollide();
 
             // Move Pacman
-            if (ValidMove(p[0], pacman.GetPosition()))
+            if (ValidMove(p, pacman.GetPosition()))
             {
-                pacman.Facing = p[0];
+                pacman.Facing = p;
             }
             if(ValidMove(pacman.Facing, pacman.GetPosition()))
             {
@@ -230,7 +226,10 @@ namespace AIBracket.GameLogic.Pacman.Game
                     g.IsVulnerable = false;
                 }
             }
-            PoweredUpCounter--;
+            if (PoweredUpCounter > -1)
+            {
+                PoweredUpCounter--;
+            }
         }
 
         public void PrintBoard()
