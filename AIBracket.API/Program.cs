@@ -98,6 +98,7 @@ namespace AIBracket.API
                                 Bot = new Bot(),
                                 IsWebSocket = true
                             });
+                            clientsToRemove.Add(client);
                         }
                         else
                         {
@@ -115,6 +116,7 @@ namespace AIBracket.API
                                         Bot = bot,
                                         IsWebSocket = false
                                     });
+                                    clientsToRemove.Add(client);
                                 }
                                 else
                                 {
