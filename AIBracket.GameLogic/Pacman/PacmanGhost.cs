@@ -16,9 +16,9 @@ namespace AIBracket.GameLogic.Pacman.Ghost
 
         public PacmanGhost()
         {
-            this.Facing = PacmanPacman.Direction.start;
-            this.IsDead = true;
-            this.IsVulnerable = false;
+            Facing = PacmanPacman.Direction.start;
+            IsDead = true;
+            IsVulnerable = false;
             Location = new PacmanCoordinate(13, 11);
         }
 
@@ -30,7 +30,7 @@ namespace AIBracket.GameLogic.Pacman.Ghost
         
         public void Move()
         {
-            switch (this.Facing)
+            switch (Facing)
             {
                 case PacmanPacman.Direction.start:
                     break;

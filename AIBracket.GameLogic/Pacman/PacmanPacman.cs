@@ -67,7 +67,6 @@ namespace AIBracket.GameLogic.Pacman.Pacman
                 default:
                     return Direction.start;
             }
-            return d;
         }
     }
 }
