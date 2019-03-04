@@ -107,6 +107,23 @@ namespace AIBracket.GameLogic.Pacman.Board
             }
         }
 
+        public void SpawnFruit()
+        {
+            var random = new Random();
+            int x, y;
+            while(true)
+            {
+                x = random.Next(1, 27);
+                y = random.Next(1, 27);
+                if (Board[x, y] == Tile.blank)
+                {
+                    Board[x, y] = Tile.fruit;
+                    return;
+                }
+            }
+        }
+
+        /// <returns>Coordinates to the other portal on the map</returns>
         public PacmanCoordinate GetCorrespondingPortal(PacmanCoordinate p)
         {
             if(p == Portals[0])
