@@ -23,7 +23,6 @@ namespace AIBracket.GameLogic.Pacman.Game
 
         public PacmanGame()
         {
-            PacmanPacman.Lives = 5;
             board = new PacmanBoard();
             pacman = new PacmanPacman();
             ghosts = new PacmanGhost[4]
@@ -33,6 +32,11 @@ namespace AIBracket.GameLogic.Pacman.Game
                 new PacmanGhost(),
                 new PacmanGhost()
             };
+            Random random = new Random();
+            foreach (var g in ghosts)
+            {
+                g.Facing = (PacmanPacman.Direction)random.Next(1, 5);
+            }
             score = 0;
             SpawnGhostCounter = 10;
             PoweredUpCounter = 0;
@@ -175,6 +179,37 @@ namespace AIBracket.GameLogic.Pacman.Game
                 }
             }
         }
+
+        /// <summary>
+        /// Finds a random direction for the ghost prioritizing not going backwards
+        /// </summary>
+        /// <param name="d">Direction or Facing</param>
+        /// <param name="pos">Location</param>
+        /// <returns>New Direction</returns>
+        private PacmanPacman.Direction DetermineGhostMove(PacmanPacman.Direction d, PacmanCoordinate pos)
+        {
+            var random = new Random();
+            List<PacmanPacman.Direction> directions = new List<PacmanPacman.Direction>(); 
+            for (int i = 1; i < 5; i++)
+            {
+                if (ValidMove((PacmanPacman.Direction)i, pos))
+                {
+                    directions.Add((PacmanPacman.Direction)i);
+                }
+            }
+            if(directions.Count > 1)
+            {
+                for (int i = 0; i < directions.Count; i++)
+                {
+                    if(directions[i] == PacmanPacman.InverseDirection(d))
+                    {
+                        directions.RemoveAt(i);
+                        break;
+                    }
+                }
+            }
+            return directions[random.Next(0, directions.Count)];
+        }
         
         /// <summary>Processes every tick of the game base on directions of each entity passed in the array
         /// p should be passed 5 directions
@@ -186,23 +221,14 @@ namespace AIBracket.GameLogic.Pacman.Game
             SpawnGhost();
 
 
-            /*
+            
             // Move ghosts
             for (int i = 0; i < ghosts.Length; i++)
             {
-                if (!ghosts[i].IsDead)
-                {
-                    if (ValidMove(p, ghosts[i].GetPosition()))
-                    {
-                        ghosts[i].Facing = p;
-                    }
-                    if (ValidMove(ghosts[i].Facing, ghosts[i].GetPosition()))
-                    {
-                        ghosts[i].Move();
-                        PortalGhost(ghosts[i].Location, i);
-                    }
-                }
-            }*/
+                ghosts[i].Facing = DetermineGhostMove(ghosts[i].Facing, ghosts[i].Location);
+                ghosts[i].Move();
+                PortalGhost(ghosts[i].Location, i);
+            }
 
             PacmanGhostCollide();
 

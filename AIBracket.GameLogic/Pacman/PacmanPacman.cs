@@ -49,5 +49,25 @@ namespace AIBracket.GameLogic.Pacman.Pacman
                     break;
             }
         } 
+        /// <summary>
+        /// Returns the opposite direction
+        /// </summary>
+        public static Direction InverseDirection(Direction d)
+        {
+            switch(d)
+            {
+                case Direction.down:
+                    return Direction.up;
+                case Direction.up:
+                    return Direction.down;
+                case Direction.left:
+                    return Direction.right;
+                case Direction.right:
+                    return Direction.left;
+                default:
+                    return Direction.start;
+            }
+            return d;
+        }
     }
 }
