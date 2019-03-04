@@ -49,11 +49,16 @@ namespace AIBracket.API.Entities
         {
             Game.UpdateGame(User.Direction);
             UpdateUsers(); // Change this when tickrate changes
+            if(Game.pacman.Lives == 0)
+            {
+                IsRunning = false;
+                User.Socket.Close();
+            }
         }
 
         private void UpdateUsers()
         {
-            var update = "update";
+            var update = Game.pacman.Location.Xpos + ", " + Game.pacman.Location.Ypos + "\r\n";
             if (!User.SendData(update))
             {
                 IsRunning = false;

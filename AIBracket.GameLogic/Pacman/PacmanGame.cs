@@ -23,7 +23,6 @@ namespace AIBracket.GameLogic.Pacman.Game
 
         public PacmanGame()
         {
-            PacmanPacman.Lives = 5;
             board = new PacmanBoard();
             pacman = new PacmanPacman();
             ghosts = new PacmanGhost[4]
@@ -160,7 +159,7 @@ namespace AIBracket.GameLogic.Pacman.Game
                     }
                     else
                     {
-                        if(PacmanPacman.Lives == 0)
+                        if(pacman.Lives == 0)
                         {
                             GameRunning = false;
                         }
@@ -169,7 +168,7 @@ namespace AIBracket.GameLogic.Pacman.Game
                             pacman.Location.Xpos = 13;
                             pacman.Location.Ypos = 17;
                             pacman.Facing = PacmanPacman.Direction.start;
-                            PacmanPacman.Lives--;
+                            pacman.Lives--;
                         }
                     }
                 }
@@ -234,7 +233,7 @@ namespace AIBracket.GameLogic.Pacman.Game
 
         public void PrintBoard()
         {
-            Console.WriteLine("Score: {0} Lives: {1}", score, PacmanPacman.Lives);
+            Console.WriteLine("Score: {0} Lives: {1}", score, pacman.Lives);
             bool foundGhost;
             char tile = 'e';
             for (int i = 0; i < 31; i++)

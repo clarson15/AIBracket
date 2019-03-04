@@ -10,7 +10,7 @@ namespace AIBracket.GameLogic.Pacman.Pacman
     public class PacmanPacman
     {
         public enum Direction { start, up, down, left, right };
-        public static int Lives;
+        public int Lives;
         public PacmanCoordinate Location;
         public Direction Facing { get; set; }
         
@@ -18,7 +18,7 @@ namespace AIBracket.GameLogic.Pacman.Pacman
         {
             Location = new PacmanCoordinate(13, 17);
             Facing = Direction.start;
-            Lives--;
+            Lives = 3;
         }
 
         public PacmanCoordinate GetPosition()
@@ -28,7 +28,7 @@ namespace AIBracket.GameLogic.Pacman.Pacman
         
         public void Move()
         {
-            switch (this.Facing)
+            switch (Facing)
             {
                 case Direction.start:
                     break;

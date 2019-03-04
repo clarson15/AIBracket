@@ -63,7 +63,7 @@ namespace AIBracket.API
 
                 for(var i = 0; i < games.Count; i++)
                 {
-                    if (games[i].IsRunning)
+                    if (!games[i].IsRunning)
                     {
                         games[i].Game.PrintBoard();
                         games.RemoveAt(i);
