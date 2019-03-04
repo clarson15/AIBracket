@@ -18,7 +18,10 @@ namespace AIBracket.GameLogic.Pacman.Game
         public  DateTime TimeStarted { get; private set; }
         public DateTime TimeEnded { get; private set; }
         public int score { get; private set; }
-        private int SpawnGhostCounter, PoweredUpCounter;
+        private int GhostScoreMultiplier { get; set; }
+        private int SpawnGhostCounter { get; set; }
+        private int PoweredUpCounter { get; set; }
+        private int FruitSpawnCounter { get; set; }
         public bool GameRunning { get; private set; }
 
         public PacmanGame()
@@ -38,8 +41,10 @@ namespace AIBracket.GameLogic.Pacman.Game
                 g.Facing = (PacmanPacman.Direction)random.Next(1, 5);
             }
             score = 0;
+            GhostScoreMultiplier = 1;
             SpawnGhostCounter = 10;
             PoweredUpCounter = 0;
+            FruitSpawnCounter = 0;
             TimeStarted = DateTime.Now;
             GameRunning = true;
         }
@@ -52,15 +57,15 @@ namespace AIBracket.GameLogic.Pacman.Game
         {
             if(t == PacmanBoard.Tile.dot)
             {
-                score += 1;
+                score += 10;
             }
             else if(t == PacmanBoard.Tile.fruit)
             {
-                score += 2;
+                score += 100;
             }
             else if(t == PacmanBoard.Tile.powerUp)
             {
-                score += 3;
+                score += 50;
             }
             return;
         }
@@ -108,6 +113,7 @@ namespace AIBracket.GameLogic.Pacman.Game
                         }
                     }
                     UpdateScore(board.GetTile(pos));
+                    GhostScoreMultiplier = 1;
                     break;
                 case PacmanBoard.Tile.dot:
                 case PacmanBoard.Tile.fruit:
@@ -160,7 +166,8 @@ namespace AIBracket.GameLogic.Pacman.Game
                         ghosts[i].IsVulnerable = false;
                         ghosts[i].Location.Xpos = 13;
                         ghosts[i].Location.Ypos = 11;
-                        score += 10;
+                        score += 200 * GhostScoreMultiplier;
+
                     }
                     else
                     {
@@ -219,7 +226,12 @@ namespace AIBracket.GameLogic.Pacman.Game
         public void UpdateGame(PacmanPacman.Direction p)
         {
             SpawnGhost();
-
+            if(FruitSpawnCounter == 60)
+            {
+                board.SpawnFruit();
+                FruitSpawnCounter = -1;
+            }
+            FruitSpawnCounter++;
 
             
             // Move ghosts
@@ -251,6 +263,7 @@ namespace AIBracket.GameLogic.Pacman.Game
                 {
                     g.IsVulnerable = false;
                 }
+                GhostScoreMultiplier = 1;
             }
             if (PoweredUpCounter > -1)
             {
