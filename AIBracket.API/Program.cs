@@ -9,15 +9,18 @@ using AIBracket.Data.Entities;
 using AIBracket.API.Entities;
 using System.Threading;
 using System.Collections.Generic;
+using AIBracket.API.Sockets;
 
 namespace AIBracket.API
 {
 
     class TcpHelper {
+        private static AIBracketContext context = new AIBracketContext();
         private static TcpListener Listener { get; set; }
         private static bool Accept { get; set; } = false;
         private static Mutex mut = new Mutex();
         private static List<TcpClient> clients = new List<TcpClient>();
+        private static List<WebSocket> websockets = new List<WebSocket>();
 
         public static void StartServer(int port) {
             IPAddress address = IPAddress.Parse("127.0.0.1");
@@ -66,70 +69,44 @@ namespace AIBracket.API
                 }
                 if(client.Available > 0)
                 {
-                    Console.WriteLine("Client is ready");
                     var buffer = new byte[client.Available];
                     client.GetStream().Read(buffer, 0, client.Available);
 
                     var message = Encoding.ASCII.GetString(buffer);
-                    using (var context = new AIBracketContext())
+                    if (new System.Text.RegularExpressions.Regex("^GET").IsMatch(message))
                     {
-                        if (new System.Text.RegularExpressions.Regex("^GET").IsMatch(message))
-                        {
-                            const string eol = "\r\n"; // HTTP/1.1 defines the sequence CR LF as the end-of-line marker
+                        const string eol = "\r\n"; // HTTP/1.1 defines the sequence CR LF as the end-of-line marker
 
-                            byte[] response = Encoding.UTF8.GetBytes("HTTP/1.1 101 Switching Protocols" + eol
-                                + "Connection: Upgrade" + eol
-                                + "Upgrade: websocket" + eol
-                                + "Sec-WebSocket-Accept: " + Convert.ToBase64String(
-                                    System.Security.Cryptography.SHA1.Create().ComputeHash(
-                                        Encoding.UTF8.GetBytes(
-                                            new System.Text.RegularExpressions.Regex("Sec-WebSocket-Key: (.*)").Match(message).Groups[1].Value.Trim() + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
-                                        )
+                        byte[] response = Encoding.UTF8.GetBytes("HTTP/1.1 101 Switching Protocols" + eol
+                            + "Connection: Upgrade" + eol
+                            + "Upgrade: websocket" + eol
+                            + "Sec-WebSocket-Accept: " + Convert.ToBase64String(
+                                System.Security.Cryptography.SHA1.Create().ComputeHash(
+                                    Encoding.UTF8.GetBytes(
+                                        new System.Text.RegularExpressions.Regex("Sec-WebSocket-Key: (.*)").Match(message).Groups[1].Value.Trim() + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
                                     )
-                                ) + eol
-                                + eol);
+                                )
+                            ) + eol
+                            + eol);
 
-                            client.GetStream().Write(response, 0, response.Length);
-                            Console.WriteLine("Websocket connected.");
-                            GameMaster.AddPlayer(new PacmanClient
-                            {
-                                Socket = client,
-                                User = new AppUser(),
-                                Bot = new Bot(),
-                                IsWebSocket = true
-                            });
-                            clientsToRemove.Add(client);
-                        }
-                        else
+                        client.GetStream().Write(response, 0, response.Length);
+                        Console.WriteLine("Websocket connected.");
+                        websockets.Add(new WebSocket(client));
+                        clientsToRemove.Add(client);
+                    }
+                    else
+                    {
+                        if(message.StartsWith("BOT "))
                         {
-                            var bot = context.Bots.Where(x => x.PrivateKey == message.Trim()).FirstOrDefault();
-                            if (bot != null)
+                            var bot = VerifyBot(message.Substring(4), client, false);
+                            if(bot != null)
                             {
-                                var user = context.Users.Where(x => x.Id == bot.IdentityId).FirstOrDefault();
-                                if (user != null)
-                                {
-                                    Console.WriteLine("Success. Bot " + bot.Name + " connected from User " + user.UserName);
-                                    GameMaster.AddPlayer(new PacmanClient
-                                    {
-                                        Socket = client,
-                                        User = user,
-                                        Bot = bot,
-                                        IsWebSocket = false
-                                    });
-                                    clientsToRemove.Add(client);
-                                }
-                                else
-                                {
-                                    Console.WriteLine("User not found for bot. This should never happen.");
-                                }
+                                GameMaster.AddPlayer(bot);
+                                clientsToRemove.Add(client);
                             }
-                            else
-                            {
-                                Console.WriteLine("Bot not found with secret \"" + message + "\"");
-                                message = "Invalid secret";
-                                client.GetStream().Write(Encoding.ASCII.GetBytes(message));
-                                client.Close();
-                            }
+                        }
+                        else if(message.StartsWith("SPECTATOR ")){
+                            // TODO
                         }
                     }
                 }
@@ -138,6 +115,67 @@ namespace AIBracket.API
             {
                 clients.Remove(client);
             }
+            for(var i = 0; i < websockets.Count(); i++)
+            {
+                var client = websockets[i];
+                if (client.IsReady)
+                {
+                    var message = client.ReadData();
+                    if(message.StartsWith("BOT "))
+                    {
+                        var bot = VerifyBot(message.Substring(4), client.Socket, true);
+                        if(bot != null)
+                        {
+                            GameMaster.AddPlayer(bot);
+                            websockets.RemoveAt(i);
+                            i--;
+                        }
+                    }
+                    else if(message.StartsWith("SPECTATOR "))
+                    {
+                        // TODO
+                    }
+                }
+            }
+        }
+
+        private static IConnectedClient VerifyBot(string input, TcpClient client, bool isWebSocket)
+        {
+            var bot = context.Bots.Where(x => x.PrivateKey == input.Trim()).FirstOrDefault();
+            if (bot != null)
+            {
+                var user = context.Users.Where(x => x.Id == bot.IdentityId).FirstOrDefault();
+                if (user != null)
+                {
+                    switch (bot.Game)
+                    {
+                        case 0:
+                            break;
+                        case 1:
+                            if (isWebSocket)
+                            {
+                                return new PacmanClient
+                                {
+                                    User = user,
+                                    Bot = bot,
+                                    Socket = new WebSocket(client)
+                                };
+                            }
+                            else
+                            {
+                                return new PacmanClient
+                                {
+                                    User = user,
+                                    Bot = bot,
+                                    Socket = new BotSocket(client)
+                                };
+                            }
+                        default:
+                            break;
+                    }
+                }
+            }
+            return null;
         }
 
         public static void Main(string[] args) {
