@@ -15,7 +15,7 @@ namespace AIBracket.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Server=localhost;Database=master;Trusted_Connection=True;");
+            optionsBuilder.UseSqlite("Data Source=Database.db");
         }
     }
 }

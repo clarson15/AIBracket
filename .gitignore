@@ -16,3 +16,9 @@
 /AIBracket.Data/bin/Debug/netcoreapp2.2
 *.user
 /AIBracket.GameLogic/bin/Debug/netcoreapp2.2
+/AIBracket.API/bin/*
+/AIBracket.API/Properties/PublishProfiles
+/AIBracket.Data/bin/*
+/AIBracket.Data/Properties/PublishProfiles
+/AIBracket.Data/Database.db
+/AIBracket.GameLogic/bin/*
