@@ -1,4 +1,6 @@
 ﻿using AIBracket.API.Entities;
+using AIBracket.GameLogic.Pacman.Game;
+using AIBracket.GameLogic.Pacman.Pacman;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,57 +10,77 @@ namespace AIBracket.API
 {
     public static class GameMaster
     {
-        private static List<Object> games; // current games running (playing atm)
-        private static List<ConnectedClient> players; // current connected players
-        private static Boolean isRunning; 
+        private static List<GamePacman> games; // current games running (playing atm)
+        private static List<IConnectedClient> waiting_players; // current connected players
+        private static bool isRunning;
+        private static Mutex mut = new Mutex();
 
         public static void Initialize() { // constructor for our games list and players
-            games = new List<Object>(); // <- create functions to add players and games
-            players = new List<ConnectedClient>();
+            games = new List<GamePacman>(); // <- create functions to add players and games
+            waiting_players = new List<IConnectedClient>();
             isRunning = false;
         }
 
-        public static void AddGame(Object game) { // adds a new thread with the game object into our thread list
-            games.Add(game);
-        }
-
-        public static void AddPlayer(ConnectedClient player) {
-            players.Add(player);
+        public static void AddPlayer(IConnectedClient player) {
+            if(player.Bot.Game == 1)
+            {
+                games.Add(new GamePacman
+                {
+                    Game = new PacmanGame(),
+                    User = (PacmanClient)player
+                });
+                return;
+            }
+            mut.WaitOne();
+            waiting_players.Add(player);
+            mut.ReleaseMutex();
         }
 
         public static int GetPlayerCount() {
-            return players.Count; // for creating a new game
+            return waiting_players.Count; // for creating a new game
         }
 
-        public static void InputCommand(string command)
-        {
-             // this will parse commands
-        }
-
-        public static async void Run() {
+        public static void Run() {
             isRunning = true;
+            var start_time = DateTime.UtcNow;
             while (isRunning) {
-
-                /*
-                1. Gets player input, if any
-                2. Update games with input from players
-                3. Update the players with current game state, loop back to 1
-                (^^^this will happen ever second -> thread.sleep() to acheive this)
-                4. adds a new game for new players if needed
-                */
-                foreach(var client in players)
+                var current_time = DateTime.UtcNow;
+                var time_elapsed = current_time - start_time;
+                foreach (var g in games)
                 {
-                    if(client.Socket.Available > 0)
+                    g.GetUserInput();
+                }
+                if (time_elapsed.TotalMilliseconds >= 1000){
+                    foreach (var g in games)
                     {
-                        byte[] buffer = new byte[1024];
-                        client.Socket.GetStream().Read(buffer, 0, buffer.Length);
-                        var message = Encoding.ASCII.GetString(buffer);
-                        Console.WriteLine("Game master read: " + message);
+                        g.UpdateGame();
+                    }
+                    start_time = current_time;
+                }
+
+                for(var i = 0; i < games.Count; i++)
+                {
+                    if (!games[i].IsRunning)
+                    {
+                        games[i].Game.PrintBoard();
+                        games.RemoveAt(i);
+                        i--;
                     }
                 }
-                Thread.Sleep(1000);
+
+                mut.WaitOne();
+                foreach(var client in waiting_players)
+                {
+                    if(client.Socket.IsReady)
+                    {
+                        var message = client.Socket.ReadData();
+                        Console.WriteLine("Game master read: " + message);
+                        client.Socket.WriteData("Hello world");
+
+                    }
+                }
+                mut.ReleaseMutex();
             }
-            // restart? print out debug stuff?
         }
     }
 }

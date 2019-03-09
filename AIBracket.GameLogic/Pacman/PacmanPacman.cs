@@ -10,7 +10,7 @@ namespace AIBracket.GameLogic.Pacman.Pacman
     public class PacmanPacman
     {
         public enum Direction { start, up, down, left, right };
-        public static int Lives;
+        public int Lives;
         public PacmanCoordinate Location;
         public Direction Facing { get; set; }
         
@@ -18,7 +18,7 @@ namespace AIBracket.GameLogic.Pacman.Pacman
         {
             Location = new PacmanCoordinate(13, 17);
             Facing = Direction.start;
-            Lives--;
+            Lives = 3;
         }
 
         public PacmanCoordinate GetPosition()
@@ -28,7 +28,7 @@ namespace AIBracket.GameLogic.Pacman.Pacman
         
         public void Move()
         {
-            switch (this.Facing)
+            switch (Facing)
             {
                 case Direction.start:
                     break;
@@ -49,5 +49,24 @@ namespace AIBracket.GameLogic.Pacman.Pacman
                     break;
             }
         } 
+        /// <summary>
+        /// Returns the opposite direction
+        /// </summary>
+        public static Direction InverseDirection(Direction d)
+        {
+            switch(d)
+            {
+                case Direction.down:
+                    return Direction.up;
+                case Direction.up:
+                    return Direction.down;
+                case Direction.left:
+                    return Direction.right;
+                case Direction.right:
+                    return Direction.left;
+                default:
+                    return Direction.start;
+            }
+        }
     }
 }

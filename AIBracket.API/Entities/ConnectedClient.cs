@@ -1,15 +1,16 @@
-﻿using AIBracket.Data.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
+using AIBracket.API.Sockets;
+using AIBracket.Data.Entities;
 
 namespace AIBracket.API.Entities
 {
-    public class ConnectedClient
+    public class ConnectedClient : IConnectedClient
     {
-        public TcpClient Socket;
-        public AppUser User;
-        public Bot Bot;
+        public ISocket Socket { get ; set ; }
+        public AppUser User { get ; set ; }
+        public Bot Bot { get ; set ; }
     }
 }
