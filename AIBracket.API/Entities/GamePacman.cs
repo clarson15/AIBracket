@@ -14,14 +14,14 @@ namespace AIBracket.API.Entities
 
         public void GetUserInput()
         {
-            if (!User.Socket.Connected)
+            if (!User.Socket.IsConnected)
             {
                 IsRunning = false;
                 return;
             }
-            if(User.Socket.Available > 0)
+            if(User.Socket.IsReady)
             {
-                var command = User.ReadData();
+                var command = User.Socket.ReadData();
                 if(command != null)
                 {
                     switch (command.ToUpper())
@@ -52,17 +52,14 @@ namespace AIBracket.API.Entities
             if(Game.pacman.Lives == 0)
             {
                 IsRunning = false;
-                User.Socket.Close();
+                User.Socket.Disconnect();
             }
         }
 
         private void UpdateUsers()
         {
             var update = Game.pacman.Location.Xpos + ", " + Game.pacman.Location.Ypos + "\r\n";
-            if (!User.SendData(update))
-            {
-                IsRunning = false;
-            }
+            User.Socket.WriteData(update);
         }
     }
 }

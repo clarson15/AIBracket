@@ -1,4 +1,5 @@
-﻿using AIBracket.Data.Entities;
+﻿using AIBracket.API.Sockets;
+using AIBracket.Data.Entities;
 using AIBracket.GameLogic.Pacman.Pacman;
 using System;
 using System.Collections.Generic;
@@ -9,11 +10,8 @@ namespace AIBracket.API.Entities
 {
     public interface IConnectedClient
     {
-        TcpClient Socket { get; set; }
+        ISocket Socket { get; set; }
         AppUser User { get; set; }
         Bot Bot { get; set; }
-        bool IsWebSocket { get; set; }
-        string ReadData();
-        bool SendData(string message);
     }
 }
