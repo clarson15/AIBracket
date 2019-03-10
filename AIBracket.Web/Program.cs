@@ -20,12 +20,16 @@ namespace AIBracket.Web
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)
         {
-            return WebHost.CreateDefaultBuilder(args).UseUrls(urls: "http://*;https://*").UseKestrel(x =>
+            return WebHost.CreateDefaultBuilder(args).UseKestrel(x =>
             {
-                x.Listen(IPAddress.Loopback, 443, listenOptions =>
+                if (System.IO.File.Exists("Cert.pfx"))
                 {
-                    listenOptions.UseHttps("Cert.pfx", "password");
-                });
+                    x.Listen(IPAddress.Any, 443, listenOptions =>
+                    {
+                        listenOptions.UseHttps("Cert.pfx", "password");
+                    });
+                }
+                x.Listen(IPAddress.Any, 80);
             }).UseStartup<Startup>();
         }
     }
