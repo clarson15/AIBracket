@@ -96,7 +96,7 @@ namespace AIBracket.API
                     }
                     else
                     {
-                        if(message.StartsWith("BOT "))
+                        if(message.StartsWith("BOT ", StringComparison.InvariantCultureIgnoreCase))
                         {
                             var bot = VerifyBot(message.Substring(4), client, false);
                             if(bot != null)

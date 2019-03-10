@@ -58,7 +58,15 @@ namespace AIBracket.API.Entities
 
         private void UpdateUsers()
         {
-            var update = Game.pacman.Location.Xpos + ", " + Game.pacman.Location.Ypos + "\r\n";
+            var update = Game.score + " " + Game.pacman.Lives + " " + Game.pacman.Location.Xpos + " " + Game.pacman.Location.Ypos;
+            foreach(var ghost in Game.ghosts)
+            {
+                update += ghost.Location.Xpos + " ";
+                update += ghost.Location.Ypos + " ";
+                update += ghost.IsDead + " ";
+                update += ghost.IsVulnerable + " ";
+            }
+            update += "\r\n\r\n";
             User.Socket.WriteData(update);
         }
     }

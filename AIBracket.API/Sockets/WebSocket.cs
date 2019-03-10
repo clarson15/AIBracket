@@ -38,8 +38,18 @@ namespace AIBracket.API.Sockets
             {
                 var readAmount = _socket.Available;
                 var data = new byte[readAmount];
-                _socket.GetStream().Read(data, 0, readAmount);
-                return Encoding.ASCII.GetString(GetDecodedData(data, data.Length));
+                try
+                {
+                    _socket.GetStream().Read(data, 0, readAmount);
+                    return Encoding.ASCII.GetString(GetDecodedData(data, data.Length));
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine("Error receiving data");
+                    Console.WriteLine(e.Message);
+                    Disconnect();
+                    return null;
+                }
             }
             return null;
         }
@@ -48,8 +58,17 @@ namespace AIBracket.API.Sockets
         {
             if (IsConnected)
             {
-                var bytes = EncodeMessageToSend(data);
-                _socket.GetStream().Write(bytes);
+                try
+                {
+                    var bytes = EncodeMessageToSend(data);
+                    _socket.GetStream().Write(bytes);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Error sending data");
+                    Console.WriteLine(e.Message);
+                    Disconnect();
+                }
             }
         }
 
