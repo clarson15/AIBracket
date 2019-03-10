@@ -75,6 +75,7 @@ namespace AIBracket.API
                     var message = Encoding.ASCII.GetString(buffer);
                     if (new System.Text.RegularExpressions.Regex("^GET").IsMatch(message))
                     {
+                        Console.WriteLine(message);
                         const string eol = "\r\n"; // HTTP/1.1 defines the sequence CR LF as the end-of-line marker
 
                         byte[] response = Encoding.UTF8.GetBytes("HTTP/1.1 101 Switching Protocols" + eol
@@ -105,7 +106,7 @@ namespace AIBracket.API
                                 clientsToRemove.Add(client);
                             }
                         }
-                        else if(message.StartsWith("SPECTATOR ")){
+                        else if(message.StartsWith("SPECTATOR ", StringComparison.InvariantCultureIgnoreCase)){
                             // TODO
                         }
                     }
@@ -121,7 +122,7 @@ namespace AIBracket.API
                 if (client.IsReady)
                 {
                     var message = client.ReadData();
-                    if(message.StartsWith("BOT "))
+                    if(message.StartsWith("BOT ", StringComparison.InvariantCultureIgnoreCase))
                     {
                         var bot = VerifyBot(message.Substring(4), client.Socket, true);
                         if(bot != null)
@@ -131,7 +132,7 @@ namespace AIBracket.API
                             i--;
                         }
                     }
-                    else if(message.StartsWith("SPECTATOR "))
+                    else if(message.StartsWith("SPECTATOR ", StringComparison.InvariantCultureIgnoreCase))
                     {
                         // TODO
                     }
