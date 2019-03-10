@@ -22,3 +22,4 @@
 /AIBracket.Data/Properties/PublishProfiles
 /AIBracket.Data/Database.db
 /AIBracket.GameLogic/bin/*
+/AIBracket.Web/Database.db

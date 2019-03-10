@@ -23,14 +23,14 @@ namespace AIBracket.API
         private static List<WebSocket> websockets = new List<WebSocket>();
 
         public static void StartServer(int port) {
-            IPAddress address = IPAddress.Parse("127.0.0.1");
+            IPAddress address = IPAddress.Any;
             GameMaster.Initialize(); 
             Task.Run(() => GameMaster.Run());
             Listener = new TcpListener(address, port);
             Listener.Start();
             Accept = true;
 
-            Console.WriteLine($"Server started. Listening to TCP clients at 127.0.0.1:{port}");
+            Console.WriteLine($"Server started. Listening to TCP clients on port {port}");
         }
 
         public static void ConnectClient(IAsyncResult ar)
