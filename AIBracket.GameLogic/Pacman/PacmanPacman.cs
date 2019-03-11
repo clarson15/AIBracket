@@ -17,7 +17,7 @@ namespace AIBracket.GameLogic.Pacman.Pacman
         public PacmanPacman()
         {
             Location = new PacmanCoordinate(13, 17);
-            Facing = Direction.start;
+            Facing = Direction.right;
             Lives = 3;
         }
 

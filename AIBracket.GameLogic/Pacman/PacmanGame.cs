@@ -171,25 +171,22 @@ namespace AIBracket.GameLogic.Pacman.Game
                     }
                     else if(!ghosts[i].IsDead)
                     {
-                        else
+                        pacman.Location.Xpos = 13;
+                        pacman.Location.Ypos = 17;
+                        pacman.Facing = PacmanPacman.Direction.right;
+                        pacman.Lives--;
+                        if (pacman.Lives == 0)
                         {
-                            pacman.Location.Xpos = 13;
-                            pacman.Location.Ypos = 17;
-                            pacman.Facing = PacmanPacman.Direction.start;
-                            pacman.Lives--;
-                            if (pacman.Lives == 0)
-                            {
-                                GameRunning = false;
-                                return;
-                            }
-                            ghosts = new PacmanGhost[4]
-                            {
-                                new PacmanGhost(),
-                                new PacmanGhost(),
-                                new PacmanGhost(),
-                                new PacmanGhost()
-                            };
+                            GameRunning = false;
+                            return;
                         }
+                        ghosts = new PacmanGhost[4]
+                        {
+                            new PacmanGhost(),
+                            new PacmanGhost(),
+                            new PacmanGhost(),
+                            new PacmanGhost()
+                        };
                     }
                 }
             }
