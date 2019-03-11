@@ -6,12 +6,13 @@ import { RouterModule } from '@angular/router'
 import { MatCardModule, MatToolbarModule, MatExpansionModule, MatButtonModule, MatInputModule, MatFormFieldModule, MatIconModule, MatMenuModule, MatDividerModule, MatSelectModule } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
+import { LearnMoreComponent } from './learn-more/learn-more.component';
+import { GettingStartedComponent } from './getting-started/getting-started.component';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component'
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
-import { CounterComponent } from './counter/counter.component';
 import { CreateAccountComponent } from './create-account/create-account.component';
 import { ProfileComponent } from './profile/profile.component';
 
@@ -23,10 +24,11 @@ import { ProfileService } from './services/profile.service';
     AppComponent,
     NavMenuComponent,
     HomeComponent,
-    CounterComponent,
     CreateAccountComponent,
     LoginComponent,
-    ProfileComponent
+    ProfileComponent,
+    LearnMoreComponent,
+    GettingStartedComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -52,7 +54,9 @@ import { ProfileService } from './services/profile.service';
       { path: 'home', component: HomeComponent, pathMatch: 'full' },
       { path: 'create-account', component: CreateAccountComponent },
       { path: 'login', component: LoginComponent },
-      { path: 'profile', component: ProfileComponent }
+      { path: 'profile', component: ProfileComponent },
+      { path: 'getting-started', component: GettingStartedComponent },
+      { path: 'learn-more', component: LearnMoreComponent },
     ])
   ],
   providers: [AccountService, ProfileService],

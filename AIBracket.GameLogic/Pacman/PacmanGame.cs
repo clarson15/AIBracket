@@ -324,7 +324,7 @@ namespace AIBracket.GameLogic.Pacman.Game
                                     tile = 'X';
                                     break;
                                 default:
-                                    tile = 'F';
+                                    tile = '?';
                                     break;
                             }
                         }

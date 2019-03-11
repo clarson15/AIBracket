@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using AIBracket.Data;
 using AIBracket.Web.Auth;
 using AIBracket.Data.Entities;
-using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -22,17 +21,15 @@ namespace AIBracket.Web.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-
-        private readonly IMapper _mapper;
+        
         private readonly AIBracketContext _appDbContext;
         private readonly UserManager<AppUser> _userManager;
         private readonly IJwtFactory _jwtFactory;
         private readonly JsonSerializerSettings _serializerSettings;
         private readonly JwtIssuerOptions _jwtOptions;
 
-        public AuthController(IMapper mapper, AIBracketContext appDbContext, UserManager<AppUser> userManager, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions)
+        public AuthController(AIBracketContext appDbContext, UserManager<AppUser> userManager, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions)
         {
-            _mapper = mapper;
             _appDbContext = appDbContext;
             _userManager = userManager;
             _jwtFactory = jwtFactory;

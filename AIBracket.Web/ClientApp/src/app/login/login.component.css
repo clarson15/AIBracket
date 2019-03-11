@@ -6,9 +6,14 @@
 .login-card {
   margin-top: 2em;
   padding: 3em;
-  width: 500px;
+  width: 75%;
+  max-width: 500px;
   margin-right: auto;
   margin-left: auto;
+}
+
+.create-link{
+  display: inline-block;
 }
 
 .submit-button {

@@ -13,7 +13,7 @@
           <mat-error *ngIf="profileForm.get('Password').hasError('password')">Incorrect username and/or password.</mat-error>
           <mat-error *ngIf="profileForm.get('Password').hasError('required')">Password is required.</mat-error>
         </mat-form-field>
-        <span>Don't have an account? <a [routerLink]="['/create-account']">Create one!</a></span>
+        <span>Don't have an account? <a class="create-link" [routerLink]="['/create-account']">Create one!</a></span>
         <div class="submit-button">
           <button mat-raised-button (click)="onSubmit()" type="button">GO</button>
         </div>
