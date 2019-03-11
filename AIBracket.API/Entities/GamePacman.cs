@@ -58,7 +58,7 @@ namespace AIBracket.API.Entities
 
         private void UpdateUsers()
         {
-            var update = Game.score + " " + Game.pacman.Lives + " " + Game.pacman.Location.Xpos + " " + Game.pacman.Location.Ypos;
+            var update = Game.score + " " + Game.pacman.Lives + " " + Game.pacman.Location.Xpos + " " + Game.pacman.Location.Ypos + " ";
             foreach(var ghost in Game.ghosts)
             {
                 update += ghost.Location.Xpos + " ";

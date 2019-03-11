@@ -169,18 +169,26 @@ namespace AIBracket.GameLogic.Pacman.Game
                         score += 200 * GhostScoreMultiplier;
 
                     }
-                    else
+                    else if(!ghosts[i].IsDead)
                     {
-                        if(pacman.Lives == 0)
-                        {
-                            GameRunning = false;
-                        }
                         else
                         {
                             pacman.Location.Xpos = 13;
                             pacman.Location.Ypos = 17;
                             pacman.Facing = PacmanPacman.Direction.start;
                             pacman.Lives--;
+                            if (pacman.Lives == 0)
+                            {
+                                GameRunning = false;
+                                return;
+                            }
+                            ghosts = new PacmanGhost[4]
+                            {
+                                new PacmanGhost(),
+                                new PacmanGhost(),
+                                new PacmanGhost(),
+                                new PacmanGhost()
+                            };
                         }
                     }
                 }
@@ -237,6 +245,7 @@ namespace AIBracket.GameLogic.Pacman.Game
             // Move ghosts
             for (int i = 0; i < ghosts.Length; i++)
             {
+                if (ghosts[i].IsDead) continue;
                 ghosts[i].Facing = DetermineGhostMove(ghosts[i].Facing, ghosts[i].Location);
                 ghosts[i].Move();
                 PortalGhost(ghosts[i].Location, i);
