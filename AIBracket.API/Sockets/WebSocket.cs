@@ -38,6 +38,12 @@ namespace AIBracket.API.Sockets
             if (IsReady)
             {
                 var readAmount = _socket.Available;
+                if(readAmount > 1024)
+                {
+                    Console.WriteLine("Data larger than 1KB: " + readAmount + " bytes");
+                    Disconnect();
+                    return "";
+                }
                 var data = new byte[readAmount];
                 try
                 {
@@ -49,10 +55,10 @@ namespace AIBracket.API.Sockets
                     Console.WriteLine("Error receiving data");
                     Console.WriteLine(e.Message);
                     Disconnect();
-                    return null;
+                    return "";
                 }
             }
-            return null;
+            return "";
         }
 
         public void WriteData(string data)

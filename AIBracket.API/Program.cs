@@ -119,6 +119,12 @@ namespace AIBracket.API
             for(var i = 0; i < websockets.Count(); i++)
             {
                 var client = websockets[i];
+                if (!client.IsConnected)
+                {
+                    websockets.RemoveAt(i);
+                    i--;
+                    continue;
+                }
                 if (client.IsReady)
                 {
                     var message = client.ReadData();

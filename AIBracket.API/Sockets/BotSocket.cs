@@ -28,11 +28,17 @@ namespace AIBracket.API.Sockets
             if (IsReady)
             {
                 var readAmount = _socket.Available;
+                if (readAmount > 1024)
+                {
+                    Console.WriteLine("Data larger than 1KB: " + readAmount + " bytes");
+                    Disconnect();
+                    return "";
+                }
                 var data = new byte[readAmount];
                 _socket.GetStream().Read(data, 0, readAmount);
                 return Encoding.ASCII.GetString(data);
             }
-            return null;
+            return "";
         }
 
         public void WriteData(string data)
