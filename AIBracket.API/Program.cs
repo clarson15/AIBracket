@@ -75,6 +75,12 @@ namespace AIBracket.API
                     var message = Encoding.ASCII.GetString(buffer);
                     if (new System.Text.RegularExpressions.Regex("^GET").IsMatch(message))
                     {
+                        if (!message.Contains("websocket"))
+                        {
+                            Console.WriteLine("Random GET request.");
+                            clientsToRemove.Add(client);
+                            continue;
+                        }
                         Console.WriteLine(message);
                         const string eol = "\r\n"; // HTTP/1.1 defines the sequence CR LF as the end-of-line marker
 
