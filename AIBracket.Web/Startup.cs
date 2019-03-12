@@ -63,8 +63,7 @@ namespace AIBracket.Web
                 ValidateIssuer = true,
                 ValidIssuer = jwtAppSettingOptions[nameof(JwtIssuerOptions.Issuer)],
 
-                ValidateAudience = true,
-                ValidAudience = jwtAppSettingOptions[nameof(JwtIssuerOptions.Audience)],
+                ValidateAudience = false,
 
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = _signingKey,

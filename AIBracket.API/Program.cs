@@ -73,7 +73,7 @@ namespace AIBracket.API
                     client.GetStream().Read(buffer, 0, client.Available);
 
                     var message = Encoding.ASCII.GetString(buffer);
-                    if (new System.Text.RegularExpressions.Regex("^GET").IsMatch(message))
+                    if (message.StartsWith("GET "))
                     {
                         if (!message.Contains("websocket"))
                         {
@@ -81,7 +81,6 @@ namespace AIBracket.API
                             clientsToRemove.Add(client);
                             continue;
                         }
-                        Console.WriteLine(message);
                         const string eol = "\r\n"; // HTTP/1.1 defines the sequence CR LF as the end-of-line marker
 
                         byte[] response = Encoding.UTF8.GetBytes("HTTP/1.1 101 Switching Protocols" + eol
@@ -100,6 +99,7 @@ namespace AIBracket.API
                         Console.WriteLine("Websocket connected.");
                         websockets.Add(new WebSocket(client));
                         clientsToRemove.Add(client);
+                        continue;
                     }
                     else
                     {
@@ -108,12 +108,20 @@ namespace AIBracket.API
                             var bot = VerifyBot(message.Substring(4), client, false);
                             if(bot != null)
                             {
+                                Console.WriteLine("Bot connected.");
                                 GameMaster.AddPlayer(bot);
                                 clientsToRemove.Add(client);
+                                continue;
                             }
                         }
                         else if(message.StartsWith("SPECTATOR ", StringComparison.InvariantCultureIgnoreCase)){
                             // TODO
+                        }
+                        else
+                        {
+                            Console.WriteLine("Unknown client.");
+                            clientsToRemove.Add(client);
+                            continue;
                         }
                     }
                 }
