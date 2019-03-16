@@ -1,4 +1,5 @@
-﻿using AIBracket.GameLogic.Pacman.Game;
+﻿using AIBracket.API.Sockets;
+using AIBracket.GameLogic.Pacman.Game;
 using AIBracket.GameLogic.Pacman.Pacman;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,8 @@ namespace AIBracket.API.Entities
         public PacmanGame Game { get; set; }
         public PacmanClient User { get; set; }
         public bool IsRunning { get; set; } = true;
+        public Guid Id { get; private set; } = Guid.NewGuid();
+        public List<ISocket> Spectators { get; set; }
 
         public void GetUserInput()
         {
@@ -68,6 +71,15 @@ namespace AIBracket.API.Entities
             }
             update += "\r\n\r\n";
             User.Socket.WriteData(update);
+            for(var i = 0; i < Spectators.Count; i++)
+            {
+                Spectators[i].WriteData(update);
+                if (!Spectators[i].IsConnected)
+                {
+                    Spectators.RemoveAt(i);
+                    i--;
+                }
+            }
         }
     }
 }

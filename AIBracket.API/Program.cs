@@ -18,7 +18,6 @@ namespace AIBracket.API
         private static AIBracketContext context = new AIBracketContext();
         private static TcpListener Listener { get; set; }
         private static bool Accept { get; set; } = false;
-        private static Mutex mut = new Mutex();
         private static List<TcpClient> clients = new List<TcpClient>();
         private static List<WebSocket> websockets = new List<WebSocket>();
 
@@ -114,8 +113,27 @@ namespace AIBracket.API
                                 continue;
                             }
                         }
-                        else if(message.StartsWith("SPECTATOR ", StringComparison.InvariantCultureIgnoreCase)){
-                            // TODO
+                        else if(message.StartsWith("WATCH ", StringComparison.InvariantCultureIgnoreCase)){
+                            var target = message.Substring(6);
+                            if (target == "GAMEMASTER")
+                            {
+                                GameMaster.AddSpectator(new BotSocket(client));
+                                clientsToRemove.Add(client);
+                                continue;
+                            }
+                            else
+                            {
+                                if(GameMaster.WatchGame(new BotSocket(client), target))
+                                {
+                                    clientsToRemove.Add(client);
+                                    continue;
+                                }
+                                else
+                                {
+                                    client.GetStream().Write(Encoding.ASCII.GetBytes("Game does not exist"));
+                                    continue;
+                                }
+                            }
                         }
                         else
                         {
@@ -152,9 +170,28 @@ namespace AIBracket.API
                             i--;
                         }
                     }
-                    else if(message.StartsWith("SPECTATOR ", StringComparison.InvariantCultureIgnoreCase))
+                    else if(message.StartsWith("WATCH ", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        // TODO
+                        var target = message.Substring(6);
+                        if (target == "GAMEMASTER")
+                        {
+                            GameMaster.AddSpectator(client);
+                            websockets.Remove(client);
+                            continue;
+                        }
+                        else
+                        {
+                            if (GameMaster.WatchGame(client, target))
+                            {
+                                websockets.Remove(client);
+                                continue;
+                            }
+                            else
+                            {
+                                client.WriteData("Game does not exist");
+                                continue;
+                            }
+                        }
                     }
                 }
             }
