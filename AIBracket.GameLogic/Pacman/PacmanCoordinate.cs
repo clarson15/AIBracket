@@ -16,6 +16,12 @@ namespace AIBracket.GameLogic.Pacman.Coordinate
             this.Ypos = Y;
         }
 
+        public PacmanCoordinate(PacmanCoordinate p)
+        {
+            this.Xpos = p.Xpos;
+            this.Ypos = p.Ypos;
+        }
+
         public static bool operator==(PacmanCoordinate lhs, PacmanCoordinate rhs)
         {
             return lhs.Xpos == rhs.Xpos && lhs.Ypos == rhs.Ypos;

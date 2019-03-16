@@ -19,7 +19,7 @@ namespace AIBracket.GameLogic.Pacman.Ghost
             Facing = PacmanPacman.Direction.start;
             IsDead = true;
             IsVulnerable = false;
-            Location = new PacmanCoordinate(13, 11);
+            Location = new PacmanCoordinate(13, 10);
         }
 
         public PacmanCoordinate GetPosition()

@@ -50,10 +50,11 @@ namespace AIBracket.API
                 {
                     g.GetUserInput();
                 }
-                if (time_elapsed.TotalMilliseconds >= 1000){
+                if (time_elapsed.TotalMilliseconds >= 500){
                     foreach (var g in games)
                     {
                         g.UpdateGame();
+                        // g.Game.PrintBoard();
                     }
                     start_time = current_time;
                 }
