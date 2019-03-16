@@ -1,22 +1,18 @@
-.login-credentials{
-  display:flex;
-  flex-direction: column;
+.header{
+  font-size: 70px;
+  opacity: 0.4;
+  border-bottom: solid;
+  border-width: 2px;
+  border-color: #EAEAEA;
 }
 
-.login-card{
-  margin-top: 2em;
-  padding: 3em;
+.container{
+  padding-left: 70px;
 }
 
-.create-card {
-  display: flex;
-  flex-direction: column;
-  padding: 3em;
-  margin-top:2em;
-}
-
-.submit-button {
-  display:flex;
-  justify-content:space-between;
-  
+.game{
+  width: 550px;
+  height: 600px;
+  background-color: white;
+  border: 1px solid black;
 }

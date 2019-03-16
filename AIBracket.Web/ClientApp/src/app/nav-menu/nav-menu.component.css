@@ -11,8 +11,13 @@
   float: right;
 }
 
-.profile-name {
+.user-button {
   display: flex;
   justify-content: center;
   align-items: center;
+  font-size: 24px;
+}
+
+.user-button mat-icon{
+  margin-left: 5px;
 }

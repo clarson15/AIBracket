@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router'
-import { MatCardModule, MatToolbarModule, MatExpansionModule, MatButtonModule, MatInputModule, MatFormFieldModule, MatIconModule, MatMenuModule, MatDividerModule, MatSelectModule } from '@angular/material';
+import { MatCardModule, MatToolbarModule, MatExpansionModule, MatButtonModule, MatInputModule, MatFormFieldModule, MatIconModule, MatMenuModule, MatDividerModule, MatSelectModule, MatSidenavModule, MatCheckboxModule } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
 import { LearnMoreComponent } from './learn-more/learn-more.component';
@@ -46,8 +46,10 @@ import { ProfileService } from './services/profile.service';
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
+    MatCheckboxModule,
     MatDividerModule,
     MatSelectModule,
+    MatSidenavModule,
     //Routes
     RouterModule.forRoot([
       { path: '', redirectTo: '/home', pathMatch: 'full' },

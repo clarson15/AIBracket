@@ -19,25 +19,11 @@ namespace AIBracket.Web.Controllers
     [Route("api/[controller]/[action]")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
-    public class BotController : ControllerBase
+    public class BotController : BaseController
     {
-        private readonly AIBracketContext _appDbContext;
-        private readonly UserManager<AppUser> _userManager;
-        private readonly IJwtFactory _jwtFactory;
-        private readonly JsonSerializerSettings _serializerSettings;
-        private readonly JwtIssuerOptions _jwtOptions;
-
-        public BotController(AIBracketContext appDbContext, UserManager<AppUser> userManager, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions)
+        public BotController(AIBracketContext appDbContext, UserManager<AppUser> userManager, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions) : base(appDbContext, userManager, jwtFactory, jwtOptions)
         {
-            _appDbContext = appDbContext;
-            _userManager = userManager;
-            _jwtFactory = jwtFactory;
-            _jwtOptions = jwtOptions.Value;
 
-            _serializerSettings = new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented
-            };
         }
 
         [HttpGet]

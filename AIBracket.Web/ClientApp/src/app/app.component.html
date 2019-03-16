@@ -1,8 +1,22 @@
 <body class="background">
   <div class="background">
-    <app-nav-menu [Account]="account" (logout)="onLogout()"></app-nav-menu>
+    <app-nav-menu [Account]="account" (logout)="onLogout()" (sidenav)="toggleNav()"></app-nav-menu>
     <div class="container">
-      <router-outlet (activate)='onActivate($event)'></router-outlet>
+      <mat-sidenav-container class="example-container">
+        <mat-sidenav #sidenav mode="side" [(opened)]="sideNavToggled">
+          <div class="side-nav">
+            <button mat-button routerLink="/home" [disableRipple]="true"><mat-icon>home</mat-icon> Home</button><br />
+            <button mat-button routerLink="/profile" [disableRipple]="true"><mat-icon>person</mat-icon> Profile</button><br />
+            <button mat-button routerLink="/tournaments" [disableRipple]="true"><mat-icon>group_work</mat-icon> Tournaments</button><br />
+            <button mat-button routerLink="/watch" [disableRipple]="true"><mat-icon>tv</mat-icon> Watch</button><br />
+            <button mat-button routerLink="/learn" [disableRipple]="true"><mat-icon>school</mat-icon> Learn</button><br />
+            <button mat-button routerLink="/forums" [disableRipple]="true"><mat-icon>forum</mat-icon> Forums</button>
+          </div>
+        </mat-sidenav>
+        <mat-sidenav-content>
+          <router-outlet (activate)='onActivate($event)'></router-outlet>
+        </mat-sidenav-content>
+      </mat-sidenav-container>
     </div>
   </div>
 </body>

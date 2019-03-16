@@ -1,20 +1,14 @@
-<mat-toolbar color="primary" style="min-width: 550px;">
+<mat-toolbar color="primary">
   <mat-toolbar-row>
+    <button mat-icon-button (click)="OpenNav()"><mat-icon>menu</mat-icon></button>
     <button mat-button routerLink="/home">
       <h1>AIBracket</h1>
-    </button>
-    <button mat-button routerLink="/getting-started">
-      <h1>Getting-Started</h1>
-    </button>
-    <button mat-button routerLink="/learn-more">
-      <h1>Learn More</h1>
     </button>
     <span class="space"></span>
     <div>
       <button *ngIf="account == null" color="primary" routerLink="/login" mat-raised-button>Login</button>
-      <div *ngIf="account != null" class="profile-name">
-        <span>{{account.firstName}} {{account.lastName}}</span>
-        <button mat-icon-button [matMenuTriggerFor]="menu"><mat-icon>person</mat-icon></button>
+      <div *ngIf="account != null">
+        <button mat-button [matMenuTriggerFor]="menu"><div class="user-button">{{account.firstName}} {{account.lastName}}<mat-icon inline=true>person</mat-icon></div></button>
         <mat-menu #menu="matMenu">
           <button mat-menu-item (click)="viewProfile()">View Profile</button>
           <button mat-menu-item (click)="Logout()">Logout</button>

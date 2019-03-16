@@ -1,6 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AccountService } from './services/account.service';
-import { HomeComponent } from './home/home.component';
 import { ProfileResponseModel } from './models/ProfileResponseModel';
 
 @Component({
@@ -8,12 +7,28 @@ import { ProfileResponseModel } from './models/ProfileResponseModel';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  title = 'app';
+export class AppComponent implements OnInit {
 
   account: ProfileResponseModel;
+  sideNavToggled: boolean = false;
 
   constructor(private accountService: AccountService) { }
+
+  ngOnInit() {
+    if (localStorage.getItem('auth_token') != null) {
+      this.attemptLogin();
+    }
+  }
+
+  attemptLogin() {
+    this.accountService.getProfile().subscribe(
+      data => {
+        this.account = data;
+      },
+      err => {
+        console.log(err);
+      });
+  }
 
   onLogout() {
     this.account = null;
@@ -22,13 +37,11 @@ export class AppComponent {
 
   onActivate($event) {
     if (this.account == null && localStorage.getItem('auth_token') != null) {
-      this.accountService.getProfile().subscribe(
-        data => {
-          this.account = data;
-        },
-        err => {
-          console.log(err);
-        });
+      this.attemptLogin();
     }
+  }
+
+  toggleNav($event) {
+    this.sideNavToggled = !this.sideNavToggled;
   }
 }

@@ -1,5 +1,6 @@
 .profile-card {
-  width: 500px;
+  width: 80%;
+  max-width: 600px;
   margin-left: auto;
   margin-right: auto;
 }

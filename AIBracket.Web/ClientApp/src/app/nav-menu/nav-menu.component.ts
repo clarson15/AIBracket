@@ -8,11 +8,11 @@ import { ProfileResponseModel } from '../models/ProfileResponseModel';
   styleUrls: ['./nav-menu.component.css']
 })
 export class NavMenuComponent {
-  isExpanded = false;
 
   @Input('Account')
   account: ProfileResponseModel;
   @Output() logout: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() sidenav: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   constructor(private router: Router) { }
 
@@ -23,5 +23,9 @@ export class NavMenuComponent {
   Logout() {
     this.logout.emit(true);
     this.router.navigate(['/login']);
+  }
+
+  OpenNav() {
+    this.sidenav.emit(true);
   }
 }
