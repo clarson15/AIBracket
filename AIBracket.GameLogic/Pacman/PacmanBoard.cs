@@ -12,6 +12,7 @@ namespace AIBracket.GameLogic.Pacman.Board
         public enum Tile { wall, blank, dot, fruit, powerUp, portal };
         private Tile[,] Board;
         private readonly int Width, Height;
+        public int DotCount { get; private set; }
         // Portals holds coordinates of corresponding portal on the map
         private readonly PacmanCoordinate[] Portals;
 
@@ -66,19 +67,20 @@ namespace AIBracket.GameLogic.Pacman.Board
             };
 
             int sizeOfPortal = 0;
+            DotCount = 0;
             for (int i = 0; i < this.Board.GetLength(1); i++)
             {
                 for (int j = 0; j < this.Board.GetLength(0); j++)
                 {
-                    if (Board[j, i] == Tile.portal)
+                    if (Board[j, i] == Tile.dot || Board[j, i] == Tile.powerUp)
+                    {
+                        DotCount++;
+                    }
+                    if (Board[j, i] == Tile.portal && sizeOfPortal < 2)
                     {
                         Portals[sizeOfPortal].Xpos = j;
                         Portals[sizeOfPortal].Ypos = i;
                         sizeOfPortal++;
-                        if (sizeOfPortal == 2)
-                        {
-                            return;
-                        }
                     }
                 }
             }
@@ -102,10 +104,15 @@ namespace AIBracket.GameLogic.Pacman.Board
             return Board[p.Xpos, p.Ypos];
         }
 
-        // Called after pacman enters a consumable (fruit or dot) tile
+        // Called after pacman enters a consumable (fruit, dot, or powerup) tile
         public void UpdateTile(PacmanCoordinate pos)
         {
-            if (Board[pos.Xpos, pos.Ypos] == Tile.dot || Board[pos.Xpos, pos.Ypos] == Tile.fruit || Board[pos.Xpos, pos.Ypos] == Tile.powerUp)
+            if (Board[pos.Xpos, pos.Ypos] == Tile.dot || Board[pos.Xpos, pos.Ypos] == Tile.powerUp)
+            {
+                DotCount--;
+                Board[pos.Xpos, pos.Ypos] = Tile.blank;
+            }
+            else if (Board[pos.Xpos, pos.Ypos] == Tile.fruit)
             {
                 Board[pos.Xpos, pos.Ypos] = Tile.blank;
             }

@@ -49,7 +49,7 @@ namespace AIBracket.API.Entities
         {
             Game.UpdateGame(User.Direction);
             UpdateUsers(); // Change this when tickrate changes
-            if(Game.pacman.Lives == 0)
+            if(Game.Pacman.Lives == 0)
             {
                 IsRunning = false;
                 User.Socket.Disconnect();
@@ -58,8 +58,8 @@ namespace AIBracket.API.Entities
 
         private void UpdateUsers()
         {
-            var update = Game.score + " " + Game.pacman.Lives + " " + Game.pacman.Location.Xpos + " " + Game.pacman.Location.Ypos + " ";
-            foreach(var ghost in Game.ghosts)
+            var update = Game.Score + " " + Game.Pacman.Lives + " " + Game.Pacman.Location.Xpos + " " + Game.Pacman.Location.Ypos + " ";
+            foreach(var ghost in Game.Ghosts)
             {
                 update += ghost.Location.Xpos + " ";
                 update += ghost.Location.Ypos + " ";
