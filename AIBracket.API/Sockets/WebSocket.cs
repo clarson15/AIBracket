@@ -48,7 +48,7 @@ namespace AIBracket.API.Sockets
                 try
                 {
                     _socket.GetStream().Read(data, 0, readAmount);
-                    return Encoding.ASCII.GetString(GetDecodedData(data));
+                    return Encoding.ASCII.GetString(GetDecodedData(data)).Trim();
                 }
                 catch(Exception e)
                 {

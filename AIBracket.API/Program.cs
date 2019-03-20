@@ -102,7 +102,8 @@ namespace AIBracket.API
                     }
                     else
                     {
-                        if(message.StartsWith("BOT ", StringComparison.InvariantCultureIgnoreCase))
+                        Console.WriteLine(message);
+                        if (message.StartsWith("BOT ", StringComparison.InvariantCultureIgnoreCase))
                         {
                             var bot = VerifyBot(message.Substring(4), client, false);
                             if(bot != null)
@@ -117,6 +118,8 @@ namespace AIBracket.API
                             var target = message.Substring(6);
                             if (target == "GAMEMASTER")
                             {
+                                Console.WriteLine("gamemaster spectator");
+                                client.GetStream().Write(Encoding.ASCII.GetBytes("OK"));
                                 GameMaster.AddSpectator(new BotSocket(client));
                                 clientsToRemove.Add(client);
                                 continue;
@@ -160,6 +163,7 @@ namespace AIBracket.API
                 if (client.IsReady)
                 {
                     var message = client.ReadData();
+                    Console.WriteLine(message);
                     if(message.StartsWith("BOT ", StringComparison.InvariantCultureIgnoreCase))
                     {
                         var bot = VerifyBot(message.Substring(4), client.Socket, true);

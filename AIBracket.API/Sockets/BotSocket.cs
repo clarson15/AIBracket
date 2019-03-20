@@ -35,8 +35,17 @@ namespace AIBracket.API.Sockets
                     return "";
                 }
                 var data = new byte[readAmount];
-                _socket.GetStream().Read(data, 0, readAmount);
-                return Encoding.ASCII.GetString(data);
+                try
+                {
+                    _socket.GetStream().Read(data, 0, readAmount);
+                    return Encoding.ASCII.GetString(data).Trim();
+                }
+                catch(Exception e)
+                {
+                    _socket.Close();
+                    Console.WriteLine(e.Message);
+                    return "";
+                }
             }
             return "";
         }
@@ -46,7 +55,15 @@ namespace AIBracket.API.Sockets
             if (IsConnected)
             {
                 var bytes = Encoding.ASCII.GetBytes(data);
-                _socket.GetStream().Write(bytes);
+                try
+                {
+                    _socket.GetStream().Write(bytes);
+                }
+                catch(Exception e)
+                {
+                    _socket.Close();
+                    Console.WriteLine(e.Message);
+                }
             }
         }
     }

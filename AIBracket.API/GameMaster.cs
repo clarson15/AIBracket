@@ -123,6 +123,7 @@ namespace AIBracket.API
                     {
                         gameMutex.WaitOne();
                         var message = spectators[i].ReadData().Trim();
+                        Console.WriteLine("Spectator said " + message);
                         if (message == "LIST GAMES")
                         {
                             spectators[i].WriteData("Pacman: " + games.Count);

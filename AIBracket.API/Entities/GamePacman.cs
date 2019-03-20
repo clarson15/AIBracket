@@ -13,7 +13,7 @@ namespace AIBracket.API.Entities
         public PacmanClient User { get; set; }
         public bool IsRunning { get; set; } = true;
         public Guid Id { get; private set; } = Guid.NewGuid();
-        public List<ISocket> Spectators { get; set; }
+        public List<ISocket> Spectators { get; set; } = new List<ISocket>();
 
         public void GetUserInput()
         {
