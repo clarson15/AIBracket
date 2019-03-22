@@ -177,7 +177,7 @@ namespace AIBracket.GameLogic.Pacman.Game
         /// <summary>
         /// Checks whether a ghost has collided with pacman and handles resetting positions after death
         /// </summary>
-        private void PacmanGhostCollide()
+        private bool PacmanGhostCollide()
         {
             for (int i = 0; i < Ghosts.Length; i++)
             {
@@ -198,11 +198,6 @@ namespace AIBracket.GameLogic.Pacman.Game
                         Pacman.Location.Ypos = 17;
                         Pacman.Facing = PacmanPacman.Direction.right;
                         Pacman.Lives--;
-                        if (Pacman.Lives == 0)
-                        {
-                            GameRunning = false;
-                            return;
-                        }
                         Ghosts = new PacmanGhost[4]
                         {
                             new PacmanGhost(),
@@ -210,9 +205,16 @@ namespace AIBracket.GameLogic.Pacman.Game
                             new PacmanGhost(),
                             new PacmanGhost()
                         };
+                        if (Pacman.Lives <= 0)
+                        {
+                            Pacman.Lives = 0;
+                            GameRunning = false;
+                            return true;
+                        }
                     }
                 }
             }
+            return false;
         }
 
         /// <summary>
@@ -311,6 +313,27 @@ namespace AIBracket.GameLogic.Pacman.Game
             {
                 PoweredUpCounter--;
             }
+        }
+
+        public string GetBoardString()
+        {
+            var ret = "";
+            for (int i = 0; i < Board.Height; i++)
+            {
+                for (int j = 0; j < Board.Width; j++)
+                {
+                    ret += (int)Board.GetTile(j, i);
+                    if (j != Board.Width - 1)
+                    {
+                        ret += " ";
+                    }
+                }
+                if (i != Board.Height - 1)
+                {
+                    ret += "\n";
+                }
+            }
+            return ret;
         }
 
         public void PrintBoard()

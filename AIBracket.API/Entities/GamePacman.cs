@@ -12,6 +12,7 @@ namespace AIBracket.API.Entities
         public PacmanGame Game { get; set; }
         public PacmanClient User { get; set; }
         public bool IsRunning { get; set; } = true;
+        public bool IsStarted { get; set; } = false;
         public Guid Id { get; private set; } = Guid.NewGuid();
         public List<ISocket> Spectators { get; set; } = new List<ISocket>();
 
@@ -50,6 +51,11 @@ namespace AIBracket.API.Entities
 
         public void UpdateGame()
         {
+            if (!IsStarted)
+            {
+                IsStarted = true;
+                User.Socket.WriteData("0 " + Game.GetBoardString());
+            }
             Game.UpdateGame(User.Direction);
             UpdateUsers(); // Change this when tickrate changes
             if(Game.Pacman.Lives == 0)
@@ -59,9 +65,15 @@ namespace AIBracket.API.Entities
             }
         }
 
+        public void AddSpectator(ISocket spec)
+        {
+            spec.WriteData("0 " + Game.GetBoardString());
+            Spectators.Add(spec);
+        }
+
         private void UpdateUsers()
         {
-            var update = Game.Score + " " + Game.Pacman.Lives + " " + Game.Pacman.Location.Xpos + " " + Game.Pacman.Location.Ypos + " ";
+            var update = "1 " + Game.Score + " " + Game.Pacman.Lives + " " + Game.Pacman.Location.Xpos + " " + Game.Pacman.Location.Ypos + " ";
             foreach(var ghost in Game.Ghosts)
             {
                 update += ghost.Location.Xpos + " ";

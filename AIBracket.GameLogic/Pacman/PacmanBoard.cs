@@ -11,7 +11,7 @@ namespace AIBracket.GameLogic.Pacman.Board
     {
         public enum Tile { wall, blank, dot, fruit, powerUp, portal };
         private Tile[,] Board;
-        private readonly int Width, Height;
+        public readonly int Width, Height;
         public int DotCount { get; private set; }
         // Portals holds coordinates of corresponding portal on the map
         private readonly PacmanCoordinate[] Portals;

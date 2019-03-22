@@ -31,7 +31,7 @@ namespace AIBracket.API
             var game = games.FirstOrDefault(x => x.Id.ToString() == guid);
             if (game != null)
             {
-                game.Spectators.Add(spectator);
+                game.AddSpectator(spectator);
                 gameMutex.ReleaseMutex();
                 return true;
             }
@@ -147,7 +147,7 @@ namespace AIBracket.API
                             }
                             else
                             {
-                                game.Spectators.Add(spectators[i]);
+                                game.AddSpectator(spectators[i]);
                                 spectators.RemoveAt(i);
                                 i--;
                             }
