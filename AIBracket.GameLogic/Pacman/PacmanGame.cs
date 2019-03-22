@@ -192,7 +192,7 @@ namespace AIBracket.GameLogic.Pacman.Game
                         Score += 200 * GhostScoreMultiplier;
 
                     }
-                    else if(!Ghosts[i].IsDead)
+                    else if (!Ghosts[i].IsDead)
                     {
                         Pacman.Location.Xpos = 13;
                         Pacman.Location.Ypos = 17;
@@ -273,16 +273,17 @@ namespace AIBracket.GameLogic.Pacman.Game
                 {
                     if (!SlowGhosts)
                     {
-                        Ghosts[i].Move();
-                        Ghosts[i].Facing = DetermineGhostMove(Ghosts[i].Facing, Ghosts[i].Location);
                         PortalGhost(Ghosts[i].Location, i);
+                        Ghosts[i].Facing = DetermineGhostMove(Ghosts[i].Facing, Ghosts[i].Location);
+                        Ghosts[i].Move();
+                        
                     }
                 }
                 else
                 {
-                    Ghosts[i].Move();
-                    Ghosts[i].Facing = DetermineGhostMove(Ghosts[i].Facing, Ghosts[i].Location);
                     PortalGhost(Ghosts[i].Location, i);
+                    Ghosts[i].Facing = DetermineGhostMove(Ghosts[i].Facing, Ghosts[i].Location);
+                    Ghosts[i].Move();                    
                 }
             }
             SlowGhosts = !SlowGhosts;

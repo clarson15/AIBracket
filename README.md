@@ -12,9 +12,9 @@ This is a live document. Anything on this page is subject to change, and should 
 
 
 ## Architecture:
-  * Central Database (SQL Server) 
-  * Data project (Interfacing with database)
-  * Game project (handles all games and logic)
+  * Database (SQLite) 
+  * Data project (Interfacing with database, DLL)
+  * Common Logic project (handles all games and logic, DLL)
   * Web project (displays live games, data viewing)
   * API project (interfaces clients with game project)
   * Everything written in C#, web written in angular
@@ -28,24 +28,18 @@ This is a live document. Anything on this page is subject to change, and should 
   * Displays statistics of AI
   * Search players/AIs
   * Players sign up to receive a private key
-  * dotnet core serverside which communicates with common logic
+  * dotnet core serverside which communicates with API through socket
 
 ## API project:
   * Validation
   * Provides a persistent client state
   * TCP socket for client communications
+  * Interfaces with data project to save data and log
+  * Stores live game data in memory, when finished store in DB 
 
 ## Common Logic:
   * Computes games
-  * Interfaces with web project to display games to users
-  * Interfaces with API project to communicate actions and gamestate to users
-  * Interfaces with data project to save data and log
-  * Stores live game data in memory for web project, when finished store in DB 
-
-## Data project:
-  * Generates private keys for AI
-  * Interfaces directly with database
-  * Contains controllers for modifying player data
+  * Stores game logic and models
 
 ## Database:
  * Users
@@ -74,6 +68,4 @@ This is a live document. Anything on this page is subject to change, and should 
 ## Setup
 1. Download [dotnet core 2.2](https://dotnet.microsoft.com/download/thank-you/dotnet-sdk-2.2.103-windows-x64-installer)
 2. Download [NodeJS](https://nodejs.org/en/)
-3. Download [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) (You also probably want SSMS)
-4. Configure AIBracket.Web appsettings.json with correct connection string to connect to the database you created (leave default if unsure)
-5. Run `dotnet ef update` from console in AIBracket.Web directory to seed database
+3. Run `dotnet ef database update` from console in AIBracket.Web directory after building to seed database
