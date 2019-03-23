@@ -12,14 +12,19 @@ namespace AIBracket.GameLogic.Pacman.Coordinate
 
         public PacmanCoordinate(int X = 0, int Y = 0)
         {
-            this.Xpos = X;
-            this.Ypos = Y;
+            Xpos = X;
+            Ypos = Y;
         }
 
         public PacmanCoordinate(PacmanCoordinate p)
         {
-            this.Xpos = p.Xpos;
-            this.Ypos = p.Ypos;
+            Xpos = p.Xpos;
+            Ypos = p.Ypos;
+        }
+
+        public override string ToString()
+        {
+            return $"{Xpos} {Ypos}";
         }
 
         public static bool operator==(PacmanCoordinate lhs, PacmanCoordinate rhs)

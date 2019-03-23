@@ -122,7 +122,7 @@ namespace AIBracket.GameLogic.Pacman.Board
             }
         }
 
-        public void SpawnFruit()
+        public PacmanCoordinate SpawnFruit()
         {
             var random = new Random();
             int x, y;
@@ -133,7 +133,7 @@ namespace AIBracket.GameLogic.Pacman.Board
                 if (Board[x, y] == Tile.blank)
                 {
                     Board[x, y] = Tile.fruit;
-                    return;
+                    return new PacmanCoordinate(x, y);
                 }
             }
         }
