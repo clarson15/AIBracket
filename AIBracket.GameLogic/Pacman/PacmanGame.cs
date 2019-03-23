@@ -32,7 +32,7 @@ namespace AIBracket.GameLogic.Pacman.Game
             Board = new PacmanBoard();
             CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.BoardReset, GetBoardString()));
             Pacman = new PacmanPacman();
-            CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.PacmanLives, ""));
+            CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.PacmanLives, $"{Pacman.Lives}"));
             Ghosts = new PacmanGhost[4]
             {
                 new PacmanGhost(),
