@@ -13,11 +13,13 @@ namespace AIBracket.Data.Entities
         public AppUser()
         {
             CreatedAt = DateTime.Now;
+            SpectatorId = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0, 16);
         }
 
         // Extended Properties
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string SpectatorId { get; set; }
     }
 }

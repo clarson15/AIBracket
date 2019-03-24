@@ -19,6 +19,23 @@ namespace AIBracket.API.Sockets
             }
         }
 
+        private string _name;
+
+        public string Name
+        {
+            get
+            {
+                return _name ?? (_name = "Spectator" + new Random().Next(1, 12800));
+            }
+            set
+            {
+                if (value != null)
+                {
+                    _name = value;
+                }
+            }
+        }
+
         public bool IsReady => _socket.Connected && _socket.Available > 0;
 
         public bool IsConnected => _socket.Connected;
@@ -26,6 +43,12 @@ namespace AIBracket.API.Sockets
         public WebSocket(TcpClient client)
         {
             _socket = client;
+        }
+
+        public WebSocket(TcpClient client, string name)
+        {
+            _socket = client;
+            Name = name;
         }
 
         public void Disconnect()

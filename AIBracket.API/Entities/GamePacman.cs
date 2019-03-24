@@ -14,6 +14,7 @@ namespace AIBracket.API.Entities
         public bool IsRunning { get; set; } = true;
         public Guid Id { get; private set; } = Guid.NewGuid();
         public List<ISocket> Spectators { get; set; } = new List<ISocket>();
+        private List<string> chats { get; set; } = new List<string>();
 
         public void GetUserInput()
         {
@@ -27,22 +28,45 @@ namespace AIBracket.API.Entities
                 var command = User.Socket.ReadData();
                 if(command != null)
                 {
-                    switch (command.ToUpper())
+                    if (command.ToUpper().StartsWith("CHAT "))
                     {
-                        case "UP":
-                            User.Direction = PacmanPacman.Direction.up;
-                            break;
-                        case "DOWN":
-                            User.Direction = PacmanPacman.Direction.down;
-                            break;
-                        case "LEFT":
-                            User.Direction = PacmanPacman.Direction.left;
-                            break;
-                        case "RIGHT":
-                            User.Direction = PacmanPacman.Direction.right;
-                            break;
-                        default:
-                            break;
+                        chats.Add(User.Socket.Name + ":" + command.Substring(5));
+                    }
+                    else
+                    {
+                        switch (command.ToUpper())
+                        {
+                            case "UP":
+                                User.Direction = PacmanPacman.Direction.up;
+                                break;
+                            case "DOWN":
+                                User.Direction = PacmanPacman.Direction.down;
+                                break;
+                            case "LEFT":
+                                User.Direction = PacmanPacman.Direction.left;
+                                break;
+                            case "RIGHT":
+                                User.Direction = PacmanPacman.Direction.right;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+            foreach(var spec in Spectators)
+            {
+                if (!spec.IsReady)
+                {
+                    continue;
+                }
+                var command = spec.ReadData();
+                if(command != null)
+                {
+                    if(command.ToUpper().StartsWith("CHAT "))
+                    {
+                        var message = command.Substring(5);
+                        chats.Add(spec.Name + ":" + message);
                     }
                 }
             }
@@ -90,6 +114,12 @@ namespace AIBracket.API.Entities
                 }
             }
             Game.CurrentGameEvent.Clear();
+            
+            foreach(var chat in chats)
+            {
+                data += "*CHAT " + chat;
+            }
+            chats.Clear();
 
             for (var i = 0; i < Spectators.Count; i++)
             {

@@ -1,5 +1,13 @@
 <div class="container">
   <h1 class="header">Featured Game</h1>
-  <canvas #myCanvas width="550" height="600" class="game"></canvas>
+  <div class="game-container">
+    <canvas #myCanvas class="game">Your browser doesn't support canvas.</canvas>
+    <div class="chat">
+      <h1 class="chat-header">Chat</h1>
+      <p class="chat-text" id="chat"></p>
+      <textarea class="chat-box" id="chatinput"></textarea>
+      <button mat-raised-button class="chat-button" (click)="SubmitChat()">SEND</button>
+    </div>
+  </div>
   <h1 class="header">News</h1>
 </div>

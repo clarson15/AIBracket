@@ -1,5 +1,6 @@
 import { Component, ViewChild, ElementRef, OnInit, NgZone } from '@angular/core';
 import { GameService } from '../services/game.service';
+import { AccountService } from '../services/account.service';
 
 @Component({
   selector: 'app-home',
@@ -13,6 +14,8 @@ export class HomeComponent implements OnInit {
   private socket$: WebSocket;
   private ActiveGame: boolean;
   private ActiveGameId: string;
+  private SocketConnected: boolean;
+  private chatbox: HTMLElement;
 
   private map: Array<Array<number>> = new Array<Array<number>>();
   private score: number;
@@ -36,32 +39,53 @@ export class HomeComponent implements OnInit {
   private ghost4i: boolean;
   private ghost4d: boolean;
 
-  constructor(private gameservice: GameService, private ngZone: NgZone) { }
+  constructor(private gameservice: GameService, private ngZone: NgZone, private accountservice: AccountService) { }
 
-ngOnInit() {
+  ngOnInit() {
+    var canvas = document.getElementsByTagName('canvas')[0];
+    this.chatbox = document.getElementById('chat');
+    canvas.width = 550;
+    canvas.height = 600;
     var ctx = this.canvasRef.nativeElement.getContext('2d');
-    this.socket$ = new WebSocket("ws://localhost:8000");
+    this.socket$ = new WebSocket("ws://" + document.location.hostname + ":8000");
     this.socket$.onmessage = (event) => {
       this.UpdateGame(event.data);
     };
-    this.socket$.onopen = (event) => {
-      this.gameservice.getFeaturedGame().subscribe(
-        data => {
-          if (data == '0') {
-            this.ActiveGame = false;
-          }
-          else {
-            this.ActiveGame = true;
-            this.ActiveGameId = data;
-            var msg = 'WATCH ' + this.ActiveGameId;
-            this.send(msg);
-            this.ngZone.runOutsideAngular(() => this.paintLoop(ctx));
-          }
-        },
-        err => {
-          console.log(err.error);
-        });
-    };
+    this.socket$.onerror = (event) => {
+      if (this.SocketConnected == null) {
+          this.ngZone.runOutsideAngular(() => this.paintLoop(ctx));
+        }
+        this.SocketConnected = false;
+      };
+      this.socket$.onopen = (event) => {
+          this.SocketConnected = true;
+          this.gameservice.getFeaturedGame().subscribe(
+            data => {
+              if (data == '0') {
+                this.ActiveGame = false;
+                this.ngZone.runOutsideAngular(() => this.paintLoop(ctx));
+              }
+              else {
+                this.accountservice.getSpectatorId().subscribe(
+                  data2 => {
+                    console.log(data2);
+                    this.ActiveGame = true;
+                    this.ActiveGameId = data;
+                    var msg = 'WATCH ' + this.ActiveGameId;
+                    if (data2.spectatorId.length > 0) {
+                      msg += ' ' + data2.spectatorId;
+                    }
+                    this.send(msg);
+                    this.ngZone.runOutsideAngular(() => this.paintLoop(ctx));
+                  },
+                  err => {
+                  });
+              }
+            },
+            err => {
+              console.log(err.error);
+            });
+        };
   }
 
   paintLoop(ctx: CanvasRenderingContext2D) {
@@ -69,77 +93,114 @@ ngOnInit() {
     if (ctx == null) {
       return;
     }
-    // Paint current frame
     ctx.fillStyle = 'white';
     ctx.clearRect(0, 0, 550, 600);
-
-    let x = 80, y = 0;
-    if (this.map != null) {
-      this.map.forEach(yd => {
-        yd.forEach(xd => {
-          switch (xd) {
-            case 0:
-              ctx.fillStyle = 'black';
-              ctx.fillRect(y, x, 16, 16);
-              break;
-            case 1:
-              break;
-            case 2: //wall blank dot fruit powerup portal
-              ctx.fillStyle = 'grey';
-              ctx.beginPath();
-              ctx.arc(y + 8, x + 8, 2, 0, 6.28);
-              ctx.fill();
-              break;
-            case 3:
-              ctx.fillStyle = 'red';
-              ctx.beginPath();
-              ctx.arc(y + 8, x + 8, 2, 0, 6.28);
-              ctx.fill();
-              break;
-            case 4:
-              ctx.fillStyle = 'green';
-              ctx.beginPath();
-              ctx.arc(y + 8, x + 8, 2, 0, 6.28);
-              ctx.fill();
-              break;
-            case 5:
-              ctx.fillStyle = 'purple';
-              ctx.beginPath();
-              ctx.arc(y + 8, x + 8, 2, 0, 6.28);
-              ctx.fill();
-              break;
-            default:
-              console.log('???:' + xd);
-              break;
-          }
-          y += 16;
-        });
-        x += 16;
-        y = 0;
-      });
+    if (!this.SocketConnected) {
+      ctx.fillStyle = 'black';
+      ctx.textAlign = 'center';
+      ctx.font = '20pt Verdana';
+      ctx.fillText('Error connecting to game server.', 275, 300);
+      ctx.stroke();
     }
+    else if (this.ActiveGame) {
+      let x = 80, y = 0;
+      if (this.map != null) {
+        this.map.forEach(yd => {
+          yd.forEach(xd => {
+            switch (xd) {
+              case 0:
+                ctx.fillStyle = 'black';
+                ctx.fillRect(y, x, 16, 16);
+                break;
+              case 1:
+                break;
+              case 2:
+                ctx.fillStyle = 'grey';
+                ctx.beginPath();
+                ctx.arc(y + 8, x + 8, 4, 0, Math.PI * 2);
+                ctx.fill();
+                break;
+              case 3:
+                ctx.fillStyle = 'red';
+                ctx.beginPath();
+                ctx.arc(y + 8, x + 8, 4, 0, Math.PI * 2);
+                ctx.fill();
+                break;
+              case 4:
+                ctx.fillStyle = 'green';
+                ctx.beginPath();
+                ctx.arc(y + 8, x + 8, 4, 0, Math.PI * 2);
+                ctx.fill();
+                break;
+              case 5:
+                ctx.fillStyle = 'purple';
+                ctx.beginPath();
+                ctx.arc(y + 8, x + 8, 4, 0, Math.PI * 2);
+                ctx.fill();
+                break;
+              default:
+                console.log('???:' + xd);
+                break;
+            }
+            y += 16;
+          });
+          x += 16;
+          y = 0;
+        });
+      }
+      
+      ctx.beginPath();
+      ctx.arc((this.pacmanx * 16) + 8, (this.pacmany * 16) + 88, 6, 0.25 * Math.PI, 1.25 * Math.PI, false);
+      ctx.fillStyle = "rgb(255, 255, 0)";
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc((this.pacmanx * 16) + 8, (this.pacmany * 16) + 88, 6, 0.75 * Math.PI, 1.75 * Math.PI, false);
+      ctx.fill();
 
-    ctx.fillStyle = 'yellow';
-    ctx.fillRect(this.pacmanx * 16, this.pacmany * 16 + 80, 16, 16);
-    ctx.stroke();
+      ctx.fillStyle = 'blue';
+      ctx.fillRect(this.ghost1x * 16, this.ghost1y * 16 + 80, 16, 16);
+      ctx.fillRect(this.ghost2x * 16, this.ghost2y * 16 + 80, 16, 16);
+      ctx.fillRect(this.ghost3x * 16, this.ghost3y * 16 + 80, 16, 16);
+      ctx.fillRect(this.ghost4x * 16, this.ghost4y * 16 + 80, 16, 16);
 
-    ctx.fillStyle = 'blue';
-    ctx.fillRect(this.ghost1x * 16, this.ghost1y * 16 + 80, 16, 16);
-    ctx.fillRect(this.ghost2x * 16, this.ghost2y * 16 + 80, 16, 16);
-    ctx.fillRect(this.ghost3x * 16, this.ghost3y * 16 + 80, 16, 16);
-    ctx.fillRect(this.ghost4x * 16, this.ghost4y * 16 + 80, 16, 16);
-
-    ctx.fillStyle = 'black';
-    ctx.font = '30pt Verdana';
-    ctx.fillText('Score: ' + this.score, 10, 30);
-    ctx.fillText('Lives: ' + this.lives, 10, 60);
-    ctx.stroke();
+      ctx.fillStyle = 'black';
+      ctx.font = '30pt Verdana';
+      ctx.textAlign = 'start';
+      if (this.score != null) {
+        ctx.fillText('Score: ' + this.score, 10, 30);
+      }
+      if (this.lives != null) {
+        ctx.fillText('Lives: ' + this.lives, 10, 60);
+      }
+      ctx.stroke();
+    }
+    else {
+      ctx.fillStyle = 'black';
+      ctx.textAlign = 'center';
+      ctx.font = '30pt Verdana';
+      ctx.fillText('There is no active game', 275, 300);
+      ctx.stroke();
+    }
 
     // Schedule next frame
     requestAnimationFrame(() => this.paintLoop(ctx));
   }
 
+  SubmitChat() {
+    var chatinput = document.getElementById('chatinput') as HTMLTextAreaElement;
+    var data = chatinput.value.trim();
+    console.log(data);
+    if (data.length > 0) {
+      this.send('CHAT ' + data);
+    }
+    chatinput.value = '';
+  }
+
   UpdateGame(data: string) {
+    if (data === "Game does not exist") {
+      this.ActiveGame = false;
+      return;
+    }
     var packets = data.split('*');
     if (packets == null) {
       return;
@@ -222,6 +283,9 @@ ngOnInit() {
           var vals = payload.split(' ');
           this.score = Number(vals[0]);
           break;
+        case "CHAT":
+          var vals = payload.split(':');
+          this.chatbox.innerText = this.chatbox.innerText + "\n" + vals[0] + ': ' + vals[1];
         default:
           break;
       }
@@ -229,6 +293,7 @@ ngOnInit() {
   }
 
   send(message: string) {
+    console.log('sending ' + message);
     this.socket$.send(message);
   }
 }

@@ -42,7 +42,8 @@ namespace AIBracket.Data.Migrations
                     AccessFailedCount = table.Column<int>(nullable: false),
                     FirstName = table.Column<string>(nullable: true),
                     LastName = table.Column<string>(nullable: true),
-                    CreatedAt = table.Column<DateTime>(nullable: false)
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    SpectatorId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {

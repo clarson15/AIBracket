@@ -176,23 +176,50 @@ namespace AIBracket.API
                     }
                     else if(message.StartsWith("WATCH ", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        var target = message.Substring(6);
-                        if (target == "GAMEMASTER")
+                        var targets = message.Substring(6).Split(' ');
+                        if (targets.Count() == 1)
                         {
-                            GameMaster.AddSpectator(client);
-                            websockets.Remove(client);
-                            continue;
-                        }
-                        else
-                        {
-                            if (GameMaster.WatchGame(client, target))
+                            var target = targets[0];
+                            if (target == "GAMEMASTER")
                             {
+                                GameMaster.AddSpectator(client);
                                 websockets.Remove(client);
                                 continue;
                             }
                             else
                             {
-                                client.WriteData("Game does not exist");
+                                if (GameMaster.WatchGame(client, target))
+                                {
+                                    websockets.Remove(client);
+                                    continue;
+                                }
+                                else
+                                {
+                                    client.WriteData("Game does not exist");
+                                    websockets.Remove(client);
+                                    continue;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            var user = context.Users.Where(x => x.SpectatorId == targets[1]).FirstOrDefault();
+                            if (user == null)
+                            {
+                                client.WriteData("SpectatorID doesn't exist");
+                                websockets.Remove(client);
+                                continue;
+                            }
+                            client.Name = user.UserName;
+                            if(targets[0] == "GAMEMASTER")
+                            {
+                                GameMaster.AddSpectator(client);
+                                websockets.Remove(client);
+                                continue;
+                            }
+                            if(GameMaster.WatchGame(client, targets[0]))
+                            {
+                                websockets.Remove(client);
                                 continue;
                             }
                         }
@@ -220,7 +247,7 @@ namespace AIBracket.API
                                 {
                                     User = user,
                                     Bot = bot,
-                                    Socket = new WebSocket(client)
+                                    Socket = new WebSocket(client, bot.Name)
                                 };
                             }
                             else
@@ -229,7 +256,7 @@ namespace AIBracket.API
                                 {
                                     User = user,
                                     Bot = bot,
-                                    Socket = new BotSocket(client)
+                                    Socket = new BotSocket(client, bot.Name)
                                 };
                             }
                         default:

@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AIBracket.Data.Migrations
 {
     [DbContext(typeof(AIBracketContext))]
-    [Migration("20190310031907_initial")]
+    [Migration("20190324214556_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -56,6 +56,8 @@ namespace AIBracket.Data.Migrations
                     b.Property<bool>("PhoneNumberConfirmed");
 
                     b.Property<string>("SecurityStamp");
+
+                    b.Property<string>("SpectatorId");
 
                     b.Property<bool>("TwoFactorEnabled");
 

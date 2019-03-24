@@ -90,6 +90,22 @@ namespace AIBracket.Web.Controllers
             return Ok(new { data.UserName, data.FirstName, data.LastName, Location = "Test"});
         }
 
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetSpectatorId()
+        {
+            if(User.Claims.Count(x => x.Type == "id") == 0)
+            {
+                return Ok(new { SpectatorId = "" });
+            }
+            var data = await _userManager.FindByIdAsync(User.Claims.First(x => x.Type == "id").Value);
+            if (data == null)
+            {
+                return Ok(new { SpectatorId = "" });
+            }
+            return Ok(new { data.SpectatorId });
+        }
+
         private async Task<ClaimsIdentity> GetClaimsIdentity(string userName, string password)
         {
             if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password))

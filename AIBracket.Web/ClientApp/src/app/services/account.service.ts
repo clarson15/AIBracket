@@ -41,6 +41,16 @@ export class AccountService {
     }), catchError((err, obs) => this.errorHandler(err, obs)));
   }
 
+  getSpectatorId(): Observable<any> {
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+    });
+    return this.http.get<any>('/api/Auth/GetSpectatorId', { headers }).pipe(map((res) => {
+      return res;
+    }), catchError((err, obs) => this.errorHandler(err, obs)));
+  }
+
   errorHandler(error: HttpErrorResponse, caught: Observable<any>) {
     if (error.status == 401) {
       localStorage.removeItem('auth_token');
