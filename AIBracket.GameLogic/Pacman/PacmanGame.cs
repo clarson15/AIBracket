@@ -12,6 +12,8 @@ namespace AIBracket.GameLogic.Pacman.Game
    
     public class PacmanGame
     {
+        public enum EventType { Dot, Fruit, PowerUp, FruitSpawn, BoardReset, PacmanLives, GhostDie };
+        public List<KeyValuePair<EventType, string>> CurrentGameEvent;
         public PacmanBoard Board { get; private set; }
         public PacmanPacman Pacman { get; private set; }
         public PacmanGhost[] Ghosts { get; private set; }
@@ -28,7 +30,9 @@ namespace AIBracket.GameLogic.Pacman.Game
         public PacmanGame()
         {
             Board = new PacmanBoard();
+            CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.BoardReset, GetBoardString()));
             Pacman = new PacmanPacman();
+            CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.PacmanLives, $"{Pacman.Lives}"));
             Ghosts = new PacmanGhost[4]
             {
                 new PacmanGhost(),
@@ -55,19 +59,23 @@ namespace AIBracket.GameLogic.Pacman.Game
         /// Updates score based on tiles that pacman enters
         /// </summary>
         /// <param name="t">Tile entered by pacman</param>
-        private void UpdateScore(PacmanBoard.Tile t)
+        private void UpdateScore(PacmanCoordinate pos)
         {
+            var t = Board.GetTile(pos);
             if(t == PacmanBoard.Tile.dot)
             {
                 Score += 10;
+                CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.Dot, pos.ToString() + " 10"));
             }
             else if(t == PacmanBoard.Tile.fruit)
             {
                 Score += 100;
+                CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.Fruit, pos.ToString() + " 100"));
             }
             else if(t == PacmanBoard.Tile.powerUp)
             {
                 Score += 50;
+                CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.PowerUp, pos.ToString() + " 50"));
             }
             return;
         }
@@ -86,6 +94,7 @@ namespace AIBracket.GameLogic.Pacman.Game
                 new PacmanGhost(),
                 new PacmanGhost()
             };
+            CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.BoardReset, GetBoardString()));
         }
 
         /// <summary>
@@ -130,7 +139,7 @@ namespace AIBracket.GameLogic.Pacman.Game
                             PoweredUpCounter = 30;
                         }
                     }
-                    UpdateScore(Board.GetTile(pos));
+                    UpdateScore(pos);
                     Board.UpdateTile(pos);
                     if (Board.DotCount <= 0)
                         ResetBoard();
@@ -138,7 +147,7 @@ namespace AIBracket.GameLogic.Pacman.Game
                     break;
                 case PacmanBoard.Tile.dot:
                 case PacmanBoard.Tile.fruit:
-                    UpdateScore(Board.GetTile(pos));
+                    UpdateScore(pos);
                     Board.UpdateTile(pos);
                     if (Board.DotCount <= 0)
                         ResetBoard();
@@ -161,11 +170,12 @@ namespace AIBracket.GameLogic.Pacman.Game
         {
             if(SpawnGhostCounter <= 0)
             {
-                foreach (var g in Ghosts)
+                for (int i = 0; i < Ghosts.Length; i++)
                 {
-                    if(g.IsDead == true)
+                    if(Ghosts[i].IsDead == true)
                     {
-                        g.IsDead = false;
+                        Ghosts[i].IsDead = false;
+                        CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.GhostDie, i + " 0"));
                         SpawnGhostCounter = 10;
                         return;
                     }
@@ -190,6 +200,7 @@ namespace AIBracket.GameLogic.Pacman.Game
                         Ghosts[i].Location.Xpos = 13;
                         Ghosts[i].Location.Ypos = 11;
                         Score += 200 * GhostScoreMultiplier;
+                        CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.GhostDie, i + $" 1 {200 * GhostScoreMultiplier}"));
 
                     }
                     else if (!Ghosts[i].IsDead)
@@ -198,6 +209,7 @@ namespace AIBracket.GameLogic.Pacman.Game
                         Pacman.Location.Ypos = 17;
                         Pacman.Facing = PacmanPacman.Direction.right;
                         Pacman.Lives--;
+                        CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.PacmanLives,  ""));
                         Ghosts = new PacmanGhost[4]
                         {
                             new PacmanGhost(),
@@ -258,7 +270,7 @@ namespace AIBracket.GameLogic.Pacman.Game
             SpawnGhost();
             if(FruitSpawnCounter == 60)
             {
-                Board.SpawnFruit();
+                CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.FruitSpawn, Board.SpawnFruit().ToString())); 
                 FruitSpawnCounter = -1;
             }
             FruitSpawnCounter++;

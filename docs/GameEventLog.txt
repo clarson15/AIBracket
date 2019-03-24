@@ -1,0 +1,16 @@
+GameEventLog : 
+All Events are indicated with two arguments: an enum of the event type and a string specifying additional information
+enum EventType { Dot, Fruit, PowerUp, FruitSpawn, BoardReset, PacmanLives, GhostDie };
+
+BoardReset is called on init and when all dots/powerups are consumed with a string of 
+the board in grid format with enum type:
+enum Tile { wall, blank, dot, fruit, powerUp, portal };
+
+PacmanLives is sent at the beginning of the game and when pacman dies with number of lives.
+
+Dot, Fruit, and PowerUp are sent when one of them is consumed with a string of the coordinate with "X Y" followed by the score to add.
+
+GhostDie is sends an index of the affected ghost followed by a " 0" if they spawned or a " 1" followed by 
+a score to add.
+
+FruitSpawn is followed by a string of "X Y" indicating the position that it spawned.
