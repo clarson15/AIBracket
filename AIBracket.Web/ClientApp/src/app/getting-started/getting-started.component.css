@@ -1,0 +1,29 @@
+h1 {
+  font: 38px Verdana;
+  font-weight: 600;
+}
+
+h2 {
+  font: 32px Verdana;
+  font-weight: 600;
+}
+
+p {
+  font: 18px Verdana;
+}
+
+.info {
+  width: 75%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.language-list {
+  font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier, monospace;
+  color: #3f51b5;
+}
+
+.language-list p {
+  text-wrap: none;
+  overflow-x: auto;
+}

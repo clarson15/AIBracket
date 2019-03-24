@@ -1,1 +1,71 @@
-HTML
+
+<div class="info">
+  <h1>Getting Started With AI Bracket</h1>
+  <p>
+    AI Bracket is designed around writing bots to play simple games. <br>
+    Based on what's going on in the game, you can design a simple AI to compete on a leaderboard for the highest score.
+  </p>
+  <h2>Creating a Bot</h2>
+  <p>
+    You can create a bot using any language. Once you are ready to test your bot, create an account and log in to access your profile.
+    Select the new bot '+' and enter the required fields to recieve a private key for your bot.
+  </p>
+  <p>
+    Statistics for every bot any bot you own can be seen on your profile along with your match history.
+  </p>
+  <h2>Connecting a Bot</h2>
+  <p>
+    Connect to AIBracket.com:8000 and send a message BOT followed by your private key to get your bot started.<br>
+    This will allow you to send and recieve data to the server about your match and your bot can process it.
+  </p>
+  <p>
+    ***The API will require some information about your intentions, whether you are connecting for a single player game, versus game, or a tournament.
+  </p>
+  <br />
+  <br />
+  <br />
+  <div class="language-list">
+    <mat-tab-group>
+      <mat-tab label="Python">
+        import socket<br />
+        import random<br />
+        <br />
+        def switchInput( c ):<br />
+        if c == 0:<br />
+        return 'LEFT'<br />
+        elif c == 1:<br />
+        return 'RIGHT'<br />
+        elif c == 2:<br />
+        return 'DOWN'<br />
+        else:<br />
+        return 'UP'<br />
+        <br />
+        TCP_IP = '127.0.0.1'<br />
+        <br />
+        TCP_PORT = 8000<br />
+        <br />
+        BUFFER_SIZE = 1024<br />
+        <br />
+        MESSAGE = "BOT Za2sMl0wpk6bou4H"<br />
+        <br />
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)<br />
+        <br />
+        s.connect((TCP_IP, TCP_PORT))<br />
+        print("Connected")<br />
+        userInput = 'LEFT'<br />
+        s.send(str.encode(MESSAGE))<br />
+        <br />
+        while userInput != 'STOP':<br />
+        data = s.recv(BUFFER_SIZE)<br />
+        data = data.decode('ascii')<br />
+        data = data.split()<br />
+        print(data)<br />
+        s.send(switchInput(random.randint(0, 4)).encode('ascii'))<br />
+        <br />
+        s.close()<br />
+      </mat-tab>
+      <mat-tab label="C#"> Content 2 </mat-tab>
+      <mat-tab label="C++"> Content 3 </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
