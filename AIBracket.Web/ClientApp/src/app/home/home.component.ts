@@ -140,48 +140,92 @@ ngOnInit() {
   }
 
   UpdateGame(data: string) {
-    //console.log(data);
-    if (data[0] === "0") {
-      console.log('got map data');
-      this.map.length = 0;
-      let rows = data.substr(2).split('\n');
-      console.log(rows.length + 'x' + rows[0].split(' ').length);
-      rows.forEach(y => {
-        let data = Array<number>();
-        let columns = y.split(' ');
-        columns.forEach(x => {
-          data.push(Number(x));
-        });
-        this.map.push(data);
-      });
+    var packets = data.split('*');
+    if (packets == null) {
+      return;
     }
-    else if (data[0] === "1") {
-      var values = data.substr(2).split(' ');
-      if (values.length != 21) {
-        console.log('something happened');
-        console.log(data);
+    packets.forEach(x => {
+      var seperator = x.indexOf(' ');
+      if (seperator == -1) return;
+      var type = x.substr(0, seperator);
+      var payload = x.substr(seperator + 1);
+      switch (type) {
+        case "0":
+          this.map.length = 0;
+          let rows = payload.split('\n');
+          console.log(rows.length + 'x' + rows[0].split(' ').length);
+          rows.forEach(y => {
+            let newrow = Array<number>();
+            let columns = y.split(' ');
+            columns.forEach(x => {
+              newrow.push(Number(x));
+            });
+            this.map.push(newrow);
+          });
+          break;
+        case "1":
+          var vals = payload.split(' ');
+          this.pacmanx = Number(vals[0]);
+          this.pacmany = Number(vals[1]);
+          break;
+        case "2":
+          var vals = payload.split(' ');
+          switch (vals[0]) {
+            case "0":
+              this.ghost1x = Number(vals[1]);
+              this.ghost1y = Number(vals[2]);
+              this.ghost1d = Boolean(vals[3]);
+              this.ghost1i = Boolean(vals[4]);
+              break;
+            case "1":
+              this.ghost2x = Number(vals[1]);
+              this.ghost2y = Number(vals[2]);
+              this.ghost2d = Boolean(vals[3]);
+              this.ghost2i = Boolean(vals[4]);
+              break;
+            case "2":
+              this.ghost3x = Number(vals[1]);
+              this.ghost3y = Number(vals[2]);
+              this.ghost3d = Boolean(vals[3]);
+              this.ghost3i = Boolean(vals[4]);
+              break;
+            case "3":
+              this.ghost4x = Number(vals[1]);
+              this.ghost4y = Number(vals[2]);
+              this.ghost4d = Boolean(vals[3]);
+              this.ghost4i = Boolean(vals[4]);
+              break;
+            default:
+              break;
+          }
+          break;
+        case "3":
+        case "4":
+        case "5":
+          var vals = payload.split(' ');
+          this.map[Number(vals[1])][Number(vals[0])] = 1;
+          this.score += Number(vals[2]);
+          break;
+        case "6":
+          var vals = payload.split(' ');
+          this.map[Number(vals[1])][Number(vals[0])] = 3;
+          break;
+        case "7":
+          var vals = payload.split(' ');
+          this.lives = Number(vals[0]);
+          break;
+        case "8":
+          var vals = payload.split(' ');
+          // Ghost die
+          break;
+        case "9":
+          var vals = payload.split(' ');
+          this.score = Number(vals[0]);
+          break;
+        default:
+          break;
       }
-      this.score = Number(values[0]);
-      this.lives = Number(values[1]);
-      this.pacmanx = Number(values[2]);
-      this.pacmany = Number(values[3]);
-      this.ghost1x = Number(values[4]);
-      this.ghost1y = Number(values[5]);
-      this.ghost1d = Boolean(values[6]);
-      this.ghost1i = Boolean(values[7]);
-      this.ghost2x = Number(values[8]);
-      this.ghost2y = Number(values[9]);
-      this.ghost2d = Boolean(values[10]);
-      this.ghost2i = Boolean(values[11]);
-      this.ghost3x = Number(values[12]);
-      this.ghost3y = Number(values[13]);
-      this.ghost3d = Boolean(values[14]);
-      this.ghost3i = Boolean(values[15]);
-      this.ghost4x = Number(values[16]);
-      this.ghost4y = Number(values[17]);
-      this.ghost4d = Boolean(values[18]);
-      this.ghost4i = Boolean(values[19]);
-    }
+    });
   }
 
   send(message: string) {

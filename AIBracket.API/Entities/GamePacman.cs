@@ -12,7 +12,6 @@ namespace AIBracket.API.Entities
         public PacmanGame Game { get; set; }
         public PacmanClient User { get; set; }
         public bool IsRunning { get; set; } = true;
-        public bool IsStarted { get; set; } = false;
         public Guid Id { get; private set; } = Guid.NewGuid();
         public List<ISocket> Spectators { get; set; } = new List<ISocket>();
 
@@ -51,13 +50,8 @@ namespace AIBracket.API.Entities
 
         public void UpdateGame()
         {
-            if (!IsStarted)
-            {
-                IsStarted = true;
-                User.Socket.WriteData("0 " + Game.GetBoardString());
-            }
             Game.UpdateGame(User.Direction);
-            UpdateUsers(); // Change this when tickrate changes
+            UpdateUsers();
             if(Game.Pacman.Lives == 0)
             {
                 IsRunning = false;
@@ -67,30 +61,49 @@ namespace AIBracket.API.Entities
 
         public void AddSpectator(ISocket spec)
         {
-            spec.WriteData("0 " + Game.GetBoardString());
-            Spectators.Add(spec);
+            var ret = "";
+            ret += (int)PacmanGame.EventType.BoardReset + " " + Game.GetBoardString() + "*";
+            ret += (int)PacmanGame.EventType.PacmanLives + " " + Game.Pacman.Lives + "*";
+            foreach(var g in Game.Ghosts)
+            {
+                ret += (int)PacmanGame.EventType.GhostUpdate + $" {g.GetPosition().ToString()} {g.IsDead} {g.IsVulnerable}*";
+            }
+            ret += (int)PacmanGame.EventType.PacmanUpdate + " " + Game.Pacman.GetPosition().ToString() + "*";
+            ret += (int)PacmanGame.EventType.Score + " " + Game.Score;
+            spec.WriteData(ret);
+            if (spec.IsConnected)
+            {
+                Spectators.Add(spec);
+            }
         }
 
         private void UpdateUsers()
         {
-            var update = "1 " + Game.Score + " " + Game.Pacman.Lives + " " + Game.Pacman.Location.Xpos + " " + Game.Pacman.Location.Ypos + " ";
-            foreach(var ghost in Game.Ghosts)
+            var data = "";
+            for(var i = 0; i < Game.CurrentGameEvent.Count; i++)
             {
-                update += ghost.Location.Xpos + " ";
-                update += ghost.Location.Ypos + " ";
-                update += ghost.IsDead + " ";
-                update += ghost.IsVulnerable + " ";
+                var e = Game.CurrentGameEvent[i];
+                data += ((int)e.Key + " " + e.Value);
+                if(i < Game.CurrentGameEvent.Count - 1)
+                {
+                    data += "*";
+                }
             }
-            update += "\r\n\r\n";
-            User.Socket.WriteData(update);
-            for(var i = 0; i < Spectators.Count; i++)
+            Game.CurrentGameEvent.Clear();
+
+            for (var i = 0; i < Spectators.Count; i++)
             {
-                Spectators[i].WriteData(update);
+                Spectators[i].WriteData(data);
                 if (!Spectators[i].IsConnected)
                 {
                     Spectators.RemoveAt(i);
                     i--;
                 }
+            }
+            User.Socket.WriteData(data);
+            if (!User.Socket.IsConnected)
+            {
+                IsRunning = false;
             }
         }
     }

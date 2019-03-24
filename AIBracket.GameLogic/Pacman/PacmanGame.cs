@@ -12,7 +12,7 @@ namespace AIBracket.GameLogic.Pacman.Game
    
     public class PacmanGame
     {
-        public enum EventType { Dot, Fruit, PowerUp, FruitSpawn, BoardReset, PacmanLives, GhostDie };
+        public enum EventType { BoardReset, PacmanUpdate, GhostUpdate, Dot, Fruit, PowerUp, FruitSpawn, PacmanLives, GhostDie, Score };
         public List<KeyValuePair<EventType, string>> CurrentGameEvent;
         public PacmanBoard Board { get; private set; }
         public PacmanPacman Pacman { get; private set; }
@@ -29,6 +29,7 @@ namespace AIBracket.GameLogic.Pacman.Game
 
         public PacmanGame()
         {
+            CurrentGameEvent = new List<KeyValuePair<EventType, string>>();
             Board = new PacmanBoard();
             CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.BoardReset, GetBoardString()));
             Pacman = new PacmanPacman();
@@ -41,11 +42,13 @@ namespace AIBracket.GameLogic.Pacman.Game
                 new PacmanGhost()
             };
             Random random = new Random();
-            foreach (var g in Ghosts)
+            for (var i = 0; i < Ghosts.Length; i++)
             {
-                g.Facing = (PacmanPacman.Direction)random.Next(1, 5);
+                Ghosts[i].Facing = (PacmanPacman.Direction)random.Next(1, 5);
+                CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.GhostUpdate, $"{i} {Ghosts[i].GetPosition().ToString()} {Ghosts[i].IsDead} {Ghosts[i].IsVulnerable}"));
             }
             Score = 0;
+            CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.Score, $"{Score}"));
             GhostScoreMultiplier = 1;
             SpawnGhostCounter = 10;
             PoweredUpCounter = 0;
@@ -221,6 +224,7 @@ namespace AIBracket.GameLogic.Pacman.Game
                         {
                             Pacman.Lives = 0;
                             GameRunning = false;
+                            TimeEnded = DateTime.Now;
                             return true;
                         }
                     }
@@ -259,28 +263,30 @@ namespace AIBracket.GameLogic.Pacman.Game
             }
             return directions[random.Next(0, directions.Count)];
         }
-        
+
         /// <summary>Processes every tick of the game base on directions of each entity passed in the array
         /// p should be passed 5 directions
         /// p[0] represents Pacman
         /// p[1] through p[4] represent ghosts in order passed </summary>
-        
+
         public void UpdateGame(PacmanPacman.Direction p)
         {
             SpawnGhost();
-            if(FruitSpawnCounter == 60)
+            if (FruitSpawnCounter == 60)
             {
-                CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.FruitSpawn, Board.SpawnFruit().ToString())); 
+                CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.FruitSpawn, Board.SpawnFruit().ToString()));
                 FruitSpawnCounter = -1;
             }
             FruitSpawnCounter++;
 
-            
+
             // Move ghosts
             for (int i = 0; i < Ghosts.Length; i++)
             {
                 if (Ghosts[i].IsDead)
+                {
                     continue;
+                }
                 if (Ghosts[i].IsVulnerable)
                 {
                     if (!SlowGhosts)
@@ -288,14 +294,13 @@ namespace AIBracket.GameLogic.Pacman.Game
                         PortalGhost(Ghosts[i].Location, i);
                         Ghosts[i].Facing = DetermineGhostMove(Ghosts[i].Facing, Ghosts[i].Location);
                         Ghosts[i].Move();
-                        
                     }
                 }
                 else
                 {
                     PortalGhost(Ghosts[i].Location, i);
                     Ghosts[i].Facing = DetermineGhostMove(Ghosts[i].Facing, Ghosts[i].Location);
-                    Ghosts[i].Move();                    
+                    Ghosts[i].Move();
                 }
             }
             SlowGhosts = !SlowGhosts;
@@ -306,7 +311,7 @@ namespace AIBracket.GameLogic.Pacman.Game
             {
                 Pacman.Facing = p;
             }
-            if(ValidMove(Pacman.Facing, Pacman.GetPosition()))
+            if (ValidMove(Pacman.Facing, Pacman.GetPosition()))
             {
                 Pacman.Move();
                 CheckTile(Pacman.GetPosition());
@@ -326,6 +331,12 @@ namespace AIBracket.GameLogic.Pacman.Game
             {
                 PoweredUpCounter--;
             }
+
+            for (var i = 0; i < Ghosts.Length; i++)
+            {
+                CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.GhostUpdate, $"{i} {Ghosts[i].GetPosition().ToString()} {Ghosts[i].IsDead} {Ghosts[i].IsVulnerable}"));
+            }
+            CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.PacmanUpdate, $"{Pacman.GetPosition().ToString()}"));
         }
 
         public string GetBoardString()
