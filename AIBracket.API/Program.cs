@@ -70,6 +70,28 @@ namespace AIBracket.API
             }
         }
 
+        private static byte[] GetDecodedData(Byte[] buffer)
+        {
+            String incomingData = String.Empty;
+            Byte secondByte = buffer[1];
+            Int32 dataLength = secondByte & 127;
+            Int32 indexFirstMask = 2;
+            if (dataLength == 126)
+                indexFirstMask = 4;
+            else if (dataLength == 127)
+                indexFirstMask = 10;
+            IEnumerable<Byte> keys = buffer.Skip(indexFirstMask).Take(4);
+            Int32 indexFirstDataByte = indexFirstMask + 4;
+
+            Byte[] decoded = new Byte[buffer.Length - indexFirstDataByte];
+            for (Int32 i = indexFirstDataByte, j = 0; i < buffer.Length; i++, j++)
+            {
+                decoded[j] = (Byte)(buffer[i] ^ keys.ElementAt(j % 4));
+            }
+
+            return decoded;
+        }
+
         public static void DiscoverIntentions()
         {
             var clientsToRemove = new List<TcpClient>();
@@ -88,7 +110,7 @@ namespace AIBracket.API
                         sslStream.AuthenticateAsServer(cert, false, SslProtocols.Tls, false);
                         var sbuffer = new byte[sslStream.Length];
                         sslStream.Read(sbuffer);
-                        Console.WriteLine(Encoding.ASCII.GetString(sbuffer));
+                        Console.WriteLine(Encoding.ASCII.GetString(GetDecodedData(sbuffer)));
                     }
                     catch(Exception e)
                     {
