@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using AIBracket.API.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
+using System.Security.Cryptography;
 
 namespace AIBracket.API
 {
@@ -74,7 +75,6 @@ namespace AIBracket.API
                     client.GetStream().Read(buffer, 0, client.Available);
 
                     var message = Encoding.ASCII.GetString(buffer);
-                    Console.WriteLine(message);
                     if (message.StartsWith("GET "))
                     {
                         if (!message.Contains("websocket"))
@@ -84,9 +84,7 @@ namespace AIBracket.API
                             continue;
                         }
                         const string eol = "\r\n"; // HTTP/1.1 defines the sequence CR LF as the end-of-line marker
-                        var certificate = new X509Certificate2("Certificate.pfx");
-                        var ssl = new SslStream(client.GetStream(), false);
-                        ssl.AuthenticateAsServer(certificate, false, false);
+                        
                         byte[] response = Encoding.UTF8.GetBytes("HTTP/1.1 101 Switching Protocols" + eol
                             + "Connection: Upgrade" + eol
                             + "Upgrade: websocket" + eol
@@ -107,7 +105,6 @@ namespace AIBracket.API
                     }
                     else
                     {
-                        Console.WriteLine(message);
                         if (message.StartsWith("BOT ", StringComparison.InvariantCultureIgnoreCase))
                         {
                             var bot = VerifyBot(message.Substring(4), client, false);
@@ -145,6 +142,15 @@ namespace AIBracket.API
                         }
                         else
                         {
+                            var certificate = new X509Certificate2("Certificate.pfx");
+                            using (RSA rsa = certificate.GetRSAPrivateKey())
+                            {
+                                var ssl = new SslStream(client.GetStream(), false);
+                                var udata = rsa.Decrypt(buffer, RSAEncryptionPadding.OaepSHA1);
+                                var newmessage = Encoding.ASCII.GetString(udata);
+                                Console.WriteLine(newmessage);
+                                ssl.AuthenticateAsServer(certificate, false, false);
+                            }
                             Console.WriteLine("Unknown client.");
                             clientsToRemove.Add(client);
                             continue;
