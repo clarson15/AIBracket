@@ -30,7 +30,7 @@ namespace AIBracket.API
             IPAddress address = IPAddress.Any;
             try
             {
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls11;
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls;
                 cert = new X509Certificate2("Cert.pfx", "password");
             }
             catch
@@ -82,10 +82,10 @@ namespace AIBracket.API
                 }
                 if(client.Available > 0)
                 {
-                    var sslStream = new SslStream(client.GetStream());
+                    var sslStream = new SslStream(client.GetStream(), false, (sender, cert, chain, err) => true);
                     try
                     {
-                        sslStream.AuthenticateAsServer(cert, false, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, false);
+                        sslStream.AuthenticateAsServer(cert, false, SslProtocols.Tls, false);
                         var sbuffer = new byte[sslStream.Length];
                         sslStream.Read(sbuffer);
                         Console.WriteLine(Encoding.ASCII.GetString(sbuffer));
