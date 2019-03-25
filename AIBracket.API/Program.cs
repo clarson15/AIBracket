@@ -21,11 +21,20 @@ namespace AIBracket.API
         private static AIBracketContext context = new AIBracketContext();
         private static TcpListener Listener { get; set; }
         private static bool Accept { get; set; } = false;
+        private static X509Certificate2 cert;
         private static List<TcpClient> clients = new List<TcpClient>();
         private static List<WebSocket> websockets = new List<WebSocket>();
 
         public static void StartServer(int port) {
             IPAddress address = IPAddress.Any;
+            try
+            {
+                cert = new X509Certificate2("Cert.pfx", "password");
+            }
+            catch
+            {
+                Console.WriteLine("No certificate found.");
+            }
             GameMaster.Initialize(); 
             Task.Run(() => GameMaster.Run());
             Listener = new TcpListener(address, port);
@@ -71,6 +80,18 @@ namespace AIBracket.API
                 }
                 if(client.Available > 0)
                 {
+                    var sslStream = new SslStream(client.GetStream());
+                    try
+                    {
+                        sslStream.AuthenticateAsServer(cert, false, false);
+                        var sbuffer = new byte[sslStream.Length];
+                        sslStream.Read(sbuffer);
+                        Console.WriteLine(Encoding.ASCII.GetString(sbuffer));
+                    }
+                    catch(Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
                     var buffer = new byte[client.Available];
                     client.GetStream().Read(buffer, 0, client.Available);
 
@@ -143,19 +164,8 @@ namespace AIBracket.API
                         else
                         {
                             var certificate = new X509Certificate2("Cert.pfx", "password");
-                            using (RSA rsa = certificate.GetRSAPrivateKey())
-                            {
-                                Console.WriteLine(buffer);
-                                Console.WriteLine(certificate.GetRSAPrivateKey());
-                                var ssl = new SslStream(client.GetStream(), false);
-                                var udata = rsa.Decrypt(buffer, RSAEncryptionPadding.OaepSHA1);
-                                var newmessage = Encoding.ASCII.GetString(udata);
-                                Console.WriteLine(newmessage);
-                                ssl.AuthenticateAsServer(certificate, false, false);
-                            }
-                            Console.WriteLine("Unknown client.");
-                            clientsToRemove.Add(client);
-                            continue;
+                            var ssl = new SslStream(client.GetStream(), false);
+                            ssl.AuthenticateAsServer(certificate, false, false);
                         }
                     }
                 }
