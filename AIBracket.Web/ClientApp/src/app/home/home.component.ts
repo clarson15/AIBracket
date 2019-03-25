@@ -47,7 +47,7 @@ export class HomeComponent implements OnInit {
     canvas.width = 550;
     canvas.height = 600;
     var ctx = this.canvasRef.nativeElement.getContext('2d');
-    this.socket$ = new WebSocket("ws://" + document.location.hostname + ":8000");
+    this.socket$ = new WebSocket("wss://" + document.location.hostname + ":8000");
     this.socket$.onmessage = (event) => {
       this.UpdateGame(event.data);
     };
