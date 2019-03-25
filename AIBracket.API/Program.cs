@@ -145,6 +145,8 @@ namespace AIBracket.API
                             var certificate = new X509Certificate2("Cert.pfx", "password");
                             using (RSA rsa = certificate.GetRSAPrivateKey())
                             {
+                                Console.WriteLine(buffer);
+                                Console.WriteLine(certificate.GetRSAPrivateKey());
                                 var ssl = new SslStream(client.GetStream(), false);
                                 var udata = rsa.Decrypt(buffer, RSAEncryptionPadding.OaepSHA1);
                                 var newmessage = Encoding.ASCII.GetString(udata);
