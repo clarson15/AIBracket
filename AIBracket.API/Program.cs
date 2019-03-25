@@ -142,7 +142,7 @@ namespace AIBracket.API
                         }
                         else
                         {
-                            var certificate = new X509Certificate2("Certificate.pfx");
+                            var certificate = new X509Certificate2("Cert.pfx");
                             using (RSA rsa = certificate.GetRSAPrivateKey())
                             {
                                 var ssl = new SslStream(client.GetStream(), false);
