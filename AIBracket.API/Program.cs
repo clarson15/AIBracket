@@ -30,6 +30,7 @@ namespace AIBracket.API
             IPAddress address = IPAddress.Any;
             try
             {
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls11;
                 cert = new X509Certificate2("Cert.pfx", "password");
             }
             catch
