@@ -13,6 +13,7 @@ using AIBracket.API.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 using System.Security.Cryptography;
+using System.Security.Authentication;
 
 namespace AIBracket.API
 {
@@ -83,7 +84,7 @@ namespace AIBracket.API
                     var sslStream = new SslStream(client.GetStream());
                     try
                     {
-                        sslStream.AuthenticateAsServer(cert, false, false);
+                        sslStream.AuthenticateAsServer(cert, false, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, false);
                         var sbuffer = new byte[sslStream.Length];
                         sslStream.Read(sbuffer);
                         Console.WriteLine(Encoding.ASCII.GetString(sbuffer));
