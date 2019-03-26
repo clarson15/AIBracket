@@ -21,13 +21,14 @@ namespace AIBracket.API
     class TcpHelper {
         private static AIBracketContext context = new AIBracketContext();
         private static TcpListener Listener { get; set; }
+        private static TcpListener SslListener { get; set; }
         private static bool Accept { get; set; } = false;
         private static X509Certificate2 cert;
         private static List<TcpClient> clients = new List<TcpClient>();
         private static List<WebSocket> websockets = new List<WebSocket>();
         private static List<SslStream> securedsockets = new List<SslStream>();
 
-        public static void StartServer(int port) {
+        public static void StartServer(int port, int sslport) {
             IPAddress address = IPAddress.Any;
             try
             {
@@ -41,10 +42,12 @@ namespace AIBracket.API
             GameMaster.Initialize(); 
             Task.Run(() => GameMaster.Run());
             Listener = new TcpListener(address, port);
+            SslListener = new TcpListener(address, sslport);
             Listener.Start();
+            SslListener.Start();
             Accept = true;
 
-            Console.WriteLine($"Server started. Listening to TCP clients on port {port}");
+            Console.WriteLine($"Server started. Listening to TCP clients on port {port}, listening to SSL TCP clients on port {sslport}");
         }
 
         public static void ConnectClient(IAsyncResult ar)
@@ -57,17 +60,39 @@ namespace AIBracket.API
             Listener.BeginAcceptTcpClient(ConnectClient, Listener);
         }
 
+        public static void SslConnectClient(IAsyncResult ar)
+        {
+            SslListener.BeginAcceptTcpClient(SslConnectClient, Listener);
+            var listener = (TcpListener)ar.AsyncState;
+            var client = listener.EndAcceptTcpClient(ar);
+            try
+            {
+                var sstream = new SslStream(client.GetStream(), false, (sender, cert, chain, err) => true);
+                sstream.AuthenticateAsServer(cert, false, SslProtocols.Tls12, false);
+                securedsockets.Add(sstream);
+                client.NoDelay = true;
+                Console.WriteLine("Secure client connected.");
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+
         public static void Listen()
         {
             if (Listener != null && Accept)
             {
                 Listener.BeginAcceptTcpClient(ConnectClient, Listener);
-                Console.WriteLine("Waiting for clients...");
-                while (true)
-                {
-                    DiscoverIntentions();
-                    Thread.Sleep(10);
-                }
+            }
+            if(SslListener != null && Accept)
+            {
+                SslListener.BeginAcceptTcpClient(SslConnectClient, SslListener);
+            }
+            while (true)
+            {
+                DiscoverIntentions();
+                Thread.Sleep(10);
             }
         }
 
@@ -105,18 +130,6 @@ namespace AIBracket.API
                 }
                 if(client.Available > 0)
                 {
-                    var sslStream = new SslStream(client.GetStream(), false, (sender, cert, chain, err) => true);
-                    try
-                    {
-                        sslStream.AuthenticateAsServer(cert, false, SslProtocols.Tls12, false);
-                        securedsockets.Add(sslStream);
-                        clientsToRemove.Add(client);
-                        continue;
-                    }
-                    catch(Exception e)
-                    {
-                        Console.WriteLine(e.Message);
-                    }
                     var buffer = new byte[client.Available];
                     client.GetStream().Read(buffer, 0, client.Available);
 
@@ -313,6 +326,7 @@ namespace AIBracket.API
             {
                 // Read the client's test message.
                 bytes = sslStream.Read(buffer, 0, buffer.Length);
+                Console.WriteLine(bytes);
 
                 // Use Decoder class to convert from bytes to UTF8
                 // in case a character spans two buffers.
@@ -370,7 +384,7 @@ namespace AIBracket.API
         }
 
         public static void Main(string[] args) {
-            StartServer(8000);
+            StartServer(8000, 8005);
             Listen();
         }
     }
