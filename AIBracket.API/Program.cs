@@ -285,7 +285,8 @@ namespace AIBracket.API
                         Console.WriteLine($"Read {read} bytes");
                         var foo = new byte[read];
                         Array.Copy(buffer, foo, read);
-                        Console.WriteLine(Encoding.ASCII.GetString(GetDecodedData(foo)));
+                        Console.WriteLine(BitConverter.ToString(foo));
+                        securedsockets[i].Write(foo);
                     }
                 }
             }
