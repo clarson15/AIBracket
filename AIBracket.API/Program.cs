@@ -108,9 +108,15 @@ namespace AIBracket.API
                     try
                     {
                         sslStream.AuthenticateAsServer(cert, false, SslProtocols.Tls, false);
-                        var sbuffer = new byte[sslStream.Length];
+                        var sbuffer = new byte[1600];
                         sslStream.Read(sbuffer);
-                        Console.WriteLine(Encoding.ASCII.GetString(GetDecodedData(sbuffer)));
+                        int i = sbuffer.Length - 1;
+                        while (sbuffer[i] == 0)
+                            --i;
+                        // now foo[i] is the last non-zero byte
+                        byte[] bar = new byte[i + 1];
+                        Array.Copy(sbuffer, bar, i + 1);
+                        Console.WriteLine(Encoding.ASCII.GetString(GetDecodedData(bar)));
                     }
                     catch(Exception e)
                     {
