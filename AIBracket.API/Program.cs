@@ -278,18 +278,39 @@ namespace AIBracket.API
             {
                 if (securedsockets[i].CanRead)
                 {
-                    var buffer = new byte[1024];
-                    var read = securedsockets[i].Read(buffer, 0, 1024);
-                    if(read > 0)
-                    {
-                        Console.WriteLine($"Read {read} bytes");
-                        var foo = new byte[read];
-                        Array.Copy(buffer, foo, read);
-                        Console.WriteLine(BitConverter.ToString(foo));
-                        securedsockets[i].Write(foo);
-                    }
+                    var message = ReadMessage(securedsockets[i]);
+                    Console.WriteLine(message);
                 }
             }
+        }
+
+        static string ReadMessage(SslStream sslStream)
+        {
+            // Read the  message sent by the client.
+            // The client signals the end of the message using the
+            // "<EOF>" marker.
+            byte[] buffer = new byte[2048];
+            StringBuilder messageData = new StringBuilder();
+            int bytes = -1;
+            do
+            {
+                // Read the client's test message.
+                bytes = sslStream.Read(buffer, 0, buffer.Length);
+
+                // Use Decoder class to convert from bytes to UTF8
+                // in case a character spans two buffers.
+                Decoder decoder = Encoding.UTF8.GetDecoder();
+                char[] chars = new char[decoder.GetCharCount(buffer, 0, bytes)];
+                decoder.GetChars(buffer, 0, bytes, chars, 0);
+                messageData.Append(chars);
+                // Check for EOF or an empty message.
+                if (messageData.ToString().IndexOf("<EOF>") != -1)
+                {
+                    break;
+                }
+            } while (bytes != 0);
+
+            return messageData.ToString();
         }
 
         private static IConnectedClient VerifyBot(string input, TcpClient client, bool isWebSocket)
