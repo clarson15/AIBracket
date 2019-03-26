@@ -68,6 +68,7 @@ namespace AIBracket.API
             {
                 var sstream = new SslStream(client.GetStream(), false, (sender, cert, chain, err) => true);
                 sstream.AuthenticateAsServer(cert, false, SslProtocols.Tls12, false);
+                sstream.ReadTimeout = 1;
                 securedsockets.Add(sstream);
                 client.NoDelay = true;
                 Console.WriteLine("Secure client connected.");
@@ -202,9 +203,8 @@ namespace AIBracket.API
                         }
                         else
                         {
-                            var certificate = new X509Certificate2("Cert.pfx", "password");
-                            var ssl = new SslStream(client.GetStream(), false);
-                            ssl.AuthenticateAsServer(certificate, false, false);
+                            Console.WriteLine("Unknown client.");
+                            clientsToRemove.Add(client);
                         }
                     }
                 }
