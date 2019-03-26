@@ -282,6 +282,7 @@ namespace AIBracket.API
                     var read = securedsockets[i].Read(buffer, 0, 1024);
                     if(read > 0)
                     {
+                        Console.WriteLine($"Read {read} bytes");
                         var foo = new byte[read];
                         Array.Copy(buffer, foo, read);
                         Console.WriteLine(Encoding.ASCII.GetString(GetDecodedData(foo)));
