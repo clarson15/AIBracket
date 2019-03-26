@@ -25,6 +25,7 @@ namespace AIBracket.API
         private static X509Certificate2 cert;
         private static List<TcpClient> clients = new List<TcpClient>();
         private static List<WebSocket> websockets = new List<WebSocket>();
+        private static List<SslStream> securedsockets = new List<SslStream>();
 
         public static void StartServer(int port) {
             IPAddress address = IPAddress.Any;
@@ -108,15 +109,7 @@ namespace AIBracket.API
                     try
                     {
                         sslStream.AuthenticateAsServer(cert, false, SslProtocols.Tls, false);
-                        var sbuffer = new byte[1600];
-                        sslStream.Read(sbuffer);
-                        int i = sbuffer.Length - 1;
-                        while (sbuffer[i] == 0)
-                            --i;
-                        // now foo[i] is the last non-zero byte
-                        byte[] bar = new byte[i + 1];
-                        Array.Copy(sbuffer, bar, i + 1);
-                        Console.WriteLine(Encoding.ASCII.GetString(GetDecodedData(bar)));
+                        securedsockets.Add(sslStream);
                     }
                     catch(Exception e)
                     {
@@ -276,6 +269,18 @@ namespace AIBracket.API
                                 continue;
                             }
                         }
+                    }
+                }
+            }
+            for (var i = 0; i < securedsockets.Count; i++)
+            {
+                if (securedsockets[i].CanRead)
+                {
+                    var buffer = new byte[1024];
+                    var read = securedsockets[i].Read(buffer, 0, 1024);
+                    if(read > 0)
+                    {
+                        Console.WriteLine(Encoding.ASCII.GetString(GetDecodedData(buffer)));
                     }
                 }
             }
