@@ -68,7 +68,7 @@ namespace AIBracket.API
             {
                 var sstream = new SslStream(client.GetStream(), false, (sender, cert, chain, err) => true);
                 sstream.AuthenticateAsServer(cert, false, SslProtocols.Tls12, false);
-                sstream.ReadTimeout = 1;
+                sstream.ReadTimeout = 10;
                 securedsockets.Add(sstream);
                 client.NoDelay = true;
                 Console.WriteLine("Secure client connected.");
@@ -290,7 +290,7 @@ namespace AIBracket.API
             }
             for (var i = 0; i < securedsockets.Count; i++)
             {
-                if (securedsockets[i].CanRead)
+                try
                 {
                     var message = ReadMessage(securedsockets[i]);
                     Console.WriteLine(message);
@@ -311,6 +311,10 @@ namespace AIBracket.API
                             + eol);
                         securedsockets[i].Write(response);
                     }
+                }
+                catch
+                {
+
                 }
             }
         }
