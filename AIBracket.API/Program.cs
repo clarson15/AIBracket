@@ -57,12 +57,11 @@ namespace AIBracket.API
             client.NoDelay = true;
             Console.WriteLine("Client connected.");
             clients.Add(client);
-            Listener.BeginAcceptTcpClient(ConnectClient, Listener);
+            listener.BeginAcceptTcpClient(ConnectClient, Listener);
         }
 
         public static void SslConnectClient(IAsyncResult ar)
         {
-            SslListener.BeginAcceptTcpClient(SslConnectClient, Listener);
             var listener = (TcpListener)ar.AsyncState;
             var client = listener.EndAcceptTcpClient(ar);
             try
@@ -77,6 +76,7 @@ namespace AIBracket.API
             {
                 Console.WriteLine(e.Message);
             }
+            listener.BeginAcceptTcpClient(SslConnectClient, Listener);
         }
 
         public static void Listen()
@@ -87,6 +87,7 @@ namespace AIBracket.API
             }
             if(SslListener != null && Accept)
             {
+                Console.WriteLine("Listening for SSL connections");
                 SslListener.BeginAcceptTcpClient(SslConnectClient, SslListener);
             }
             while (true)

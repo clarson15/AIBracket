@@ -109,7 +109,7 @@ export class HomeComponent implements OnInit {
       ctx.fillStyle = 'black';
       ctx.textAlign = 'center';
       ctx.font = '20pt Verdana';
-      ctx.fillText('Error connecting to game server.', 275, 300);
+      ctx.fillText('Error connecting to game server.\n' + this.socket$.url, 275, 300);
       ctx.stroke();
     }
     else if (this.ActiveGame) {
