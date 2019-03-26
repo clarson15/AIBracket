@@ -31,7 +31,7 @@ namespace AIBracket.GameLogic.Pacman.Game
         {
             CurrentGameEvent = new List<KeyValuePair<EventType, string>>();
             Board = new PacmanBoard();
-            CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.BoardReset, GetBoardString()));
+            CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.BoardReset, $"{Board.Width.ToString()} {Board.Height.ToString()} {GetBoardString()}"));
             Pacman = new PacmanPacman();
             CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.PacmanLives, $"{Pacman.Lives}"));
             Ghosts = new PacmanGhost[4]
@@ -97,7 +97,7 @@ namespace AIBracket.GameLogic.Pacman.Game
                 new PacmanGhost(),
                 new PacmanGhost()
             };
-            CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.BoardReset, GetBoardString()));
+            CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.BoardReset, $"{Board.Width.ToString()} {Board.Height.ToString()} {GetBoardString()}"));
         }
 
         /// <summary>
@@ -212,7 +212,7 @@ namespace AIBracket.GameLogic.Pacman.Game
                         Pacman.Location.Ypos = 17;
                         Pacman.Facing = PacmanPacman.Direction.right;
                         Pacman.Lives--;
-                        CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.PacmanLives,  ""));
+                        CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.PacmanLives,  $"{Pacman.Lives}"));
                         Ghosts = new PacmanGhost[4]
                         {
                             new PacmanGhost(),
@@ -351,10 +351,6 @@ namespace AIBracket.GameLogic.Pacman.Game
                     {
                         ret += " ";
                     }
-                }
-                if (i != Board.Height - 1)
-                {
-                    ret += "\n";
                 }
             }
             return ret;
