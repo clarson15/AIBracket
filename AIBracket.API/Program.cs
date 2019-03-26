@@ -280,6 +280,23 @@ namespace AIBracket.API
                 {
                     var message = ReadMessage(securedsockets[i]);
                     Console.WriteLine(message);
+                    if (message.StartsWith("GET "))
+                    {
+                        const string eol = "\r\n"; // HTTP/1.1 defines the sequence CR LF as the end-of-line marker
+
+                        byte[] response = Encoding.UTF8.GetBytes("HTTP/1.1 101 Switching Protocols" + eol
+                            + "Connection: Upgrade" + eol
+                            + "Upgrade: websocket" + eol
+                            + "Sec-WebSocket-Accept: " + Convert.ToBase64String(
+                                System.Security.Cryptography.SHA1.Create().ComputeHash(
+                                    Encoding.UTF8.GetBytes(
+                                        new System.Text.RegularExpressions.Regex("Sec-WebSocket-Key: (.*)").Match(message).Groups[1].Value.Trim() + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
+                                    )
+                                )
+                            ) + eol
+                            + eol);
+                        securedsockets[i].Write(response);
+                    }
                 }
             }
         }
@@ -304,7 +321,7 @@ namespace AIBracket.API
                 decoder.GetChars(buffer, 0, bytes, chars, 0);
                 messageData.Append(chars);
                 // Check for EOF or an empty message.
-                if (messageData.ToString().IndexOf("<EOF>") != -1)
+                if (messageData.ToString().IndexOf("\r\n\r\n") != -1)
                 {
                     break;
                 }
