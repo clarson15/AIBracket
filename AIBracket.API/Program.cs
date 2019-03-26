@@ -110,6 +110,8 @@ namespace AIBracket.API
                     {
                         sslStream.AuthenticateAsServer(cert, false, SslProtocols.Tls, false);
                         securedsockets.Add(sslStream);
+                        clientsToRemove.Add(client);
+                        continue;
                     }
                     catch(Exception e)
                     {
