@@ -66,15 +66,12 @@ namespace AIBracket.API
                 var time_elapsed = current_time - start_time;
                 foreach (var g in games)
                 {
-                    Console.WriteLine("Getting user input");
                     g.GetUserInput();
                 }
                 if (time_elapsed.TotalMilliseconds >= 500){
                     foreach (var g in games)
                     {
-                        Console.WriteLine("Before update");
                         g.UpdateGame();
-                        Console.WriteLine("After update");
                         // g.Game.PrintBoard();
                     }
                     start_time = current_time;

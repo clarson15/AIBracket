@@ -132,9 +132,7 @@ namespace AIBracket.API.Entities
                     i--;
                 }
             }
-            Console.WriteLine("Before update bot");
             User.Socket.WriteData(data);
-            Console.WriteLine("After update bot");
             if (!User.Socket.IsConnected)
             {
                 IsRunning = false;
