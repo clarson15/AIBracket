@@ -47,7 +47,17 @@ export class HomeComponent implements OnInit {
     canvas.width = 550;
     canvas.height = 600;
     var ctx = this.canvasRef.nativeElement.getContext('2d');
-    this.socket$ = new WebSocket("ws://" + document.location.hostname + ":8000");
+    let port = 0;
+    let protocol = "";
+    if (document.location.protocol === 'https:') {
+      port = 8005;
+      protocol = "wss://";
+    }
+    else {
+      protocol = "ws://";
+      port = 8000;
+    }
+    this.socket$ = new WebSocket(protocol + document.location.hostname + ":" + port);
     this.socket$.onmessage = (event) => {
       this.UpdateGame(event.data);
     };
@@ -99,7 +109,7 @@ export class HomeComponent implements OnInit {
       ctx.fillStyle = 'black';
       ctx.textAlign = 'center';
       ctx.font = '20pt Verdana';
-      ctx.fillText('Error connecting to game server.', 275, 300);
+      ctx.fillText('Error connecting to game server.\n' + this.socket$.url, 275, 300);
       ctx.stroke();
     }
     else if (this.ActiveGame) {

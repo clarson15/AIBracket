@@ -10,6 +10,10 @@ using AIBracket.API.Entities;
 using System.Threading;
 using System.Collections.Generic;
 using AIBracket.API.Sockets;
+using System.Security.Cryptography.X509Certificates;
+using System.Net.Security;
+using System.Security.Cryptography;
+using System.Security.Authentication;
 
 namespace AIBracket.API
 {
@@ -17,19 +21,33 @@ namespace AIBracket.API
     class TcpHelper {
         private static AIBracketContext context = new AIBracketContext();
         private static TcpListener Listener { get; set; }
+        private static TcpListener SslListener { get; set; }
         private static bool Accept { get; set; } = false;
+        private static X509Certificate2 cert;
         private static List<TcpClient> clients = new List<TcpClient>();
         private static List<WebSocket> websockets = new List<WebSocket>();
+        private static List<SslStream> securedsockets = new List<SslStream>();
 
-        public static void StartServer(int port) {
+        public static void StartServer(int port, int sslport) {
             IPAddress address = IPAddress.Any;
+            try
+            {
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls;
+                cert = new X509Certificate2("Cert.pfx", "password");
+            }
+            catch
+            {
+                Console.WriteLine("No certificate found.");
+            }
             GameMaster.Initialize(); 
             Task.Run(() => GameMaster.Run());
             Listener = new TcpListener(address, port);
+            SslListener = new TcpListener(address, sslport);
             Listener.Start();
+            SslListener.Start();
             Accept = true;
 
-            Console.WriteLine($"Server started. Listening to TCP clients on port {port}");
+            Console.WriteLine($"Server started. Listening to TCP clients on port {port}, listening to SSL TCP clients on port {sslport}");
         }
 
         public static void ConnectClient(IAsyncResult ar)
@@ -39,7 +57,27 @@ namespace AIBracket.API
             client.NoDelay = true;
             Console.WriteLine("Client connected.");
             clients.Add(client);
-            Listener.BeginAcceptTcpClient(ConnectClient, Listener);
+            listener.BeginAcceptTcpClient(ConnectClient, Listener);
+        }
+
+        public static void SslConnectClient(IAsyncResult ar)
+        {
+            var listener = (TcpListener)ar.AsyncState;
+            var client = listener.EndAcceptTcpClient(ar);
+            try
+            {
+                var sstream = new SslStream(client.GetStream(), false, (sender, cert, chain, err) => true);
+                sstream.AuthenticateAsServer(cert, false, SslProtocols.Tls12, false);
+                sstream.ReadTimeout = 10;
+                securedsockets.Add(sstream);
+                client.NoDelay = true;
+                Console.WriteLine("Secure client connected.");
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            listener.BeginAcceptTcpClient(SslConnectClient, Listener);
         }
 
         public static void Listen()
@@ -47,13 +85,39 @@ namespace AIBracket.API
             if (Listener != null && Accept)
             {
                 Listener.BeginAcceptTcpClient(ConnectClient, Listener);
-                Console.WriteLine("Waiting for clients...");
-                while (true)
-                {
-                    DiscoverIntentions();
-                    Thread.Sleep(10);
-                }
             }
+            if(SslListener != null && Accept)
+            {
+                Console.WriteLine("Listening for SSL connections");
+                SslListener.BeginAcceptTcpClient(SslConnectClient, SslListener);
+            }
+            while (true)
+            {
+                DiscoverIntentions();
+                Thread.Sleep(10);
+            }
+        }
+
+        private static byte[] GetDecodedData(Byte[] buffer)
+        {
+            String incomingData = String.Empty;
+            Byte secondByte = buffer[1];
+            Int32 dataLength = secondByte & 127;
+            Int32 indexFirstMask = 2;
+            if (dataLength == 126)
+                indexFirstMask = 4;
+            else if (dataLength == 127)
+                indexFirstMask = 10;
+            IEnumerable<Byte> keys = buffer.Skip(indexFirstMask).Take(4);
+            Int32 indexFirstDataByte = indexFirstMask + 4;
+
+            Byte[] decoded = new Byte[buffer.Length - indexFirstDataByte];
+            for (Int32 i = indexFirstDataByte, j = 0; i < buffer.Length; i++, j++)
+            {
+                decoded[j] = (Byte)(buffer[i] ^ keys.ElementAt(j % 4));
+            }
+
+            return decoded;
         }
 
         public static void DiscoverIntentions()
@@ -81,7 +145,7 @@ namespace AIBracket.API
                             continue;
                         }
                         const string eol = "\r\n"; // HTTP/1.1 defines the sequence CR LF as the end-of-line marker
-
+                        
                         byte[] response = Encoding.UTF8.GetBytes("HTTP/1.1 101 Switching Protocols" + eol
                             + "Connection: Upgrade" + eol
                             + "Upgrade: websocket" + eol
@@ -102,7 +166,6 @@ namespace AIBracket.API
                     }
                     else
                     {
-                        Console.WriteLine(message);
                         if (message.StartsWith("BOT ", StringComparison.InvariantCultureIgnoreCase))
                         {
                             var bot = VerifyBot(message.Substring(4), client, false);
@@ -142,7 +205,6 @@ namespace AIBracket.API
                         {
                             Console.WriteLine("Unknown client.");
                             clientsToRemove.Add(client);
-                            continue;
                         }
                     }
                 }
@@ -226,6 +288,65 @@ namespace AIBracket.API
                     }
                 }
             }
+            for (var i = 0; i < securedsockets.Count; i++)
+            {
+                try
+                {
+                    var message = ReadMessage(securedsockets[i]);
+                    Console.WriteLine(message);
+                    if (message.StartsWith("GET "))
+                    {
+                        const string eol = "\r\n"; // HTTP/1.1 defines the sequence CR LF as the end-of-line marker
+
+                        byte[] response = Encoding.UTF8.GetBytes("HTTP/1.1 101 Switching Protocols" + eol
+                            + "Connection: Upgrade" + eol
+                            + "Upgrade: websocket" + eol
+                            + "Sec-WebSocket-Accept: " + Convert.ToBase64String(
+                                System.Security.Cryptography.SHA1.Create().ComputeHash(
+                                    Encoding.UTF8.GetBytes(
+                                        new System.Text.RegularExpressions.Regex("Sec-WebSocket-Key: (.*)").Match(message).Groups[1].Value.Trim() + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
+                                    )
+                                )
+                            ) + eol
+                            + eol);
+                        securedsockets[i].Write(response);
+                    }
+                }
+                catch
+                {
+
+                }
+            }
+        }
+
+        static string ReadMessage(SslStream sslStream)
+        {
+            // Read the  message sent by the client.
+            // The client signals the end of the message using the
+            // "<EOF>" marker.
+            byte[] buffer = new byte[2048];
+            StringBuilder messageData = new StringBuilder();
+            int bytes = -1;
+            do
+            {
+                // Read the client's test message.
+                bytes = sslStream.Read(buffer, 0, buffer.Length);
+                Console.WriteLine(bytes);
+
+                // Use Decoder class to convert from bytes to UTF8
+                // in case a character spans two buffers.
+                Decoder decoder = Encoding.UTF8.GetDecoder();
+                char[] chars = new char[decoder.GetCharCount(buffer, 0, bytes)];
+                decoder.GetChars(buffer, 0, bytes, chars, 0);
+                messageData.Append(chars);
+                // Check for EOF or an empty message.
+                if (messageData.ToString().IndexOf("\r\n\r\n") != -1)
+                {
+                    break;
+                }
+            } while (bytes != 0);
+
+            return messageData.ToString();
         }
 
         private static IConnectedClient VerifyBot(string input, TcpClient client, bool isWebSocket)
@@ -268,7 +389,7 @@ namespace AIBracket.API
         }
 
         public static void Main(string[] args) {
-            StartServer(8000);
+            StartServer(8000, 8005);
             Listen();
         }
     }
