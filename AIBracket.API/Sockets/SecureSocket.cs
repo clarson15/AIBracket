@@ -69,8 +69,15 @@ namespace AIBracket.API.Sockets
 
         public void WriteData(string data)
         {
-            var bytes = GetEncodedData(data);
-            Buffer.BlockCopy(bytes, 0, _writebuffer, 0, bytes.Length);
+            byte[] bytes;
+            if (_isWebsocket)
+            {
+                bytes = GetEncodedData(data);
+            }
+            else
+            {
+                bytes = Encoding.ASCII.GetBytes(data);
+            }
             try
             {
                 _socket.BeginWrite(bytes, 0, bytes.Length, new AsyncCallback(WriteCallback), _socket);
