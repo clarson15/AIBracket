@@ -5,15 +5,14 @@ using System.Net.Sockets;
 using System.Linq;
 using System.Threading.Tasks;
 using AIBracket.Data;
-using AIBracket.Data.Entities;
 using AIBracket.API.Entities;
 using System.Threading;
 using System.Collections.Generic;
 using AIBracket.API.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
-using System.Security.Cryptography;
 using System.Security.Authentication;
+using AIBracket.Data.Entities;
 
 namespace AIBracket.API
 {
@@ -24,15 +23,13 @@ namespace AIBracket.API
         private static TcpListener SslListener { get; set; }
         private static bool Accept { get; set; } = false;
         private static X509Certificate2 cert;
-        private static List<TcpClient> clients = new List<TcpClient>();
-        private static List<WebSocket> websockets = new List<WebSocket>();
-        private static List<SslStream> securedsockets = new List<SslStream>();
+        private static List<ISocket> clients = new List<ISocket>();
 
         public static void StartServer(int port, int sslport) {
             IPAddress address = IPAddress.Any;
             try
             {
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls;
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                 cert = new X509Certificate2("Cert.pfx", "password");
             }
             catch
@@ -56,7 +53,7 @@ namespace AIBracket.API
             var client = listener.EndAcceptTcpClient(ar);
             client.NoDelay = true;
             Console.WriteLine("Client connected.");
-            clients.Add(client);
+            clients.Add(new InsecureSocket(client));
             listener.BeginAcceptTcpClient(ConnectClient, Listener);
         }
 
@@ -68,8 +65,7 @@ namespace AIBracket.API
             {
                 var sstream = new SslStream(client.GetStream(), false, (sender, cert, chain, err) => true);
                 sstream.AuthenticateAsServer(cert, false, SslProtocols.Tls12, false);
-                sstream.ReadTimeout = 10;
-                securedsockets.Add(sstream);
+                clients.Add(new SecureSocket(sstream));
                 client.NoDelay = true;
                 Console.WriteLine("Secure client connected.");
             }
@@ -97,263 +93,85 @@ namespace AIBracket.API
                 Thread.Sleep(10);
             }
         }
-
-        private static byte[] GetDecodedData(Byte[] buffer)
-        {
-            String incomingData = String.Empty;
-            Byte secondByte = buffer[1];
-            Int32 dataLength = secondByte & 127;
-            Int32 indexFirstMask = 2;
-            if (dataLength == 126)
-                indexFirstMask = 4;
-            else if (dataLength == 127)
-                indexFirstMask = 10;
-            IEnumerable<Byte> keys = buffer.Skip(indexFirstMask).Take(4);
-            Int32 indexFirstDataByte = indexFirstMask + 4;
-
-            Byte[] decoded = new Byte[buffer.Length - indexFirstDataByte];
-            for (Int32 i = indexFirstDataByte, j = 0; i < buffer.Length; i++, j++)
-            {
-                decoded[j] = (Byte)(buffer[i] ^ keys.ElementAt(j % 4));
-            }
-
-            return decoded;
-        }
-
+        
         public static void DiscoverIntentions()
         {
-            var clientsToRemove = new List<TcpClient>();
-            foreach(var client in clients)
+            for(var i = 0; i < clients.Count; i++)
             {
-                if (!client.Connected)
+                if (!clients[i].IsConnected)
                 {
-                    clientsToRemove.Add(client);
-                    continue;
-                }
-                if(client.Available > 0)
-                {
-                    var buffer = new byte[client.Available];
-                    client.GetStream().Read(buffer, 0, client.Available);
-
-                    var message = Encoding.ASCII.GetString(buffer);
-                    if (message.StartsWith("GET "))
-                    {
-                        if (!message.Contains("websocket"))
-                        {
-                            Console.WriteLine("Random GET request.");
-                            clientsToRemove.Add(client);
-                            continue;
-                        }
-                        const string eol = "\r\n"; // HTTP/1.1 defines the sequence CR LF as the end-of-line marker
-                        
-                        byte[] response = Encoding.UTF8.GetBytes("HTTP/1.1 101 Switching Protocols" + eol
-                            + "Connection: Upgrade" + eol
-                            + "Upgrade: websocket" + eol
-                            + "Sec-WebSocket-Accept: " + Convert.ToBase64String(
-                                System.Security.Cryptography.SHA1.Create().ComputeHash(
-                                    Encoding.UTF8.GetBytes(
-                                        new System.Text.RegularExpressions.Regex("Sec-WebSocket-Key: (.*)").Match(message).Groups[1].Value.Trim() + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
-                                    )
-                                )
-                            ) + eol
-                            + eol);
-
-                        client.GetStream().Write(response, 0, response.Length);
-                        Console.WriteLine("Websocket connected.");
-                        websockets.Add(new WebSocket(client));
-                        clientsToRemove.Add(client);
-                        continue;
-                    }
-                    else
-                    {
-                        if (message.StartsWith("BOT ", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            var bot = VerifyBot(message.Substring(4), client, false);
-                            if(bot != null)
-                            {
-                                Console.WriteLine("Bot connected.");
-                                GameMaster.AddPlayer(bot);
-                                clientsToRemove.Add(client);
-                                continue;
-                            }
-                        }
-                        else if(message.StartsWith("WATCH ", StringComparison.InvariantCultureIgnoreCase)){
-                            var target = message.Substring(6);
-                            if (target == "GAMEMASTER")
-                            {
-                                Console.WriteLine("gamemaster spectator");
-                                client.GetStream().Write(Encoding.ASCII.GetBytes("OK"));
-                                GameMaster.AddSpectator(new BotSocket(client));
-                                clientsToRemove.Add(client);
-                                continue;
-                            }
-                            else
-                            {
-                                if(GameMaster.WatchGame(new BotSocket(client), target))
-                                {
-                                    clientsToRemove.Add(client);
-                                    continue;
-                                }
-                                else
-                                {
-                                    client.GetStream().Write(Encoding.ASCII.GetBytes("Game does not exist"));
-                                    continue;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine("Unknown client.");
-                            clientsToRemove.Add(client);
-                        }
-                    }
-                }
-            }
-            foreach(var client in clientsToRemove)
-            {
-                clients.Remove(client);
-            }
-            for(var i = 0; i < websockets.Count(); i++)
-            {
-                var client = websockets[i];
-                if (!client.IsConnected)
-                {
-                    websockets.RemoveAt(i);
+                    clients.RemoveAt(i);
                     i--;
                     continue;
                 }
-                if (client.IsReady)
+                if (clients[i].IsReady)
                 {
-                    var message = client.ReadData();
-                    Console.WriteLine(message);
-                    if(message.StartsWith("BOT ", StringComparison.InvariantCultureIgnoreCase))
+                    var message = clients[i].ReadData();
+                    if (message.StartsWith("BOT ", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        var bot = VerifyBot(message.Substring(4), client.Socket, true);
-                        if(bot != null)
+                        var bot = VerifyBot(message.Substring(4), clients[i]);
+                        if (bot != null)
                         {
+                            Console.WriteLine("Bot connected.");
                             GameMaster.AddPlayer(bot);
-                            websockets.RemoveAt(i);
+                            clients.RemoveAt(i);
                             i--;
+                            continue;
                         }
                     }
-                    else if(message.StartsWith("WATCH ", StringComparison.InvariantCultureIgnoreCase))
+                    else if (message.StartsWith("WATCH ", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        var targets = message.Substring(6).Split(' ');
-                        if (targets.Count() == 1)
+                        var target = message.Substring(6);
+                        if (target == "GAMEMASTER")
                         {
-                            var target = targets[0];
-                            if (target == "GAMEMASTER")
+                            Console.WriteLine("gamemaster spectator");
+                            clients[i].WriteData("OK");
+                            GameMaster.AddSpectator(clients[i]);
+                            clients.RemoveAt(i);
+                            i--;
+                            continue;
+                        }
+                        else
+                        {
+                            var targets = target.Split(' ');
+                            if (targets.Length > 1)
                             {
-                                GameMaster.AddSpectator(client);
-                                websockets.Remove(client);
+                                var user = context.Users.FirstOrDefault(x => x.SpectatorId == targets[1]);
+                                if (user != null)
+                                {
+                                    clients[i].Name = user.UserName;
+                                }
+                            }
+                            if (GameMaster.WatchGame(clients[i], target))
+                            {
+                                clients.RemoveAt(i);
+                                i--;
                                 continue;
                             }
                             else
                             {
-                                if (GameMaster.WatchGame(client, target))
-                                {
-                                    websockets.Remove(client);
-                                    continue;
-                                }
-                                else
-                                {
-                                    client.WriteData("Game does not exist");
-                                    websockets.Remove(client);
-                                    continue;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            var user = context.Users.Where(x => x.SpectatorId == targets[1]).FirstOrDefault();
-                            if (user == null)
-                            {
-                                client.WriteData("SpectatorID doesn't exist");
-                                websockets.Remove(client);
-                                continue;
-                            }
-                            client.Name = user.UserName;
-                            if(targets[0] == "GAMEMASTER")
-                            {
-                                GameMaster.AddSpectator(client);
-                                websockets.Remove(client);
-                                continue;
-                            }
-                            if(GameMaster.WatchGame(client, targets[0]))
-                            {
-                                websockets.Remove(client);
+                                clients[i].WriteData("Game does not exist");
                                 continue;
                             }
                         }
                     }
-                }
-            }
-            for (var i = 0; i < securedsockets.Count; i++)
-            {
-                try
-                {
-                    var message = ReadMessage(securedsockets[i]);
-                    Console.WriteLine(message);
-                    if (message.StartsWith("GET "))
+                    else
                     {
-                        const string eol = "\r\n"; // HTTP/1.1 defines the sequence CR LF as the end-of-line marker
-
-                        byte[] response = Encoding.UTF8.GetBytes("HTTP/1.1 101 Switching Protocols" + eol
-                            + "Connection: Upgrade" + eol
-                            + "Upgrade: websocket" + eol
-                            + "Sec-WebSocket-Accept: " + Convert.ToBase64String(
-                                System.Security.Cryptography.SHA1.Create().ComputeHash(
-                                    Encoding.UTF8.GetBytes(
-                                        new System.Text.RegularExpressions.Regex("Sec-WebSocket-Key: (.*)").Match(message).Groups[1].Value.Trim() + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
-                                    )
-                                )
-                            ) + eol
-                            + eol);
-                        securedsockets[i].Write(response);
+                        Console.WriteLine("Unknown client.");
+                        clients.RemoveAt(i);
+                        i--;
+                        continue;
                     }
-                }
-                catch
-                {
-
                 }
             }
         }
 
-        static string ReadMessage(SslStream sslStream)
-        {
-            // Read the  message sent by the client.
-            // The client signals the end of the message using the
-            // "<EOF>" marker.
-            byte[] buffer = new byte[2048];
-            StringBuilder messageData = new StringBuilder();
-            int bytes = -1;
-            do
-            {
-                // Read the client's test message.
-                bytes = sslStream.Read(buffer, 0, buffer.Length);
-                Console.WriteLine(bytes);
-
-                // Use Decoder class to convert from bytes to UTF8
-                // in case a character spans two buffers.
-                Decoder decoder = Encoding.UTF8.GetDecoder();
-                char[] chars = new char[decoder.GetCharCount(buffer, 0, bytes)];
-                decoder.GetChars(buffer, 0, bytes, chars, 0);
-                messageData.Append(chars);
-                // Check for EOF or an empty message.
-                if (messageData.ToString().IndexOf("\r\n\r\n") != -1)
-                {
-                    break;
-                }
-            } while (bytes != 0);
-
-            return messageData.ToString();
-        }
-
-        private static IConnectedClient VerifyBot(string input, TcpClient client, bool isWebSocket)
+        private static IConnectedClient VerifyBot(string input, ISocket client)
         {
             var bot = context.Bots.Where(x => x.PrivateKey == input.Trim()).FirstOrDefault();
             if (bot != null)
             {
+                client.Name = bot.Name;
                 var user = context.Users.Where(x => x.Id == bot.IdentityId).FirstOrDefault();
                 if (user != null)
                 {
@@ -362,24 +180,12 @@ namespace AIBracket.API
                         case 0:
                             break;
                         case 1:
-                            if (isWebSocket)
+                            return new PacmanClient
                             {
-                                return new PacmanClient
-                                {
-                                    User = user,
-                                    Bot = bot,
-                                    Socket = new WebSocket(client, bot.Name)
-                                };
-                            }
-                            else
-                            {
-                                return new PacmanClient
-                                {
-                                    User = user,
-                                    Bot = bot,
-                                    Socket = new BotSocket(client, bot.Name)
-                                };
-                            }
+                                User = user,
+                                Bot = bot,
+                                Socket = client
+                            };
                         default:
                             break;
                     }
