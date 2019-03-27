@@ -48,6 +48,7 @@ namespace AIBracket.API
                     Game = new PacmanGame(),
                     User = (PacmanClient)player
                 });
+                Console.WriteLine("Added pacman game");
                 return;
             }
             waiting_players.Add(player);
@@ -65,6 +66,7 @@ namespace AIBracket.API
                 var time_elapsed = current_time - start_time;
                 foreach (var g in games)
                 {
+                    Console.WriteLine("Getting user input");
                     g.GetUserInput();
                 }
                 if (time_elapsed.TotalMilliseconds >= 500){
