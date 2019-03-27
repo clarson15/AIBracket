@@ -71,6 +71,14 @@ namespace AIBracket.API.Sockets
         {
             var bytes = GetEncodedData(data);
             Buffer.BlockCopy(bytes, 0, _writebuffer, 0, bytes.Length);
+            try
+            {
+                _socket.Client.BeginSend(bytes, 0, bytes.Length, 0, new AsyncCallback(WriteCallback), _socket);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Error writing data to socket: " + e.Message);
+            }
         }
 
         private byte[] GetEncodedData(string buffer)
