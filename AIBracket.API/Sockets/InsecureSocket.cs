@@ -179,7 +179,7 @@ namespace AIBracket.API.Sockets
                             case 0x09:
                                 Buffer.BlockCopy(newbuff, 1, _writebuffer, 1, byteCount - 1);
                                 _writebuffer[0] = 0x8A;
-                                stream.Client.BeginSend(_writebuffer, 0, byteCount, 0, new AsyncCallback(WriteCallback), ar);
+                                stream.Client.BeginSend(_writebuffer, 0, byteCount, 0, new AsyncCallback(WriteCallback), stream);
                                 break;
                             case 0xA:
                                 Console.WriteLine("Pong");
@@ -213,7 +213,7 @@ namespace AIBracket.API.Sockets
                                     )
                                 ) + eol
                                 + eol);
-                            stream.Client.BeginSend(response, 0, response.Length, 0, new AsyncCallback(WriteCallback), ar);
+                            stream.Client.BeginSend(response, 0, response.Length, 0, new AsyncCallback(WriteCallback), stream);
                             _first = false;
                             stream.Client.BeginReceive(_readbuffer, 0, buff_size, 0, new AsyncCallback(ReadCallback), stream);
                             return;
