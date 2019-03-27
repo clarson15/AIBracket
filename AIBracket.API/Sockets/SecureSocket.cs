@@ -121,7 +121,6 @@ namespace AIBracket.API.Sockets
             SslStream stream = (SslStream)ar.AsyncState;
             try
             {
-                Console.WriteLine("Finished writing data");
                 stream.EndWrite(ar);
             }catch(Exception e)
             {
@@ -136,7 +135,6 @@ namespace AIBracket.API.Sockets
             int byteCount = -1;
             try
             {
-                Console.WriteLine("Reading data from the server.");
                 byteCount = stream.EndRead(ar);
                 var newbuff = new byte[byteCount];
                 if(byteCount == 0)

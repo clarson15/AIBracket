@@ -122,7 +122,6 @@ namespace AIBracket.API.Sockets
             TcpClient stream = (TcpClient)ar.AsyncState;
             try
             {
-                Console.WriteLine("Finished writing data");
                 stream.Client.EndSend(ar);
             }
             catch (Exception e)
@@ -138,7 +137,6 @@ namespace AIBracket.API.Sockets
             int byteCount = -1;
             try
             {
-                Console.WriteLine("Reading data from the server.");
                 byteCount = stream.Client.EndReceive(ar);
                 var newbuff = new byte[byteCount];
                 if (byteCount == 0)
