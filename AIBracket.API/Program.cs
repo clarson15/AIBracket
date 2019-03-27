@@ -54,7 +54,7 @@ namespace AIBracket.API
             client.NoDelay = true;
             Console.WriteLine("Client connected.");
             clients.Add(new InsecureSocket(client));
-            listener.BeginAcceptTcpClient(ConnectClient, Listener);
+            listener.BeginAcceptTcpClient(ConnectClient, listener);
         }
 
         public static void SslConnectClient(IAsyncResult ar)
@@ -71,9 +71,9 @@ namespace AIBracket.API
             }
             catch(Exception e)
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine("Error connecting secure client: " + e.Message);
             }
-            listener.BeginAcceptTcpClient(SslConnectClient, Listener);
+            listener.BeginAcceptTcpClient(SslConnectClient, listener);
         }
 
         public static void Listen()
