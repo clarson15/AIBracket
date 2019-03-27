@@ -157,7 +157,7 @@ namespace AIBracket.API
                     }
                     else
                     {
-                        Console.WriteLine("Unknown client.");
+                        Console.WriteLine("Unknown client " + message);
                         clients.RemoveAt(i);
                         i--;
                         continue;

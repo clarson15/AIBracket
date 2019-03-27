@@ -75,9 +75,7 @@ namespace AIBracket.API.Entities
         public void UpdateGame()
         {
             Game.UpdateGame(User.Direction);
-            Console.WriteLine("Before update users");
             UpdateUsers();
-            Console.WriteLine("After update users");
             if(Game.Pacman.Lives == 0)
             {
                 IsRunning = false;
