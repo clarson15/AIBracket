@@ -76,11 +76,7 @@ namespace AIBracket.API.Entities
         {
             Game.UpdateGame(User.Direction);
             UpdateUsers();
-            if(Game.Pacman.Lives == 0)
-            {
-                IsRunning = false;
-                User.Socket.Disconnect();
-            }
+            Game = new PacmanGame();
         }
 
         public void AddSpectator(ISocket spec)

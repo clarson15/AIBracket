@@ -57,7 +57,7 @@ namespace AIBracket.API.Sockets
         {
             if (IsReady)
             {
-                var message = _payloads[0];
+                var message = _payloads[0].Trim();
                 _payloads.RemoveAt(0);
                 return message;
             }
@@ -201,12 +201,10 @@ namespace AIBracket.API.Sockets
                     var message = GetDecodedData(newbuff);
                     if ((newbuff[0] & 0x80) == 0)
                     {
-                        Console.WriteLine("Received continuation frame");
                         _ppayload += Encoding.ASCII.GetString(message);
                     }
                     else
                     {
-                        Console.WriteLine("Received finish frame");
                         switch (newbuff[0] & 0x0F)
                         {
                             case 0x01: //text
@@ -216,18 +214,16 @@ namespace AIBracket.API.Sockets
                                 break;
                             case 0x00: //continue
                                 _ppayload += Encoding.ASCII.GetString(message);
-                                Console.WriteLine("Received continuation frame in finish frame");
                                 break;
                             case 0x02:
-                                Console.WriteLine("Received binary frame");
                                 break;
                             case 0x08:
-                                Console.WriteLine("Closing connection");
                                 stream.Dispose();
                                 return;
                             case 0x09:
                                 Buffer.BlockCopy(newbuff, 1, _writebuffer, 1, byteCount - 1);
                                 _writebuffer[0] = 0x8A;
+                                Console.WriteLine("Ping");
                                 stream.Client.BeginSend(_writebuffer, 0, byteCount, 0, new AsyncCallback(WriteCallback), stream);
                                 break;
                             case 0xA:
