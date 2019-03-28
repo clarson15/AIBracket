@@ -72,7 +72,7 @@ namespace AIBracket.API.Sockets
             byte[] bytes;
             if (_isWebsocket)
             {
-                bytes = GetEncodedData(data);
+                bytes = EncodeMessageToSend(data);
             }
             else
             {
@@ -88,30 +88,62 @@ namespace AIBracket.API.Sockets
             }
         }
 
-        private byte[] GetEncodedData(string buffer)
+        private static byte[] EncodeMessageToSend(string message)
         {
-            var barray = new byte[buffer.Length + 10];
-            var hlength = 0;
-            barray[0] = 0x81;
-            if (buffer.Length > 0xFFFF)
+            Byte[] response;
+            Byte[] bytesRaw = Encoding.UTF8.GetBytes(message);
+            Byte[] frame = new Byte[10];
+
+            Int32 indexStartRawData = -1;
+            Int32 length = bytesRaw.Length;
+
+            frame[0] = (Byte)129;
+            if (length <= 125)
             {
-                barray[1] = 0x7F;
-                hlength = 10;
-                Buffer.BlockCopy(BitConverter.GetBytes((long)buffer.Length), 0, barray, 2, 8);
+                frame[1] = (Byte)length;
+                indexStartRawData = 2;
             }
-            else if (buffer.Length > 0xFF)
+            else if (length >= 126 && length <= 65535)
             {
-                barray[1] = 0x7E;
-                hlength = 4;
-                Buffer.BlockCopy(BitConverter.GetBytes((long)buffer.Length), 0, barray, 2, 2);
+                frame[1] = (Byte)126;
+                frame[2] = (Byte)((length >> 8) & 255);
+                frame[3] = (Byte)(length & 255);
+                indexStartRawData = 4;
             }
             else
             {
-                hlength = 2;
-                barray[1] = (byte)buffer.Length;
+                frame[1] = (Byte)127;
+                frame[2] = (Byte)((length >> 56) & 255);
+                frame[3] = (Byte)((length >> 48) & 255);
+                frame[4] = (Byte)((length >> 40) & 255);
+                frame[5] = (Byte)((length >> 32) & 255);
+                frame[6] = (Byte)((length >> 24) & 255);
+                frame[7] = (Byte)((length >> 16) & 255);
+                frame[8] = (Byte)((length >> 8) & 255);
+                frame[9] = (Byte)(length & 255);
+
+                indexStartRawData = 10;
             }
-            Buffer.BlockCopy(Encoding.ASCII.GetBytes(buffer), 0, barray, hlength, buffer.Length);
-            return barray.Take(hlength + buffer.Length).ToArray();
+
+            response = new Byte[indexStartRawData + length];
+
+            Int32 i, reponseIdx = 0;
+
+            //Add the frame bytes to the reponse
+            for (i = 0; i < indexStartRawData; i++)
+            {
+                response[reponseIdx] = frame[i];
+                reponseIdx++;
+            }
+
+            //Add the data bytes to the response
+            for (i = 0; i < length; i++)
+            {
+                response[reponseIdx] = bytesRaw[i];
+                reponseIdx++;
+            }
+
+            return response;
         }
 
         private byte[] GetDecodedData(byte[] buffer)
