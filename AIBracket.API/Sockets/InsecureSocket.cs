@@ -90,43 +90,46 @@ namespace AIBracket.API.Sockets
 
         private byte[] GetEncodedData(string buffer)
         {
-            var barray = new List<byte>();
-            barray.Add(0x81);
+            var barray = new byte[buffer.Length + 10];
+            var hlength = 0;
+            barray[0] = 0x81;
             if (buffer.Length > 0xFFFF)
             {
-                barray.Add(127);
-                barray.AddRange(BitConverter.GetBytes((Int32)buffer.Length));
+                barray[1] = 0x7F;
+                hlength = 10;
+                Buffer.BlockCopy(BitConverter.GetBytes((long)buffer.Length), 0, barray, 2, 8);
             }
             else if (buffer.Length > 0xFF)
             {
-                barray.Add(126);
-                barray.AddRange(BitConverter.GetBytes((Int16)buffer.Length));
+                barray[1] = 0x7E;
+                hlength = 4;
+                Buffer.BlockCopy(BitConverter.GetBytes((long)buffer.Length), 0, barray, 2, 2);
             }
             else
             {
-                barray.Add((byte)buffer.Length);
+                barray[1] = (byte)buffer.Length;
             }
-            barray.AddRange(Encoding.ASCII.GetBytes(buffer));
-            return barray.ToArray();
+            Buffer.BlockCopy(Encoding.ASCII.GetBytes(buffer), 0, barray, hlength, buffer.Length);
+            return barray;
         }
 
-        private byte[] GetDecodedData(Byte[] buffer)
+        private byte[] GetDecodedData(byte[] buffer)
         {
-            String incomingData = String.Empty;
-            Byte secondByte = buffer[1];
-            Int32 dataLength = secondByte & 127;
-            Int32 indexFirstMask = 2;
+            string incomingData = string.Empty;
+            byte secondByte = buffer[1];
+            int dataLength = secondByte & 127;
+            int indexFirstMask = 2;
             if (dataLength == 126)
                 indexFirstMask = 4;
             else if (dataLength == 127)
                 indexFirstMask = 10;
-            IEnumerable<Byte> keys = buffer.Skip(indexFirstMask).Take(4);
-            Int32 indexFirstDataByte = indexFirstMask + 4;
+            IEnumerable<byte> keys = buffer.Skip(indexFirstMask).Take(4);
+            int indexFirstDataByte = indexFirstMask + 4;
 
-            Byte[] decoded = new Byte[buffer.Length - indexFirstDataByte];
-            for (Int32 i = indexFirstDataByte, j = 0; i < buffer.Length; i++, j++)
+            byte[] decoded = new byte[buffer.Length - indexFirstDataByte];
+            for (int i = indexFirstDataByte, j = 0; i < buffer.Length; i++, j++)
             {
-                decoded[j] = (Byte)(buffer[i] ^ keys.ElementAt(j % 4));
+                decoded[j] = (byte)(buffer[i] ^ keys.ElementAt(j % 4));
             }
 
             return decoded;
@@ -187,7 +190,7 @@ namespace AIBracket.API.Sockets
                                 break;
                             case 0x08:
                                 Console.WriteLine("Closing connection");
-                                //stream.Dispose();
+                                stream.Dispose();
                                 return;
                             case 0x09:
                                 Buffer.BlockCopy(newbuff, 1, _writebuffer, 1, byteCount - 1);
