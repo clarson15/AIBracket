@@ -140,6 +140,7 @@ namespace AIBracket.API
                                 {
                                     clients[i].Name = user.UserName;
                                 }
+                                target = targets[0];
                             }
                             if (GameMaster.WatchGame(clients[i], target))
                             {
