@@ -174,6 +174,7 @@ namespace AIBracket.API.Sockets
                             case 0x01: //text
                                 _ppayload += Encoding.ASCII.GetString(message);
                                 _payloads.Add(_ppayload);
+                                Console.WriteLine("Received " + _ppayload);
                                 _ppayload = "";
                                 break;
                             case 0x00: //continue
