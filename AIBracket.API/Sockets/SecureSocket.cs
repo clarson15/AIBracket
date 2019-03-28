@@ -186,7 +186,7 @@ namespace AIBracket.API.Sockets
                                 break;
                             case 0x08:
                                 Console.WriteLine("Closing connection");
-                                stream.Dispose();
+                                //stream.Dispose();
                                 return;
                             case 0x09:
                                 Buffer.BlockCopy(newbuff, 1, _writebuffer, 1, byteCount - 1);
