@@ -111,7 +111,7 @@ namespace AIBracket.API.Sockets
                 barray[1] = (byte)buffer.Length;
             }
             Buffer.BlockCopy(Encoding.ASCII.GetBytes(buffer), 0, barray, hlength, buffer.Length);
-            return barray;
+            return barray.Take(hlength + buffer.Length).ToArray();
         }
 
         private byte[] GetDecodedData(byte[] buffer)

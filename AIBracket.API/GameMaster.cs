@@ -120,6 +120,7 @@ namespace AIBracket.API
                             {
                                 buffer += game.Id.ToString() + " " + game.Game.Score + "\n";
                             }
+                            Console.WriteLine("Sending " + buffer);
                             spectators[i].WriteData(buffer);
                         }
                         else if(message.StartsWith("WATCH "))

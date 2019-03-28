@@ -107,12 +107,12 @@ namespace AIBracket.API
                 if (clients[i].IsReady)
                 {
                     var message = clients[i].ReadData();
+                    Console.WriteLine("Read: " + message);
                     if (message.StartsWith("BOT ", StringComparison.InvariantCultureIgnoreCase))
                     {
                         var bot = VerifyBot(message.Substring(4), clients[i]);
                         if (bot != null)
                         {
-                            Console.WriteLine("Bot connected.");
                             GameMaster.AddPlayer(bot);
                             clients.RemoveAt(i);
                             i--;
@@ -124,7 +124,6 @@ namespace AIBracket.API
                         var target = message.Substring(6);
                         if (target == "GAMEMASTER")
                         {
-                            Console.WriteLine("gamemaster spectator");
                             clients[i].WriteData("OK");
                             GameMaster.AddSpectator(clients[i]);
                             clients.RemoveAt(i);
@@ -157,7 +156,6 @@ namespace AIBracket.API
                     }
                     else
                     {
-                        Console.WriteLine("Unknown client " + message);
                         clients.RemoveAt(i);
                         i--;
                         continue;
