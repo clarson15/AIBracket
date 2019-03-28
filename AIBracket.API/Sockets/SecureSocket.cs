@@ -164,7 +164,7 @@ namespace AIBracket.API.Sockets
                     if((newbuff[0] & 0x80) == 0)
                     {
                         Console.WriteLine("Received continuation frame");
-                        _ppayload += Encoding.ASCII.GetString(newbuff);
+                        _ppayload += Encoding.ASCII.GetString(message);
                     }
                     else
                     {
@@ -172,12 +172,12 @@ namespace AIBracket.API.Sockets
                         switch(newbuff[0] & 0x0F)
                         {
                             case 0x01: //text
-                                _ppayload += Encoding.ASCII.GetString(newbuff);
+                                _ppayload += Encoding.ASCII.GetString(message);
                                 _payloads.Add(_ppayload);
                                 _ppayload = "";
                                 break;
                             case 0x00: //continue
-                                _ppayload += Encoding.ASCII.GetString(newbuff);
+                                _ppayload += Encoding.ASCII.GetString(message);
                                 Console.WriteLine("Received continuation frame in finish frame");
                                 break;
                             case 0x02:
