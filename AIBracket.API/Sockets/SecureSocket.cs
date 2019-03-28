@@ -107,6 +107,7 @@ namespace AIBracket.API.Sockets
             }
             else
             {
+                hlength = 2;
                 barray[1] = (byte)buffer.Length;
             }
             Buffer.BlockCopy(Encoding.ASCII.GetBytes(buffer), 0, barray, hlength, buffer.Length);
