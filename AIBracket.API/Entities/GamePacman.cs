@@ -12,7 +12,7 @@ namespace AIBracket.API.Entities
         public PacmanGame Game { get; set; }
         public PacmanClient User { get; set; }
         public bool IsRunning { get; set; } = true;
-        public Guid Id { get; private set; } = Guid.NewGuid();
+        public Guid Id { get; set; } = Guid.NewGuid();
         public List<ISocket> Spectators { get; set; } = new List<ISocket>();
         private List<string> chats { get; set; } = new List<string>();
 
@@ -78,7 +78,7 @@ namespace AIBracket.API.Entities
             UpdateUsers();
             if (Game.Pacman.Lives == 0)
             {
-                Game = new PacmanGame();
+                IsRunning = false;
             }
         }
 

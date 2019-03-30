@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Linq;
+using AIBracket.Data;
+using AIBracket.Data.Entities;
 
 namespace AIBracket.API
 {
@@ -16,12 +18,14 @@ namespace AIBracket.API
         private static List<IConnectedClient> waiting_players; // current connected players
         private static List<ISocket> spectators; 
         private static bool isRunning;
+        private static AIBracketContext context;
 
         public static void Initialize() { // constructor for our games list and players
             games = new List<GamePacman>(); // <- create functions to add players and games
             waiting_players = new List<IConnectedClient>();
             isRunning = false;
             spectators = new List<ISocket>();
+            context = new AIBracketContext();
         }
 
         public static bool WatchGame(ISocket spectator, string guid)
@@ -72,7 +76,6 @@ namespace AIBracket.API
                     foreach (var g in games)
                     {
                         g.UpdateGame();
-                        // g.Game.PrintBoard();
                     }
                     start_time = current_time;
                 }
@@ -81,10 +84,19 @@ namespace AIBracket.API
                 {
                     if (!games[i].IsRunning)
                     {
-                        games[i].Game.PrintBoard();
-                        spectators.AddRange(games[i].Spectators);
-                        games.RemoveAt(i);
-                        i--;
+                        context.PacmanGames.Add(new PacmanGames
+                        {
+                            Id = games[i].Id,
+                            BotId = games[i].User.Bot.Id,
+                            StartDate = games[i].Game.TimeStarted,
+                            EndDate = games[i].Game.TimeEnded,
+                            Score = games[i].Game.Score,
+                            Difficulty = 1
+                        });
+                        context.SaveChanges();
+                        games[i].Game = new PacmanGame();
+                        games[i].Id = Guid.NewGuid();
+                        games[i].IsRunning = true;
                     }
                 }
                 foreach(var client in waiting_players)
