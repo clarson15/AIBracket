@@ -85,6 +85,7 @@ namespace AIBracket.API.Sockets
             catch(Exception e)
             {
                 Console.WriteLine("Error writing data to socket: " + e.Message);
+                Disconnect();
             }
         }
 
@@ -272,7 +273,8 @@ namespace AIBracket.API.Sockets
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error reading data from sslsocket: " + e.Message);
+                Console.WriteLine("Error reading data from socket: " + e.Message);
+                Disconnect();
                 return;
             }
         }

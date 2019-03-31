@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Security;
-using System.Net.Sockets;
 using System.Text;
 
 namespace AIBracket.API.Sockets
@@ -50,7 +49,7 @@ namespace AIBracket.API.Sockets
 
         public void Disconnect()
         {
-            _socket.Close();
+            _socket.Dispose();
         }
 
         public string ReadData()
@@ -85,6 +84,7 @@ namespace AIBracket.API.Sockets
             catch(Exception e)
             {
                 Console.WriteLine("Error receiving data from client: " + e.Message);
+                Disconnect();
             }
         }
 
@@ -177,7 +177,7 @@ namespace AIBracket.API.Sockets
             }catch(Exception e)
             {
                 Console.WriteLine("Error writing data to socket: " + e.Message);
-                stream.Dispose();
+                Disconnect();
             }
         }
 
@@ -271,6 +271,7 @@ namespace AIBracket.API.Sockets
             catch (Exception e)
             {
                 Console.WriteLine("Error reading data from sslsocket: " + e.Message);
+                Disconnect();
                 return;
             }
         }

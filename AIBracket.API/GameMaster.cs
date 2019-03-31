@@ -82,7 +82,7 @@ namespace AIBracket.API
 
                 for(var i = 0; i < games.Count; i++)
                 {
-                    if (!games[i].IsRunning)
+                    if (!games[i].IsRunning && games[i].User.Socket.IsConnected)
                     {
                         context.PacmanGames.Add(new PacmanGames
                         {
@@ -97,6 +97,12 @@ namespace AIBracket.API
                         games[i].Game = new PacmanGame();
                         games[i].Id = Guid.NewGuid();
                         games[i].IsRunning = true;
+                    }
+                    else
+                    {
+                        spectators.AddRange(games[i].Spectators);
+                        games.RemoveAt(i);
+                        i--;
                     }
                 }
                 foreach(var client in waiting_players)

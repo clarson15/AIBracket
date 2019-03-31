@@ -1,6 +1,8 @@
 export class BotsResponseModel {
-  id: number;
+  id: string;
   name: string;
   game: number;
   privateKey: string;
+  showSecret: boolean;
+  history: any;
 }

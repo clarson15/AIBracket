@@ -18,6 +18,12 @@
   width: 140px;
 }
 
+.fake-anchor {
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .create-bot-button{
   float: right;
 }

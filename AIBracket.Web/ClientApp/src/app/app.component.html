@@ -1,5 +1,5 @@
 <body class="background max-height">
-  <div class="max-height">
+  <div class="max-height" *ngIf="isReady">
     <app-nav-menu [Account]="account" (logout)="onLogout()" (sidenav)="toggleNav()"></app-nav-menu>
     <div class="container">
       <mat-sidenav-container class="example-container">
@@ -14,7 +14,9 @@
           </div>
         </mat-sidenav>
         <mat-sidenav-content>
-          <router-outlet (activate)='onActivate($event)'></router-outlet>
+          <div class="router-container">
+            <router-outlet (activate)='onActivate($event)'></router-outlet>
+          </div>
         </mat-sidenav-content>
       </mat-sidenav-container>
     </div>

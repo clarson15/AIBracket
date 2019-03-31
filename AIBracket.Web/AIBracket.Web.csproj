@@ -42,6 +42,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\src\app\models\BotHistoryResponseModel.ts" />
     <None Remove="ClientApp\src\app\models\BotsResponseModel.ts" />
     <None Remove="ClientApp\src\app\models\CreateAccountResponseModel.ts" />
     <None Remove="ClientApp\src\app\models\LoginResponseModel.ts" />
@@ -53,6 +54,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\app\models\BotHistoryResponseModel.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\models\CreateAccountResponseModel.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\models\BotsResponseModel.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\models\LoginResponseModel.ts" />

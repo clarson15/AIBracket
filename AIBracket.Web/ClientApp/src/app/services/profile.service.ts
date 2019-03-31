@@ -6,6 +6,7 @@ import { FormGroup } from '@angular/forms';
 import { catchError, map } from 'rxjs/operators';
 import { Observable, throwError, of } from 'rxjs';
 import { BotsResponseModel } from '../models/BotsResponseModel';
+import { BotHistoryResponseModel } from '../models/BotHistoryResponseModel';
 
 @Injectable()
 export class ProfileService {
@@ -24,26 +25,38 @@ export class ProfileService {
     }), catchError((err, obs) => this.errorHandler(err, obs)));
   }
 
-  createBot(form: FormGroup): Observable<any> {
+  getBotHistory(id: string): Observable<BotHistoryResponseModel[]> {
     let httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
       })
     };
-    return this.http.post<any>('/api/Bot/CreateBot', form.value, httpOptions).pipe(map((res) => {
+    return this.http.get<BotHistoryResponseModel[]>('/api/Bot/GetBotHistory?Id=' + id, httpOptions).pipe(map((res) => {
       return res;
     }), catchError((err, obs) => this.errorHandler(err, obs)));
   }
 
-  deleteBot(id: number): Observable<any> {
+  createBot(form: FormGroup): Observable<string> {
     let httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
       })
     };
-    return this.http.post<any>('/api/Bot/DeleteBot', id, httpOptions).pipe(map((res) => {
+    return this.http.post<string>('/api/Bot/CreateBot', form.value, httpOptions).pipe(map((res) => {
+      return res;
+    }), catchError((err, obs) => this.errorHandler(err, obs)));
+  }
+
+  deleteBot(id: string): Observable<any> {
+    let httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+      })
+    };
+    return this.http.post<any>('/api/Bot/DeleteBot', "\"" + id + "\"", httpOptions).pipe(map((res) => {
       return res;
     }), catchError((err, obs) => this.errorHandler(err, obs)));
   }

@@ -6,11 +6,11 @@ namespace AIBracket.Data.Entities
     public class PacmanGames
     {
         [Key]
-        public Guid Id;
-        public Guid BotId;
-        public DateTime StartDate;
-        public DateTime EndDate;
-        public int Score;
-        public int Difficulty;
+        public Guid Id { get; set; }
+        public Guid BotId { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public int Score { get; set; }
+        public int Difficulty { get; set; }
     }
 }

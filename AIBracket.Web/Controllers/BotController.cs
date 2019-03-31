@@ -47,39 +47,58 @@ namespace AIBracket.Web.Controllers
                 return Unauthorized();
             }
             var guid = Guid.NewGuid().ToByteArray();
-            var botmodel = _appDbContext.Bots.Add(new Bot
+            var newBot = new Bot
             {
                 IdentityId = data.Id,
                 PrivateKey = Convert.ToBase64String(guid).Substring(0, 16),
                 Name = bot.Name,
                 Game = bot.Game
-            });
+            };
+            var botmodel = _appDbContext.Bots.Add(newBot);
             await _appDbContext.SaveChangesAsync();
-            return Ok();
+            return Ok(newBot.Id);
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeleteBot([FromBody] int Id)
+        public async Task<IActionResult> DeleteBot([FromBody]string Id)
         {
+            var success = Guid.TryParse(Id, out Guid guid);
+            if (!success)
+            {
+                return BadRequest("Invalid Id");
+            }
             var data = await _userManager.FindByIdAsync(User.Claims.First(x => x.Type == "id").Value);
             if (data == null)
             {
                 return Unauthorized();
             }
-            var bot = await _appDbContext.Bots.FindAsync(Id);
+            var bot = await _appDbContext.Bots.FindAsync(guid);
             if(bot != null)
             {
-                _appDbContext.Bots.Remove(bot);
+                if (bot.IdentityId == data.Id)
+                {
+                    _appDbContext.Bots.Remove(bot);
+                    await _appDbContext.SaveChangesAsync();
+                    return Ok();
+                }
+                else
+                {
+                    return Unauthorized("You cannot delete someone else's bot");
+                }
             }
-            await _appDbContext.SaveChangesAsync();
-            return Ok();
+            return BadRequest();
         }
 
         [AllowAnonymous]
         [HttpGet]
-        public IActionResult GetBotHistory([FromBody] Guid Id)
+        public IActionResult GetBotHistory(string Id)
         {
-            var games = _appDbContext.PacmanGames.Where(x => x.BotId == Id).ToList();
+            var success = Guid.TryParse(Id, out Guid guid);
+            if (!success)
+            {
+                return BadRequest("Invalid Bot Id");
+            }
+            var games = _appDbContext.PacmanGames.Where(x => x.BotId == guid).ToList();
             return Ok(games);
         }
     }

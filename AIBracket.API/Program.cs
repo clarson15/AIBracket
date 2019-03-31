@@ -61,6 +61,7 @@ namespace AIBracket.API
         {
             var listener = (TcpListener)ar.AsyncState;
             var client = listener.EndAcceptTcpClient(ar);
+            client.NoDelay = true;
             try
             {
                 var sstream = new SslStream(client.GetStream(), false, (sender, cert, chain, err) => true);
@@ -107,7 +108,6 @@ namespace AIBracket.API
                 if (clients[i].IsReady)
                 {
                     var message = clients[i].ReadData();
-                    Console.WriteLine("Read: " + message);
                     if (message.StartsWith("BOT ", StringComparison.InvariantCultureIgnoreCase))
                     {
                         var bot = VerifyBot(message.Substring(4), clients[i]);
