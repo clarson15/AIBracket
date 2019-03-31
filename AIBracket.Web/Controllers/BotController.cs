@@ -78,6 +78,14 @@ namespace AIBracket.Web.Controllers
                 if (bot.IdentityId == data.Id)
                 {
                     _appDbContext.Bots.Remove(bot);
+                    switch (bot.Game)
+                    {
+                        case 1:
+                            _appDbContext.PacmanGames.RemoveRange(_appDbContext.PacmanGames.Where(x => x.BotId == bot.Id));
+                            break;
+                        default:
+                            break;
+                    }
                     await _appDbContext.SaveChangesAsync();
                     return Ok();
                 }
