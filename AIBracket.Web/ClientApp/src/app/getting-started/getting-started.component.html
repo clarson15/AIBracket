@@ -1,4 +1,3 @@
-
 <div class="info">
   <h1>Getting Started With AI Bracket</h1>
   <p>
@@ -8,7 +7,7 @@
   <h2>Creating a Bot</h2>
   <p>
     You can create a bot using any language. Once you are ready to test your bot, create an account and log in to access your profile.
-    Select the new bot '+' and enter the required fields to recieve a private key for your bot.
+    Select the new bot + and enter the required fields to recieve a private key for your bot.
   </p>
   <p>
     Statistics for every bot any bot you own can be seen on your profile along with your match history.
@@ -22,50 +21,49 @@
     ***The API will require some information about your intentions, whether you are connecting for a single player game, versus game, or a tournament.
   </p>
   <br />
-  <br />
-  <br />
-  <div class="language-list">
+  <h2>Game Events Documentation</h2>
+  <p>
+    Everything that happens in the game will be sent to you using an event system.
+    Each game has its own unique events specified by an enumeration as the first section delimeted by a space.
+    Events are sent to you at even intervals so sometimes there will be multiple updates.
+    These updates are delimeted by an *.
+  </p>
+  <p>
+    Example: 3 25 2 10
+  </p>
+  <p>
+    In this example the 3 tell you what kind of event this is. In the case of Pacman this would mean it is an update telling that a dot was consumed.
+    The Dot event has its own information that you need such as which dot, and how much to add to the score.
+    This can be seen in the example where the 25 is the x coordinate of the dot, and the 2 is the y coordinate.
+    The score is on the end as a 10.
+  </p>
+  <div class="game-documentation-list">
     <mat-tab-group>
-      <mat-tab label="Python">
-        import socket<br />
-        import random<br />
-        <br />
-        def switchInput( c ):<br />
-        if c == 0:<br />
-        return 'LEFT'<br />
-        elif c == 1:<br />
-        return 'RIGHT'<br />
-        elif c == 2:<br />
-        return 'DOWN'<br />
-        else:<br />
-        return 'UP'<br />
-        <br />
-        TCP_IP = '127.0.0.1'<br />
-        <br />
-        TCP_PORT = 8000<br />
-        <br />
-        BUFFER_SIZE = 1024<br />
-        <br />
-        MESSAGE = "BOT Za2sMl0wpk6bou4H"<br />
-        <br />
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)<br />
-        <br />
-        s.connect((TCP_IP, TCP_PORT))<br />
-        print("Connected")<br />
-        userInput = 'LEFT'<br />
-        s.send(str.encode(MESSAGE))<br />
-        <br />
-        while userInput != 'STOP':<br />
-        data = s.recv(BUFFER_SIZE)<br />
-        data = data.decode('ascii')<br />
-        data = data.split()<br />
-        print(data)<br />
-        s.send(switchInput(random.randint(0, 4)).encode('ascii'))<br />
-        <br />
-        s.close()<br />
+      <mat-tab label="Pacman">
+        <ul>
+          <li>A board reset event is represented as a 0 and is followed by Width and Height of the board.
+            <ul>
+              <li>Everytile is represented by a 0 for a wall, 1 for a blank, 2 for a dot, 3 for a fruit, 4 for a power up, and 5 for a portal.</li>
+              <li>Fruit will not be spawned any time the map is reset, so this can be ignored.</li>
+              <li>The list is from left to right, top to bottom.</li>
+            </ul>
+          </li>
+          <li>A pacman position event is represented as a 1 and will be followed by Pacman's new X and Y position.</li>
+          <li>A ghost position event is represented as a 2 and will be followed by a 0 1 2 or 3 indicating which ghost is being updated, followed by the ghost's new X and Y, and two booleans indicating whether the ghost is dead and/or is vulnerable to dying.</li>
+          <li>All the following have an X and Y coordinate of the location and a positive value to add to the score (this can be ignored if you don't want to factor score into your bot)
+            <ul>
+              <li>A dot being consumed is represented as a 3</li>
+              <li>A fruit being consumed is represented as a 4</li>
+              <li>A power up being consumed is represented as a 5</li>
+            </ul>
+          </li>
+          <li>A fruit being spawned is represented as a 6 and is followed by the X and Y coordinate of where it was spawned.</li>
+          <li>Pacman lives updates are represented as a 7 and are followed by the number of lives.</li>
+          <li> When a ghost dies or spawns it is represented as an 8 and is followed by a 0 1 2 or 3 indicating which ghost is affected, and a boolean indicating if it's a death. </li>
+          <li>The score event is shown at the beginning of the game or if a spectator joins and is indicated by a 9.</li>
+        </ul>
       </mat-tab>
-      <mat-tab label="C#"> Content 2 </mat-tab>
-      <mat-tab label="C++"> Content 3 </mat-tab>
+      <mat-tab label="Tanks"> Content 2 </mat-tab>
     </mat-tab-group>
   </div>
 </div>
