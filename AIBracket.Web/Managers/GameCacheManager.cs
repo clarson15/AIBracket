@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AIBracket.Web.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -11,85 +12,134 @@ namespace AIBracket.Web.Managers
 {
     public static class GameCacheManager
     {
-        private static DateTime LastUpdated { get; set; }
         private static string FeaturedGame { get; set; }
+        private static object lockObj { get; set; } = new object();
         private static TcpClient Client { get; set; }
         private static bool isReady { get; set; } = false;
+        private static byte[] receiveBuffer = new byte[1024];
+        public static List<GameSummaryModel> Games { get; set; }
 
-        static GameCacheManager()
+        public static void Start()
         {
-            LastUpdated = DateTime.UnixEpoch;
             Client = new TcpClient("127.0.0.1", 8000);
+            Games = new List<GameSummaryModel>();
             Client.GetStream().Write(Encoding.ASCII.GetBytes("WATCH GAMEMASTER"));
-            var timeout = DateTime.Now.AddSeconds(2);
-            while (Client.Available == 0)
-            {
-                if(DateTime.Now - timeout > TimeSpan.FromSeconds(0))
-                {
-                    LastUpdated = DateTime.Now;
-                    return;
-                }
-                Thread.Sleep(0);
-            }
-            isReady = true;
-            var ready = Client.Available;
-            var bytes = new byte[ready];
-            Client.GetStream().Read(bytes, 0, ready);
-            UpdateData();
+            Client.GetStream().BeginRead(receiveBuffer, 0, 1024, new AsyncCallback(ReadCallback), Client);
         }
 
-        private static void UpdateData()
+        private static void ReadCallback(IAsyncResult ar)
         {
-            if (!isReady)
+            TcpClient stream = (TcpClient)ar.AsyncState;
+            var bytesRead = -1;
+            try
             {
-                return;
-            }
-            Client.GetStream().Write(Encoding.ASCII.GetBytes("LIST PACMAN")); 
-            var timeout = DateTime.Now.AddSeconds(2);
-            while(Client.Available == 0)
-            {
-                if(DateTime.Now - timeout > TimeSpan.FromSeconds(0))
+                bytesRead = stream.GetStream().EndRead(ar);
+                var newarray = new byte[bytesRead];
+                Buffer.BlockCopy(receiveBuffer, 0, newarray, 0, bytesRead);
+                stream.GetStream().BeginRead(receiveBuffer, 0, 1024, new AsyncCallback(ReadCallback), stream);
+                var message = Encoding.ASCII.GetString(newarray).Trim();
+                lock (lockObj)
                 {
-                    LastUpdated = DateTime.Now;
-                    return;
+                    UpdateData(message);
                 }
-                Thread.Sleep(0);
             }
-            var ready = Client.Available;
-            var bytes = new byte[ready];
-            Client.GetStream().Read(bytes, 0, ready);
-            var message = Encoding.ASCII.GetString(bytes);
-            var games = message.Split('\n');
-            var parsedGames = new List<KeyValuePair<string, int>>();
-            foreach(var game in games)
+            catch(Exception e)
             {
-                if (string.IsNullOrWhiteSpace(game))
-                {
+                Console.WriteLine("Error receiving GameMaster data: " + e.Message);
+            }
+        }
+
+        private static void UpdateData(string message)
+        {
+            var elements = message.Split(' ');
+            switch (elements[0])
+            {
+                case "0":
+                    if(elements.Length < 5)
+                    {
+                        break;
+                    }
+                    var newGame = new GameSummaryModel
+                    {
+                        GameId = elements[1],
+                        GameType = int.Parse(elements[2]),
+                        BotId = elements[3],
+                        Score = int.Parse(elements[4])
+                    };
+                    Games.Add(newGame);
                     break;
-                }
-                var data = game.Split(' ');
-                if(data.Count() != 2)
-                {
-                    return;
-                }
-                var newGame = new KeyValuePair<string, int>(data[0], int.Parse(data[1]));
-                parsedGames.Add(newGame);
+                case "1":
+                    if(elements.Length < 3)
+                    {
+                        break;
+                    }
+                    var gameToRemove = Games.FirstOrDefault(x => x.GameId == elements[1]);
+                    if (gameToRemove != null)
+                    {
+                        Games.Remove(gameToRemove);
+                    }
+                    break;
+                case "2":
+                    for(int i = 1; (i + 3) < elements.Length; i+=4)
+                    {
+                        var newGamel = new GameSummaryModel
+                        {
+                            GameId = elements[i],
+                            GameType = int.Parse(elements[i + 1]),
+                            BotId = elements[i + 2],
+                            Score = int.Parse(elements[i + 3])
+                        };
+                        Games.Add(newGamel);
+                    }
+                    break;
+                case "3":
+                    if(elements.Length < 5)
+                    {
+                        break;
+                    }
+                    var game = Games.FirstOrDefault(x => x.GameId == elements[1]);
+                    if(game != null)
+                    {
+                        Games.Remove(game);
+                        game.GameId = elements[2];
+                        game.GameType = int.Parse(elements[3]);
+                        game.Score = int.Parse(elements[4]);
+                        Games.Add(game);
+                    }
+                    break;
+                default:
+                    Console.WriteLine("Received OP code " + elements[0]);
+                    break;
             }
-            if(games.Count() == 0)
+            var fg = Games.FirstOrDefault(x => x.Score == Games.Max(y => y.Score));
+            if(fg != null)
             {
-                return;
+                FeaturedGame = fg.GameId;
             }
-            FeaturedGame = parsedGames.First(y => parsedGames.Max(x => x.Value) == y.Value).Key;
-            LastUpdated = DateTime.Now;
+            else
+            {
+                FeaturedGame = null;
+            }
+        }
+
+        public static bool IsBotActive(string Id)
+        {
+            bool ret;
+            lock (lockObj)
+            {
+                ret = Games.Count(x => x.BotId == Id) > 0;
+            }
+            return ret;
         }
 
         public static string GetFeaturedGameId()
         {
-            if(DateTime.Now - LastUpdated > TimeSpan.FromSeconds(10))
+            string featured;
+            lock (lockObj)
             {
-                UpdateData();
+                featured = FeaturedGame;
             }
-            return FeaturedGame;
+            return featured;
         }
     }
 }

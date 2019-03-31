@@ -36,15 +36,15 @@
           </mat-panel-description>
         </mat-expansion-panel-header>
         <p>Private Key: <span *ngIf="bot.showSecret">{{bot.privateKey}}</span><span class="fake-anchor" (click)="showSecret(i)" *ngIf="!bot.showSecret">Show secret</span></p>
-        <span>History:</span><br />
+        <span style="margin-top:5px; font-size:20px;">History:</span><br />
         <div class="history" *ngIf="bot.history != null && bot.history.length > 0">
           <div class="history-cell" *ngFor="let history of bot.history">
-            <span>Date: {{history.startDate}} - {{history.endDate}}</span><br />
             <span>Score: {{history.score}}</span>
+            <span>Date: {{history.startDate}} - {{history.endDate}}</span>
           </div>
         </div>
-        <div class="no-history" *ngIf="bot.history == null || bot.history.length == 0">
-          <span>You have not played a game yet.</span>
+        <div class="no-history" *ngIf="bot.history == null || bot.history.length == 0" style="text-align: center;">
+          <span>This bot has not played a game yet.</span>
         </div>
         <p>
           <button mat-raised-button color="warn" style="float: right;" (click)="deleteBot(bot.id)">Delete</button>

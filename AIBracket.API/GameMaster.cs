@@ -42,16 +42,38 @@ namespace AIBracket.API
         public static void AddSpectator(ISocket spectator)
         {
             spectators.Add(spectator);
+            var ret = "2 ";
+            foreach(var g in games)
+            {
+                ret += g.Id.ToString() + " 1 " + g.User.Bot.Id.ToString() + " " + g.Game.Score + " ";
+            }
+            spectator.WriteData(ret.TrimEnd());
+        }
+
+        public static bool IsPlayerConnected(IConnectedClient client)
+        {
+            return games.Count(x => x.User.Bot.Id == client.Bot.Id) > 0;
         }
 
         public static void AddPlayer(IConnectedClient player) {
             if(player.Bot.Game == 1)
             {
-                games.Add(new GamePacman
+                var game = new GamePacman
                 {
                     Game = new PacmanGame(),
                     User = (PacmanClient)player
-                });
+                };
+                games.Add(game);
+                string ret = "0 " + game.Id.ToString() + " 1 " + game.User.Bot.Id.ToString() + " " + game.Game.Score;
+                for(var i = 0; i < spectators.Count; i++){
+                    spectators[i].WriteData(ret);
+                    if (!spectators[i].IsConnected)
+                    {
+                        spectators.RemoveAt(i);
+                        i--;
+                        continue;
+                    }
+                }
                 Console.WriteLine("Added pacman game");
                 return;
             }
@@ -93,13 +115,36 @@ namespace AIBracket.API
                             Score = games[i].Game.Score,
                             Difficulty = 1
                         });
+                        var ret = "3 " + games[i].Id.ToString() + " ";
                         context.SaveChanges();
                         games[i].Game = new PacmanGame();
                         games[i].Id = Guid.NewGuid();
+                        ret += games[i].Id.ToString() + " 1 " + games[i].Game.Score;
+                        for(int j = 0; j < spectators.Count; j++)
+                        {
+                            spectators[j].WriteData(ret);
+                            if (!spectators[j].IsConnected)
+                            {
+                                spectators.RemoveAt(j);
+                                j--;
+                                continue;
+                            }
+                        }
                         games[i].IsRunning = true;
                     }
-                    else
+                    else if(!games[i].IsRunning)
                     {
+                        var ret = "1 " + games[i].Id.ToString() + " 1";
+                        for(var j = 0; j < spectators.Count; j++)
+                        {
+                            spectators[j].WriteData(ret);
+                            if (!spectators[j].IsConnected)
+                            {
+                                spectators.RemoveAt(j);
+                                j--;
+                                continue;
+                            }
+                        }
                         spectators.AddRange(games[i].Spectators);
                         games.RemoveAt(i);
                         i--;

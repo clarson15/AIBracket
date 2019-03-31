@@ -113,7 +113,14 @@ namespace AIBracket.API
                         var bot = VerifyBot(message.Substring(4), clients[i]);
                         if (bot != null)
                         {
-                            GameMaster.AddPlayer(bot);
+                            if (GameMaster.IsPlayerConnected(bot))
+                            {
+                                bot.Socket.WriteData("Bot is already connected.");
+                            }
+                            else
+                            {
+                                GameMaster.AddPlayer(bot);
+                            }
                             clients.RemoveAt(i);
                             i--;
                             continue;
@@ -124,7 +131,6 @@ namespace AIBracket.API
                         var target = message.Substring(6);
                         if (target == "GAMEMASTER")
                         {
-                            clients[i].WriteData("OK");
                             GameMaster.AddSpectator(clients[i]);
                             clients.RemoveAt(i);
                             i--;

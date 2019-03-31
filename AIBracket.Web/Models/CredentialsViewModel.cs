@@ -1,4 +1,4 @@
-﻿namespace AIBracket.Web.Controllers
+﻿namespace AIBracket.Web.Models
 {
     public class CredentialsViewModel
     {

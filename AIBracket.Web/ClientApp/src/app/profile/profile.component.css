@@ -33,3 +33,19 @@
   justify-content: center;
   align-items: center;
 }
+
+.history{
+
+}
+
+.history-cell span{
+  font-size: 16px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.history-cell{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}

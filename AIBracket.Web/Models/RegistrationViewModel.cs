@@ -1,6 +1,6 @@
 ﻿using AIBracket.Data.Entities;
 
-namespace AIBracket.Web.Controllers
+namespace AIBracket.Web.Models
 {
     public class RegistrationViewModel : AppUser
     {

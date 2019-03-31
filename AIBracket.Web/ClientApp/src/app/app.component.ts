@@ -48,6 +48,9 @@ export class AppComponent implements OnInit {
   }
 
   onActivate($event) {
+    if (this.account == null && localStorage.getItem('auth_token') != null) {
+      this.attemptLogin();
+    }
     if ($event.constructor.name == "ProfileComponent") {
       $event.user = this.account;
     }

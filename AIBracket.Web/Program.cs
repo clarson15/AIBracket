@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using AIBracket.Web.Managers;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +16,7 @@ namespace AIBracket.Web
     {
         public static void Main(string[] args)
         {
+            GameCacheManager.Start();
             CreateWebHostBuilder(args).Build().Run();
         }
 

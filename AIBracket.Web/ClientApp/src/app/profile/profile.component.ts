@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { ProfileService } from '../services/profile.service';
 import { BotsResponseModel } from '../models/BotsResponseModel';
 import { ProfileResponseModel } from '../models/ProfileResponseModel';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-profile',
@@ -34,7 +35,10 @@ export class ProfileComponent implements OnInit {
         data.forEach(x => {
           x.showSecret = false;
           this.profileService.getBotHistory(x.id).subscribe(history => {
-            console.log(history);
+            history.forEach(h => {
+              h.endDate = moment.duration(moment(h.endDate).diff(moment(h.startDate))).humanize();
+              h.startDate = moment(h.startDate).fromNow();
+            });
             this.bots.find(b => b.id == x.id).history = history;
           })
         });
