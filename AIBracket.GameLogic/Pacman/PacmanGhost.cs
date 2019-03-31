@@ -51,5 +51,78 @@ namespace AIBracket.GameLogic.Pacman.Ghost
                     break;
             }
         }
+
+        /// <summary>
+        /// Finds a random direction for the ghost prioritizing not going backwards
+        /// </summary>
+        /// <param name="d">Direction or Facing</param>
+        /// <param name="pos">Location</param>
+        /// <returns>New Direction</returns>
+        public PacmanPacman.Direction DetermineGhostMoveEasy(List<PacmanPacman.Direction> possible)
+        {
+            var random = new Random();
+            if (possible.Count > 1)
+            {
+                for (int i = 0; i < possible.Count; i++)
+                {
+                    if (possible[i] == PacmanPacman.InverseDirection(Facing)) 
+                    {
+                        possible.RemoveAt(i);
+                        break;
+                    }
+                }
+                return possible[random.Next(0, possible.Count)];
+            }
+            return PacmanPacman.Direction.start;
+        }
+
+        public PacmanPacman.Direction DetermineGhostMoveMedium(List<PacmanPacman.Direction> possible, PacmanCoordinate pos)
+        {
+            var random = new Random();
+            var difference = Location - pos;
+            if (possible.Contains(PacmanPacman.InverseDirection(Facing)))
+            {
+                possible.Remove(PacmanPacman.InverseDirection(Facing));
+            }
+            if (possible.Count > 0)
+            {
+                if (Math.Abs(difference.Xpos) > Math.Abs(difference.Ypos))
+                {
+                    if (difference.Xpos > 0)
+                    {
+                        if (possible.Contains(PacmanPacman.Direction.left))
+                        {
+                            return PacmanPacman.Direction.left;
+                        }
+                    }
+                    else
+                    {
+                        if (possible.Contains(PacmanPacman.Direction.right))
+                        {
+                            return PacmanPacman.Direction.right;
+                        }
+                    }
+                }
+                else
+                {
+                    if (difference.Ypos > 0)
+                    {
+                        if (possible.Contains(PacmanPacman.Direction.up))
+                        {
+                            return PacmanPacman.Direction.up;
+                        }
+                    }
+                    else
+                    {
+                        if (possible.Contains(PacmanPacman.Direction.down))
+                        {
+                            return PacmanPacman.Direction.down;
+                        }
+                    }
+                }
+                return possible[random.Next(0, possible.Count)];
+            }
+            return PacmanPacman.Direction.start;
+        }
     }
 }

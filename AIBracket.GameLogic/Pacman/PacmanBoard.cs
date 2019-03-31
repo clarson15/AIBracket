@@ -1,4 +1,5 @@
 ﻿using AIBracket.GameLogic.Pacman.Coordinate;
+using AIBracket.GameLogic.Pacman.Pacman;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -136,6 +137,43 @@ namespace AIBracket.GameLogic.Pacman.Board
                     return new PacmanCoordinate(x, y);
                 }
             }
+        }
+
+        /// <summary>
+        /// Checks the result of executing a direction based on the position of an entity
+        /// </summary>
+        /// <param name="d">Direction entity is trying to move towards</param>
+        /// <param name="pos">Position of entity currently</param>
+        /// <returns>Whether a move is valid</returns>
+        public bool ValidMove(PacmanPacman.Direction d, PacmanCoordinate pos)
+        {
+            switch (d)
+            {
+                case PacmanPacman.Direction.start:
+                    return true;
+                case PacmanPacman.Direction.up:
+                    return GetTile(pos.Xpos, pos.Ypos - 1) != PacmanBoard.Tile.wall;
+                case PacmanPacman.Direction.down:
+                    return GetTile(pos.Xpos, pos.Ypos + 1) != PacmanBoard.Tile.wall;
+                case PacmanPacman.Direction.left:
+                    return GetTile(pos.Xpos - 1, pos.Ypos) != PacmanBoard.Tile.wall;
+                case PacmanPacman.Direction.right:
+                    return GetTile(pos.Xpos + 1, pos.Ypos) != PacmanBoard.Tile.wall;
+            }
+            return false;
+        }
+
+        public List<PacmanPacman.Direction> PotentialDirections(PacmanCoordinate pos)
+        {
+            List<PacmanPacman.Direction> directions = new List<PacmanPacman.Direction>(); 
+            for (int i = 1; i< 5; i++)
+            {
+                if (ValidMove((PacmanPacman.Direction) i, pos))
+                {
+                    directions.Add((PacmanPacman.Direction) i);
+                }
+            }
+            return directions;
         }
 
         /// <returns>Coordinates to the other portal on the map</returns>
