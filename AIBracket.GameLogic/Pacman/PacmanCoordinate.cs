@@ -37,6 +37,11 @@ namespace AIBracket.GameLogic.Pacman.Coordinate
             return lhs.Xpos != rhs.Xpos && lhs.Ypos != rhs.Ypos;
         }
 
+        public static PacmanCoordinate operator-(PacmanCoordinate lhs, PacmanCoordinate rhs)
+        {
+            return new PacmanCoordinate(lhs.Xpos - rhs.Xpos, lhs.Ypos - rhs.Ypos);
+        }
+
         public override bool Equals(object obj)
         {
             if (obj == null)

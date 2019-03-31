@@ -12,13 +12,15 @@ namespace AIBracket.GameLogic.Pacman.Game
    
     public class PacmanGame
     {
-        public enum EventType { BoardReset, PacmanUpdate, GhostUpdate, Dot, Fruit, PowerUp, FruitSpawn, PacmanLives, GhostDie, Score };
+        public enum EventType { BoardReset, PacmanUpdate, GhostUpdate, Dot, Fruit, PowerUp, FruitSpawn, PacmanLives, GhostDie, Score, DifficultyIncrease };
+        public enum PacmanDifficulty { Easy, Medium, Hard };
         public List<KeyValuePair<EventType, string>> CurrentGameEvent;
         public PacmanBoard Board { get; private set; }
         public PacmanPacman Pacman { get; private set; }
         public PacmanGhost[] Ghosts { get; private set; }
         public  DateTime TimeStarted { get; private set; }
         public DateTime TimeEnded { get; private set; }
+        public PacmanDifficulty Difficulty { get; private set; }
         public int Score { get; private set; }
         private int GhostScoreMultiplier { get; set; }
         private int SpawnGhostCounter { get; set; }
@@ -31,7 +33,7 @@ namespace AIBracket.GameLogic.Pacman.Game
         {
             CurrentGameEvent = new List<KeyValuePair<EventType, string>>();
             Board = new PacmanBoard();
-            CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.BoardReset, $"{Board.Width.ToString()} {Board.Height.ToString()} {GetBoardString()}"));
+            CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.BoardReset, GetBoardString()));
             Pacman = new PacmanPacman();
             CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.PacmanLives, $"{Pacman.Lives}"));
             Ghosts = new PacmanGhost[4]
@@ -47,6 +49,7 @@ namespace AIBracket.GameLogic.Pacman.Game
                 Ghosts[i].Facing = (PacmanPacman.Direction)random.Next(1, 5);
                 CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.GhostUpdate, $"{i} {Ghosts[i].GetPosition().ToString()} {Ghosts[i].IsDead} {Ghosts[i].IsVulnerable}"));
             }
+            Difficulty = PacmanDifficulty.Easy;
             Score = 0;
             CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.Score, $"{Score}"));
             GhostScoreMultiplier = 1;
@@ -97,31 +100,13 @@ namespace AIBracket.GameLogic.Pacman.Game
                 new PacmanGhost(),
                 new PacmanGhost()
             };
-            CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.BoardReset, $"{Board.Width.ToString()} {Board.Height.ToString()} {GetBoardString()}"));
+            CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.BoardReset, GetBoardString()));
         }
 
-        /// <summary>
-        /// Checks the result of executing a direction based on the position of an entity
-        /// </summary>
-        /// <param name="d">Direction entity is trying to move towards</param>
-        /// <param name="pos">Position of entity currently</param>
-        /// <returns>Whether a move is valid</returns>
-        private bool ValidMove(PacmanPacman.Direction d, PacmanCoordinate pos)
+        public void UpdateDifficulty(PacmanDifficulty d)
         {
-            switch(d)
-            {
-                case PacmanPacman.Direction.start:
-                    return true;
-                case PacmanPacman.Direction.up:
-                    return Board.GetTile(pos.Xpos, pos.Ypos - 1) != PacmanBoard.Tile.wall;
-                case PacmanPacman.Direction.down:
-                    return Board.GetTile(pos.Xpos, pos.Ypos + 1) != PacmanBoard.Tile.wall;
-                case PacmanPacman.Direction.left:
-                    return Board.GetTile(pos.Xpos - 1, pos.Ypos) != PacmanBoard.Tile.wall;
-                case PacmanPacman.Direction.right:
-                    return Board.GetTile(pos.Xpos + 1, pos.Ypos) != PacmanBoard.Tile.wall;
-            }
-            return false;
+            Difficulty = d;
+            CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.DifficultyIncrease, $"{(int)d}"));
         }
 
         /// <summary> This method is called after a move is made by pacman to determine whether or not to update the board.
@@ -233,36 +218,7 @@ namespace AIBracket.GameLogic.Pacman.Game
             return false;
         }
 
-        /// <summary>
-        /// Finds a random direction for the ghost prioritizing not going backwards
-        /// </summary>
-        /// <param name="d">Direction or Facing</param>
-        /// <param name="pos">Location</param>
-        /// <returns>New Direction</returns>
-        private PacmanPacman.Direction DetermineGhostMove(PacmanPacman.Direction d, PacmanCoordinate pos)
-        {
-            var random = new Random();
-            List<PacmanPacman.Direction> directions = new List<PacmanPacman.Direction>(); 
-            for (int i = 1; i < 5; i++)
-            {
-                if (ValidMove((PacmanPacman.Direction)i, pos))
-                {
-                    directions.Add((PacmanPacman.Direction)i);
-                }
-            }
-            if(directions.Count > 1)
-            {
-                for (int i = 0; i < directions.Count; i++)
-                {
-                    if(directions[i] == PacmanPacman.InverseDirection(d))
-                    {
-                        directions.RemoveAt(i);
-                        break;
-                    }
-                }
-            }
-            return directions[random.Next(0, directions.Count)];
-        }
+        
 
         /// <summary>Processes every tick of the game base on directions of each entity passed in the array
         /// p should be passed 5 directions
@@ -292,14 +248,14 @@ namespace AIBracket.GameLogic.Pacman.Game
                     if (!SlowGhosts)
                     {
                         PortalGhost(Ghosts[i].Location, i);
-                        Ghosts[i].Facing = DetermineGhostMove(Ghosts[i].Facing, Ghosts[i].Location);
+                        Ghosts[i].Facing = Ghosts[i].DetermineGhostMoveMedium(Board.PotentialDirections(Ghosts[i].Location), Pacman.Location);
                         Ghosts[i].Move();
                     }
                 }
                 else
                 {
                     PortalGhost(Ghosts[i].Location, i);
-                    Ghosts[i].Facing = DetermineGhostMove(Ghosts[i].Facing, Ghosts[i].Location);
+                    Ghosts[i].Facing = Ghosts[i].DetermineGhostMoveMedium(Board.PotentialDirections(Ghosts[i].Location), Pacman.Location);
                     Ghosts[i].Move();
                 }
             }
@@ -307,11 +263,11 @@ namespace AIBracket.GameLogic.Pacman.Game
             PacmanGhostCollide();
 
             // Move Pacman
-            if (ValidMove(p, Pacman.GetPosition()))
+            if (Board.ValidMove(p, Pacman.GetPosition()))
             {
                 Pacman.Facing = p;
             }
-            if (ValidMove(Pacman.Facing, Pacman.GetPosition()))
+            if (Board.ValidMove(Pacman.Facing, Pacman.GetPosition()))
             {
                 Pacman.Move();
                 CheckTile(Pacman.GetPosition());
@@ -341,7 +297,7 @@ namespace AIBracket.GameLogic.Pacman.Game
 
         public string GetBoardString()
         {
-            var ret = "";
+            var ret = $"{Board.Width} {Board.Height} ";
             for (int i = 0; i < Board.Height; i++)
             {
                 for (int j = 0; j < Board.Width; j++)
@@ -351,6 +307,10 @@ namespace AIBracket.GameLogic.Pacman.Game
                     {
                         ret += " ";
                     }
+                }
+                if (i != Board.Height - 1)
+                {
+                    ret += " ";
                 }
             }
             return ret;

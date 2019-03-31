@@ -223,16 +223,16 @@ export class HomeComponent implements OnInit {
       switch (type) {
         case "0":
           this.map.length = 0;
-          let rows = payload.split('\n');
-          console.log(rows.length + 'x' + rows[0].split(' ').length);
-          rows.forEach(y => {
-            let newrow = Array<number>();
-            let columns = y.split(' ');
-            columns.forEach(x => {
-              newrow.push(Number(x));
-            });
-            this.map.push(newrow);
-          });
+          let tiles = payload.split(' ');
+          let width = Number(tiles.shift());
+          let height = Number(tiles.shift());
+          for (let i = 0; i < height; i += 1) {
+            let rows = new Array<number>();
+            for (let j = 0; j < width; j += 1) {
+              rows.push(Number(tiles[i * width + j]));
+            }
+            this.map.push(rows);
+          }
           break;
         case "1":
           var vals = payload.split(' ');
