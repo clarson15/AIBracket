@@ -1,12 +1,12 @@
-<body class="background">
-  <div class="background">
+<body class="background max-height">
+  <div class="max-height">
     <app-nav-menu [Account]="account" (logout)="onLogout()" (sidenav)="toggleNav()"></app-nav-menu>
     <div class="container">
       <mat-sidenav-container class="example-container">
         <mat-sidenav #sidenav mode="side" [(opened)]="sideNavToggled">
           <div class="side-nav">
             <button mat-button routerLink="/home" [disableRipple]="true"><mat-icon>home</mat-icon> Home</button><br />
-            <button mat-button routerLink="/profile" [disableRipple]="true"><mat-icon>person</mat-icon> Profile</button><br />
+            <button mat-button *ngIf="account != null" routerLink="/profile" [disableRipple]="true"><mat-icon>person</mat-icon> Profile</button><br *ngIf="account != null" />
             <button mat-button routerLink="/tournaments" [disableRipple]="true"><mat-icon>group_work</mat-icon> Tournaments</button><br />
             <button mat-button routerLink="/watch" [disableRipple]="true"><mat-icon>tv</mat-icon> Watch</button><br />
             <button mat-button routerLink="/learn" [disableRipple]="true"><mat-icon>school</mat-icon> Learn</button><br />

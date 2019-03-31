@@ -9,6 +9,7 @@
   padding: 3em;
   margin-top: 2em;
   width: 75%;
+  max-width: 800px;
   margin-right: auto;
   margin-left: auto;
 }

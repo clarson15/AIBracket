@@ -74,5 +74,13 @@ namespace AIBracket.Web.Controllers
             await _appDbContext.SaveChangesAsync();
             return Ok();
         }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult GetBotHistory([FromBody] Guid Id)
+        {
+            var games = _appDbContext.PacmanGames.Where(x => x.BotId == Id).ToList();
+            return Ok(games);
+        }
     }
 }

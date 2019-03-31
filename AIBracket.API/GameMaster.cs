@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Linq;
+using AIBracket.Data;
+using AIBracket.Data.Entities;
 
 namespace AIBracket.API
 {
@@ -16,51 +18,44 @@ namespace AIBracket.API
         private static List<IConnectedClient> waiting_players; // current connected players
         private static List<ISocket> spectators; 
         private static bool isRunning;
-        private static Mutex clientMutex = new Mutex(), spectatorMutex = new Mutex(), gameMutex = new Mutex();
+        private static AIBracketContext context;
 
         public static void Initialize() { // constructor for our games list and players
             games = new List<GamePacman>(); // <- create functions to add players and games
             waiting_players = new List<IConnectedClient>();
             isRunning = false;
             spectators = new List<ISocket>();
+            context = new AIBracketContext();
         }
 
         public static bool WatchGame(ISocket spectator, string guid)
         {
-            gameMutex.WaitOne();
             var game = games.FirstOrDefault(x => x.Id.ToString() == guid);
             if (game != null)
             {
                 game.AddSpectator(spectator);
-                gameMutex.ReleaseMutex();
                 return true;
             }
-            gameMutex.ReleaseMutex();
             return false;
         }
 
         public static void AddSpectator(ISocket spectator)
         {
-            spectatorMutex.WaitOne();
             spectators.Add(spectator);
-            spectatorMutex.ReleaseMutex();
         }
 
         public static void AddPlayer(IConnectedClient player) {
             if(player.Bot.Game == 1)
             {
-                gameMutex.WaitOne();
                 games.Add(new GamePacman
                 {
                     Game = new PacmanGame(),
                     User = (PacmanClient)player
                 });
-                gameMutex.ReleaseMutex();
+                Console.WriteLine("Added pacman game");
                 return;
             }
-            clientMutex.WaitOne();
             waiting_players.Add(player);
-            clientMutex.ReleaseMutex();
         }
 
         public static int GetPlayerCount() {
@@ -73,7 +68,6 @@ namespace AIBracket.API
             while (isRunning) {
                 var current_time = DateTime.UtcNow;
                 var time_elapsed = current_time - start_time;
-                gameMutex.WaitOne();
                 foreach (var g in games)
                 {
                     g.GetUserInput();
@@ -82,7 +76,6 @@ namespace AIBracket.API
                     foreach (var g in games)
                     {
                         g.UpdateGame();
-                        // g.Game.PrintBoard();
                     }
                     start_time = current_time;
                 }
@@ -91,14 +84,21 @@ namespace AIBracket.API
                 {
                     if (!games[i].IsRunning)
                     {
-                        games[i].Game.PrintBoard();
-                        spectators.AddRange(games[i].Spectators);
-                        games.RemoveAt(i);
-                        i--;
+                        context.PacmanGames.Add(new PacmanGames
+                        {
+                            Id = games[i].Id,
+                            BotId = games[i].User.Bot.Id,
+                            StartDate = games[i].Game.TimeStarted,
+                            EndDate = games[i].Game.TimeEnded,
+                            Score = games[i].Game.Score,
+                            Difficulty = 1
+                        });
+                        context.SaveChanges();
+                        games[i].Game = new PacmanGame();
+                        games[i].Id = Guid.NewGuid();
+                        games[i].IsRunning = true;
                     }
                 }
-                gameMutex.ReleaseMutex();
-                clientMutex.WaitOne();
                 foreach(var client in waiting_players)
                 {
                     if(client.Socket.IsReady)
@@ -109,8 +109,6 @@ namespace AIBracket.API
 
                     }
                 }
-                clientMutex.ReleaseMutex();
-                spectatorMutex.WaitOne();
                 for(var i = 0; i < spectators.Count; i++)
                 {
                     if (!spectators[i].IsConnected)
@@ -121,7 +119,6 @@ namespace AIBracket.API
                     }
                     if (spectators[i].IsReady)
                     {
-                        gameMutex.WaitOne();
                         var message = spectators[i].ReadData().Trim();
                         Console.WriteLine("Spectator said " + message);
                         if (message == "LIST GAMES")
@@ -135,6 +132,7 @@ namespace AIBracket.API
                             {
                                 buffer += game.Id.ToString() + " " + game.Game.Score + "\n";
                             }
+                            Console.WriteLine("Sending " + buffer);
                             spectators[i].WriteData(buffer);
                         }
                         else if(message.StartsWith("WATCH "))
@@ -152,10 +150,8 @@ namespace AIBracket.API
                                 i--;
                             }
                         }
-                        gameMutex.ReleaseMutex();
                     }
                 }
-                spectatorMutex.ReleaseMutex();
                 Thread.Sleep(1);
             }
         }

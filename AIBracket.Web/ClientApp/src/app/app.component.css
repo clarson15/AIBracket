@@ -9,16 +9,24 @@ body {
   font-family: Verdana, Geneva, sans-serif;
 }
 
-.container{
+.max-height{
   height: 100%;
+}
+
+.container{
+  position: absolute;
+  bottom: 0;
+  top: 65px;
+  left: 0;
+  right: 0;
 }
 
 .background{
-  height: 100%;
+  overflow-y: auto;
 }
 
 .mat-sidenav-container{
-  position: absolute;
+  position: relative;
   height: 100%;
   background-color: white;
 }
