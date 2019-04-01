@@ -24,6 +24,10 @@ namespace AIBracket.API.Sockets
 
         private string _name, _ppayload;
 
+        private int readCount;
+
+        private DateTime lastCheck;
+
         public string Name
         {
             get
@@ -45,6 +49,8 @@ namespace AIBracket.API.Sockets
             _first = true;
             _readbuffer = new byte[buff_size];
             _writebuffer = new byte[buff_size];
+            lastCheck = DateTime.Now;
+            readCount = 0;
             _socket.Client.BeginReceive(_readbuffer, 0, buff_size, 0, new AsyncCallback(ReadCallback), _socket);
         }
 
@@ -186,6 +192,18 @@ namespace AIBracket.API.Sockets
         private void ReadCallback(IAsyncResult ar)
         {
             TcpClient stream = (TcpClient)ar.AsyncState;
+            if(DateTime.Now.Subtract(lastCheck).Seconds > 1)
+            {
+                readCount = 0;
+                lastCheck = DateTime.Now;
+            }
+            readCount++;
+            if (readCount > 3)
+            {
+                WriteData("Too many packets.");
+                Disconnect();
+                return;
+            }
             int byteCount = -1;
             try
             {
@@ -208,26 +226,26 @@ namespace AIBracket.API.Sockets
                     {
                         switch (newbuff[0] & 0x0F)
                         {
-                            case 0x01: //text
+                            case 0x01: // text
                                 _ppayload += Encoding.ASCII.GetString(message);
                                 _payloads.Add(_ppayload);
                                 _ppayload = "";
                                 break;
-                            case 0x00: //continue
+                            case 0x00: // continue
                                 _ppayload += Encoding.ASCII.GetString(message);
                                 break;
-                            case 0x02:
+                            case 0x02: // binary
                                 break;
-                            case 0x08:
+                            case 0x08: // close
                                 stream.Dispose();
                                 return;
-                            case 0x09:
+                            case 0x09: // ping
                                 Buffer.BlockCopy(newbuff, 1, _writebuffer, 1, byteCount - 1);
                                 _writebuffer[0] = 0x8A;
                                 Console.WriteLine("Ping");
                                 stream.Client.BeginSend(_writebuffer, 0, byteCount, 0, new AsyncCallback(WriteCallback), stream);
                                 break;
-                            case 0xA:
+                            case 0xA: // pong
                                 Console.WriteLine("Pong");
                                 break;
                             default:

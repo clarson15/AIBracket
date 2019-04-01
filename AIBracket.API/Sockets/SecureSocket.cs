@@ -24,6 +24,10 @@ namespace AIBracket.API.Sockets
 
         private string _name, _ppayload;
 
+        private int readCount;
+
+        private DateTime lastCheck;
+
         public string Name {
             get
             {
@@ -44,6 +48,8 @@ namespace AIBracket.API.Sockets
             _first = true;
             _readbuffer = new byte[buff_size];
             _writebuffer = new byte[buff_size];
+            readCount = 0;
+            lastCheck = DateTime.Now;
             _socket.BeginRead(_readbuffer, 0, buff_size, new AsyncCallback(ReadCallback), _socket);
         }
 
@@ -184,6 +190,17 @@ namespace AIBracket.API.Sockets
         private void ReadCallback(IAsyncResult ar)
         {
             SslStream stream = (SslStream)ar.AsyncState;
+            if(DateTime.Now.Subtract(lastCheck).Seconds > 1)
+            {
+                readCount = 0;
+                lastCheck = DateTime.Now;
+            }
+            readCount++;
+            if(readCount > 3)
+            {
+                WriteData("Too many packets.");
+                Disconnect();
+            }
             int byteCount = -1;
             try
             {
