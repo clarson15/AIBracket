@@ -2,15 +2,16 @@
 using AIBracket.GameLogic.Pacman.Pacman;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AIBracket.GameLogic.Pacman.Ghost
 {
     public class PacmanGhost
     {
+        const int DividendForChanceOfHinderingMove = -150;
+        const int StartingPercentage = 100;
         public enum Ghost { Blue, Pink, Red, Orange };
         public bool IsDead, IsVulnerable;
+        private int DeadCounter;
         public PacmanCoordinate Location;
         public PacmanPacman.Direction Facing { get; set; }
 
@@ -19,6 +20,7 @@ namespace AIBracket.GameLogic.Pacman.Ghost
             Facing = PacmanPacman.Direction.start;
             IsDead = true;
             IsVulnerable = false;
+            DeadCounter = 0;
             Location = new PacmanCoordinate(13, 10);
         }
 
@@ -27,7 +29,6 @@ namespace AIBracket.GameLogic.Pacman.Ghost
             return Location;
         }
 
-        
         public void Move()
         {
             switch (Facing)
@@ -53,36 +54,46 @@ namespace AIBracket.GameLogic.Pacman.Ghost
         }
 
         /// <summary>
-        /// Finds a random direction for the ghost prioritizing not going backwards
+        /// Starts the timer until respawn after a ghost dies
         /// </summary>
-        /// <param name="d">Direction or Facing</param>
-        /// <param name="pos">Location</param>
-        /// <returns>New Direction</returns>
-        public PacmanPacman.Direction DetermineGhostMoveEasy(List<PacmanPacman.Direction> possible)
+        public void StartDeathCounter()
         {
-            var random = new Random();
-            if (possible.Count > 1)
-            {
-                for (int i = 0; i < possible.Count; i++)
-                {
-                    if (possible[i] == PacmanPacman.InverseDirection(Facing)) 
-                    {
-                        possible.RemoveAt(i);
-                        break;
-                    }
-                }
-                return possible[random.Next(0, possible.Count)];
-            }
-            return PacmanPacman.Direction.start;
+            DeadCounter = 10;
         }
 
-        public PacmanPacman.Direction DetermineGhostMoveMedium(List<PacmanPacman.Direction> possible, PacmanCoordinate pos)
+        /// <summary>
+        /// Decrements DeadCounter
+        /// </summary>
+        /// <returns>If the ghost should be respawned</returns>
+        public bool DecrementDeathTimerCheckRespawn()
         {
+            return --DeadCounter == 0;
+        }
+
+        /// <summary>
+        /// Determines the Ghosts moves based on a target position prioritizing minimizing distance
+        /// Has a chance to choose a random valid move
+        /// </summary>
+        /// <param name="possible">List of valid directions</param>
+        /// <param name="pos">Target Coordinate</param>
+        /// <param name="chance">Percent Chance the move will be random</param>
+        /// <returns></returns>
+        public PacmanPacman.Direction DetermineGhostMove(List<PacmanPacman.Direction> possible, PacmanCoordinate pos, int score)
+        {
+            // f(x) = x / -150 + 100 
+            // Dividend should change after testing
+            var chance = (score / DividendForChanceOfHinderingMove) + StartingPercentage;
             var random = new Random();
+            var chanceForRandomMove = random.Next(101);
             var difference = Location - pos;
             if (possible.Contains(PacmanPacman.InverseDirection(Facing)))
             {
                 possible.Remove(PacmanPacman.InverseDirection(Facing));
+            }
+            if (chanceForRandomMove >= chance)
+            {
+                Console.WriteLine($"Randomizing {score} move");
+                return possible[random.Next(0, possible.Count)];
             }
             if (possible.Count > 0)
             {
