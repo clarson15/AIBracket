@@ -12,6 +12,7 @@ namespace AIBracket.Data
     public class AIBracketContext : IdentityDbContext<AppUser, IdentityRole<Guid>, Guid>
     {
         public DbSet<Bot> Bots { get; set; }
+        public DbSet<PacmanGames> PacmanGames { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
