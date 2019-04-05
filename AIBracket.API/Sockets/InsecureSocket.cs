@@ -198,7 +198,7 @@ namespace AIBracket.API.Sockets
                 lastCheck = DateTime.Now;
             }
             readCount++;
-            if (readCount > 3)
+            if (readCount > 10)
             {
                 WriteData("Too many packets.");
                 Disconnect();

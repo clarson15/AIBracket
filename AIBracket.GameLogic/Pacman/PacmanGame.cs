@@ -12,18 +12,15 @@ namespace AIBracket.GameLogic.Pacman.Game
    
     public class PacmanGame
     {
-        public enum EventType { BoardReset, PacmanUpdate, GhostUpdate, Dot, Fruit, PowerUp, FruitSpawn, PacmanLives, GhostDie, Score, DifficultyIncrease };
-        public enum PacmanDifficulty { Easy, Medium, Hard };
+        public enum EventType { BoardReset, PacmanUpdate, GhostUpdate, Dot, Fruit, PowerUp, FruitSpawn, PacmanLives, GhostDie, Score };
         public List<KeyValuePair<EventType, string>> CurrentGameEvent;
         public PacmanBoard Board { get; private set; }
         public PacmanPacman Pacman { get; private set; }
         public PacmanGhost[] Ghosts { get; private set; }
         public  DateTime TimeStarted { get; private set; }
         public DateTime TimeEnded { get; private set; }
-        public PacmanDifficulty Difficulty { get; private set; }
         public int Score { get; private set; }
         private int GhostScoreMultiplier { get; set; }
-        private int SpawnGhostCounter { get; set; }
         private int PoweredUpCounter { get; set; }
         private int FruitSpawnCounter { get; set; }
         private bool SlowGhosts { get; set; }
@@ -49,11 +46,9 @@ namespace AIBracket.GameLogic.Pacman.Game
                 Ghosts[i].Facing = (PacmanPacman.Direction)random.Next(1, 5);
                 CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.GhostUpdate, $"{i} {Ghosts[i].GetPosition().ToString()} {Ghosts[i].IsDead} {Ghosts[i].IsVulnerable}"));
             }
-            Difficulty = PacmanDifficulty.Easy;
             Score = 0;
             CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.Score, $"{Score}"));
             GhostScoreMultiplier = 1;
-            SpawnGhostCounter = 10;
             PoweredUpCounter = 0;
             FruitSpawnCounter = 0;
             SlowGhosts = false;
@@ -103,12 +98,6 @@ namespace AIBracket.GameLogic.Pacman.Game
             CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.BoardReset, GetBoardString()));
         }
 
-        public void UpdateDifficulty(PacmanDifficulty d)
-        {
-            Difficulty = d;
-            CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.DifficultyIncrease, $"{(int)d}"));
-        }
-
         /// <summary> This method is called after a move is made by pacman to determine whether or not to update the board.
         /// It also calls update score if a fruit or dot was consumed </summary>
         private void CheckTile(PacmanCoordinate pos) 
@@ -156,20 +145,18 @@ namespace AIBracket.GameLogic.Pacman.Game
 
         private void SpawnGhost()
         {
-            if(SpawnGhostCounter <= 0)
+            for (int i = 0; i < Ghosts.Length; i++)
             {
-                for (int i = 0; i < Ghosts.Length; i++)
+                if (Ghosts[i].DecrementDeathTimerCheckRespawn())
                 {
-                    if(Ghosts[i].IsDead == true)
+                    if (Ghosts[i].IsDead == true)
                     {
                         Ghosts[i].IsDead = false;
                         CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.GhostDie, i + " 0"));
-                        SpawnGhostCounter = 10;
                         return;
                     }
                 }
             }
-            SpawnGhostCounter--;
         }
 
         /// <summary>
@@ -185,11 +172,11 @@ namespace AIBracket.GameLogic.Pacman.Game
                     {
                         Ghosts[i].IsDead = true;
                         Ghosts[i].IsVulnerable = false;
+                        Ghosts[i].StartDeathCounter();
                         Ghosts[i].Location.Xpos = 13;
                         Ghosts[i].Location.Ypos = 11;
                         Score += 200 * GhostScoreMultiplier;
                         CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.GhostDie, i + $" 1 {200 * GhostScoreMultiplier}"));
-
                     }
                     else if (!Ghosts[i].IsDead)
                     {
@@ -218,13 +205,36 @@ namespace AIBracket.GameLogic.Pacman.Game
             return false;
         }
 
-        
+        /// <summary>
+        /// Helper method for editing Ghost's Target Location and calling necessary moves
+        /// </summary>
+        /// <param name="i">Ghost Index</param>
+        private void ProcessGhostMove(int i)
+        {
+            PortalGhost(Ghosts[i].Location, i);
+            var GhostTargetLocation = new PacmanCoordinate(Pacman.Location);
+            switch (i)
+            {
+                case 0:
+                    break;
+                case 1:
+                    GhostTargetLocation.Xpos += 5;
+                    break;
+                case 2:
+                    GhostTargetLocation.Xpos -= 2;
+                    break;
+                case 3:
+                    GhostTargetLocation.Ypos += 3;
+                    break;
+            }
+            Ghosts[i].Facing = Ghosts[i].DetermineGhostMove(Board.PotentialDirections(Ghosts[i].Location), GhostTargetLocation, Score);
+            Ghosts[i].Move();
+        }
 
         /// <summary>Processes every tick of the game base on directions of each entity passed in the array
         /// p should be passed 5 directions
         /// p[0] represents Pacman
         /// p[1] through p[4] represent ghosts in order passed </summary>
-
         public void UpdateGame(PacmanPacman.Direction p)
         {
             SpawnGhost();
@@ -247,16 +257,12 @@ namespace AIBracket.GameLogic.Pacman.Game
                 {
                     if (!SlowGhosts)
                     {
-                        PortalGhost(Ghosts[i].Location, i);
-                        Ghosts[i].Facing = Ghosts[i].DetermineGhostMoveMedium(Board.PotentialDirections(Ghosts[i].Location), Pacman.Location);
-                        Ghosts[i].Move();
+                        ProcessGhostMove(i);
                     }
                 }
                 else
                 {
-                    PortalGhost(Ghosts[i].Location, i);
-                    Ghosts[i].Facing = Ghosts[i].DetermineGhostMoveMedium(Board.PotentialDirections(Ghosts[i].Location), Pacman.Location);
-                    Ghosts[i].Move();
+                    ProcessGhostMove(i);
                 }
             }
             SlowGhosts = !SlowGhosts;

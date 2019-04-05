@@ -21,6 +21,7 @@ namespace AIBracket.Web.Managers
 
         public static void Start()
         {
+            Thread.Sleep(1000);
             Client = new TcpClient("127.0.0.1", 8000);
             Games = new List<GameSummaryModel>();
             Client.GetStream().Write(Encoding.ASCII.GetBytes("WATCH GAMEMASTER"));
