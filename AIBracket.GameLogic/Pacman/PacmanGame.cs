@@ -35,10 +35,10 @@ namespace AIBracket.GameLogic.Pacman.Game
             CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.PacmanLives, $"{Pacman.Lives}"));
             Ghosts = new PacmanGhost[4]
             {
-                new PacmanGhost(),
-                new PacmanGhost(),
-                new PacmanGhost(),
-                new PacmanGhost()
+                new PacmanGhost(1),
+                new PacmanGhost(2),
+                new PacmanGhost(3),
+                new PacmanGhost(4)
             };
             Random random = new Random();
             for (var i = 0; i < Ghosts.Length; i++)
@@ -90,10 +90,10 @@ namespace AIBracket.GameLogic.Pacman.Game
             Pacman = new PacmanPacman();
             Ghosts = new PacmanGhost[]
             {
-                new PacmanGhost(),
-                new PacmanGhost(),
-                new PacmanGhost(),
-                new PacmanGhost()
+                new PacmanGhost(1),
+                new PacmanGhost(2),
+                new PacmanGhost(3),
+                new PacmanGhost(4)
             };
             CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.BoardReset, GetBoardString()));
         }
@@ -152,7 +152,6 @@ namespace AIBracket.GameLogic.Pacman.Game
                     if (Ghosts[i].IsDead == true)
                     {
                         Ghosts[i].IsDead = false;
-                        CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.GhostDie, i + " 0"));
                         return;
                     }
                 }
@@ -187,10 +186,10 @@ namespace AIBracket.GameLogic.Pacman.Game
                         CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.PacmanLives,  $"{Pacman.Lives}"));
                         Ghosts = new PacmanGhost[4]
                         {
-                            new PacmanGhost(),
-                            new PacmanGhost(),
-                            new PacmanGhost(),
-                            new PacmanGhost()
+                            new PacmanGhost(1),
+                            new PacmanGhost(2),
+                            new PacmanGhost(3),
+                            new PacmanGhost(4)
                         };
                         if (Pacman.Lives <= 0)
                         {

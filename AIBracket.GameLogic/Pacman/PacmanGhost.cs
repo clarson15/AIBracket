@@ -7,7 +7,7 @@ namespace AIBracket.GameLogic.Pacman.Ghost
 {
     public class PacmanGhost
     {
-        const int DividendForChanceOfHinderingMove = -150;
+        const int DividendForChanceOfHinderingMove = -250;
         const int StartingPercentage = 100;
         public enum Ghost { Blue, Pink, Red, Orange };
         public bool IsDead, IsVulnerable;
@@ -15,12 +15,12 @@ namespace AIBracket.GameLogic.Pacman.Ghost
         public PacmanCoordinate Location;
         public PacmanPacman.Direction Facing { get; set; }
 
-        public PacmanGhost()
+        public PacmanGhost(int number)
         {
             Facing = PacmanPacman.Direction.start;
             IsDead = true;
             IsVulnerable = false;
-            DeadCounter = 0;
+            DeadCounter = 10 * number;
             Location = new PacmanCoordinate(13, 10);
         }
 
@@ -67,7 +67,7 @@ namespace AIBracket.GameLogic.Pacman.Ghost
         /// <returns>If the ghost should be respawned</returns>
         public bool DecrementDeathTimerCheckRespawn()
         {
-            return --DeadCounter == 0;
+            return (--DeadCounter) <= 0;
         }
 
         /// <summary>
