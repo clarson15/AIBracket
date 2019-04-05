@@ -51,8 +51,7 @@ namespace AIBracket.Web
                 o.Password.RequireNonAlphanumeric = false;
                 o.Password.RequiredLength = 6;
             })
-            .AddEntityFrameworkStores<AIBracketContext>()
-            .AddDefaultTokenProviders();
+            .AddEntityFrameworkStores<AIBracketContext>();
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
