@@ -15,6 +15,7 @@ namespace AIBracket.API.Entities
         public Guid Id { get; set; } = Guid.NewGuid();
         public List<ISocket> Spectators { get; set; } = new List<ISocket>();
         private List<string> chats { get; set; } = new List<string>();
+        private DateTime lastTick { get; set; } = DateTime.UnixEpoch;
 
         public void GetUserInput()
         {
@@ -74,11 +75,15 @@ namespace AIBracket.API.Entities
 
         public void UpdateGame()
         {
-            Game.UpdateGame(User.Direction);
-            UpdateUsers();
-            if (Game.Pacman.Lives == 0)
+            if (DateTime.Now.Subtract(lastTick).TotalMilliseconds >= 500)
             {
-                IsRunning = false;
+                lastTick = DateTime.Now;
+                Game.UpdateGame(User.Direction);
+                UpdateUsers();
+                if (Game.Pacman.Lives == 0)
+                {
+                    IsRunning = false;
+                }
             }
         }
 

@@ -103,23 +103,14 @@ namespace AIBracket.API
 
         public static void Run() {
             isRunning = true;
-            var start_time = DateTime.UtcNow;
             while (isRunning) {
                 lock (lockobj)
                 {
                     var current_time = DateTime.UtcNow;
-                    var time_elapsed = current_time - start_time;
                     foreach (var g in games)
                     {
                         g.GetUserInput();
-                    }
-                    if (time_elapsed.TotalMilliseconds >= 500)
-                    {
-                        foreach (var g in games)
-                        {
-                            g.UpdateGame();
-                        }
-                        start_time = current_time;
+                        g.UpdateGame();
                     }
 
                     for (var i = 0; i < games.Count; i++)

@@ -76,6 +76,7 @@ namespace AIBracket.Web
                 options.Issuer = "AIBracket.com";
                 options.Audience = "AIBracket.com";
                 options.SigningCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256);
+                options.ValidFor = new TimeSpan(0, 0, 2);
             });
         }
 
@@ -116,7 +117,7 @@ namespace AIBracket.Web
 
             app.UseSpa(spa =>
             {
-                spa.Options.SourcePath = "ClientApp";
+                spa.Options.SourcePath = "ClientApp/dist";
             });
         }
     }
