@@ -86,7 +86,7 @@ namespace AIBracket.Web.Controllers
             var data = await _userManager.FindByIdAsync(User.Claims.First(x => x.Type == "id").Value);
             if(data == null)
             {
-                return Forbid();
+                return Unauthorized();
             }
             return Ok(new { data.UserName, data.FirstName, data.LastName, Location = "Test"});
         }

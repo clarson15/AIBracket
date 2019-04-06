@@ -34,10 +34,39 @@ namespace AIBracket.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/dist";
+            });
+
+            services.AddSingleton<IJwtFactory, JwtFactory>();
+            services.Configure<JwtIssuerOptions>(options =>
+            {
+                options.Issuer = "AIBracket.com";
+                options.Audience = "AIBracket.com";
+                options.SigningCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256);
+            });
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = _signingKey,
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidAudience = "AIBracket.com",
+                    ValidAudiences = new[] {"AIBracket.com"},
+                    ClockSkew = TimeSpan.Zero
+                };
+                options.Audience = "AIBracket.com";
+                options.ClaimsIssuer = "AIBracket.com";
+                options.Validate();
             });
 
             services.TryAddTransient<IHttpContextAccessor, HttpContextAccessor>();
@@ -52,31 +81,8 @@ namespace AIBracket.Web
                 o.Password.RequiredLength = 6;
             })
             .AddEntityFrameworkStores<AIBracketContext>();
-            services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(x =>
-            {
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = _signingKey,
-                    ValidateIssuer = false,
-                    ValidateAudience = false
-                };
-            });
-            services.AddSingleton<IJwtFactory, JwtFactory>();
-            services.Configure<JwtIssuerOptions>(options =>
-            {
-                options.Issuer = "AIBracket.com";
-                options.Audience = "AIBracket.com";
-                options.SigningCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256);
-                options.ValidFor = new TimeSpan(0, 0, 2);
-            });
+            
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -92,7 +98,7 @@ namespace AIBracket.Web
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
+            
             app.UseAuthentication();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
