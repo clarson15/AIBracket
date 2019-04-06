@@ -32,12 +32,7 @@ namespace AIBracket.Web
                     });
                 }
                 x.Listen(IPAddress.Any, 80);
-            }).UseStartup<Startup>()
-            .ConfigureLogging(logging =>
-            {
-                logging.ClearProviders();
-                logging.AddConsole();
-            });
+            }).UseStartup<Startup>();
         }
     }
 }
