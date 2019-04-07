@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router'
-import { MatCardModule, MatToolbarModule, MatExpansionModule, MatButtonModule, MatInputModule, MatFormFieldModule, MatIconModule, MatMenuModule, MatDividerModule, MatSelectModule, MatSidenavModule, MatCheckboxModule, MatTab, MatTabsModule } from '@angular/material';
+import { MatCardModule, MatToolbarModule, MatExpansionModule, MatButtonModule, MatInputModule, MatFormFieldModule, MatIconModule, MatMenuModule, MatDividerModule, MatSelectModule, MatSidenavModule, MatCheckboxModule, MatTab, MatTabsModule, MatListModule } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
 import { LearnMoreComponent } from './learn-more/learn-more.component';
@@ -54,6 +54,7 @@ import { ErrorInterceptor } from './services/error.interceptor';
     MatSelectModule,
     MatSidenavModule,
     MatTabsModule,
+    MatListModule,
     //Routes
     RouterModule.forRoot([
       { path: '', redirectTo: '/home', pathMatch: 'full' },

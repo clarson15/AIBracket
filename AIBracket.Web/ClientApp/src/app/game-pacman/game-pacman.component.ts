@@ -30,10 +30,19 @@ export class GamePacmanComponent implements OnInit {
   private pacmanTargetY: number = 0;
   private ghosts: PacmanGhost[];
   private lastFrame: Date;
+  private ghostImages: HTMLImageElement[];
+  private ghostV: HTMLImageElement;
 
   constructor(private ngZone: NgZone) {}
 
   ngOnInit() {
+    this.ghostImages = new Array<HTMLImageElement>(4);
+    for (let i = 0; i < 4; i++) {
+      this.ghostImages[i] = new Image();
+      this.ghostImages[i].src = 'assets/Ghost' + (i+1) + '.png';
+    }
+    this.ghostV = new Image();
+    this.ghostV.src = "assets/GhostV.png";
     this.ghosts = new Array<PacmanGhost>();
     for (let i = 0; i < 4; i++) {
       this.ghosts.push(new PacmanGhost());
@@ -158,11 +167,11 @@ export class GamePacmanComponent implements OnInit {
         this.pacmanY += frametime / 500;
       }
       ctx.beginPath();
-      ctx.arc((this.pacmanX * 16) + 8, (this.pacmanY * 16) + 88, 7, 0.75 * Math.PI, 1.75 * Math.PI, false);
+      ctx.arc((this.pacmanX * 16) + 8, (this.pacmanY * 16) + 88, 7, 0.75 * Math.PI, 1.8 * Math.PI, false);
       ctx.fillStyle = "rgb(0, 0, 0)";
       ctx.fill();
       ctx.beginPath();
-      ctx.arc((this.pacmanX * 16) + 8, (this.pacmanY * 16) + 88, 7, 0.25 * Math.PI, 1.25 * Math.PI, false);
+      ctx.arc((this.pacmanX * 16) + 8, (this.pacmanY * 16) + 88, 7, 0.2 * Math.PI, 1.25 * Math.PI, false);
       ctx.fillStyle = "rgb(0, 0, 0)";
       ctx.fill();
       ctx.beginPath();
@@ -174,6 +183,7 @@ export class GamePacmanComponent implements OnInit {
       ctx.fillStyle = "rgb(255, 255, 0)";
       ctx.fill();
 
+      let i = 0;
       this.ghosts.forEach(ghost => {
         ctx.fillStyle = 'blue';
         if (ghost.x - ghost.targetX > 0) {
@@ -188,7 +198,13 @@ export class GamePacmanComponent implements OnInit {
         if (ghost.y - ghost.targetY < 0) {
           ghost.y += frametime / 500;
         }
-        ctx.fillRect(ghost.x * 16, ghost.y * 16 + 80, 16, 16);
+        if (this.ghostImages[i].complete && ghost.vulnerable === false) {
+          ctx.drawImage(this.ghostImages[i], ghost.x * 16 + 2, ghost.y * 16 + 82);
+        }
+        else if (this.ghostV.complete && ghost.vulnerable === true) {
+          ctx.drawImage(this.ghostV, ghost.x * 16 + 2, ghost.y * 16 + 82);
+        }
+        i++;
       });
 
       ctx.beginPath();
@@ -292,8 +308,10 @@ export class GamePacmanComponent implements OnInit {
           }
           this.ghosts[index].targetX = newX;
           this.ghosts[index].targetY = newY;
-          this.ghosts[index].dead = Boolean(vals[3]);
-          this.ghosts[index].vulnerable = Boolean(vals[4]);
+          var d = vals[3] === 'True' ? true : false;
+          var v = vals[4] === 'True' ? true : false;
+          this.ghosts[index].dead = d;
+          this.ghosts[index].vulnerable = v;
           break;
         case "3":
         case "4":
