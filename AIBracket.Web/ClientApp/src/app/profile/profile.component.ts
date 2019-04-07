@@ -16,9 +16,10 @@ export class ProfileComponent implements OnInit {
 
   constructor(private profileService: ProfileService, private router: Router) { }
 
-  private bots: BotsResponseModel[];
-  private CreationExpanded: boolean;
-  private newId: string;
+  bots: BotsResponseModel[];
+  CreationExpanded: boolean;
+  newId: string;
+  tournaments: any;
 
   public user: ProfileResponseModel;
 
