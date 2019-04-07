@@ -38,7 +38,7 @@ export class ProfileComponent implements OnInit {
           this.profileService.getBotHistory(x.id).subscribe(history => {
             history.forEach(h => {
               h.endDate = moment.duration(moment(h.endDate).diff(moment(h.startDate))).humanize();
-              h.startDate = moment(h.startDate).fromNow();
+              h.startDate = moment.utc(h.startDate).fromNow();
             });
             this.bots.find(b => b.id == x.id).history = history;
           })
