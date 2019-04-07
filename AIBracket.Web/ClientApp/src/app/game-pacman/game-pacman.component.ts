@@ -54,7 +54,7 @@ export class GamePacmanComponent implements OnInit {
       canvas.style.width = document.body.clientWidth + 'px';
       canvas.style.height = 600 * ratio + 'px';
     }
-    canvas.width = 550;
+    canvas.width = 448;
     canvas.height = 600;
     var ctx = this.canvasRef.nativeElement.getContext('2d');
     let port = 0;
