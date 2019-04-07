@@ -1,5 +1,5 @@
 <mat-card class="profile-card">
-  <h1>{{user.userName}}'s Profile</h1>
+  <h1 *ngIf="user != null">{{user.userName}}'s Profile</h1>
   <div class="section">
     <h2>Bots</h2>
     <mat-accordion class="bot-expander">
