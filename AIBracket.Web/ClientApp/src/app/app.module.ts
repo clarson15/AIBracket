@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router'
 import { MatCardModule, MatToolbarModule, MatExpansionModule, MatButtonModule, MatInputModule, MatFormFieldModule, MatIconModule, MatMenuModule, MatDividerModule, MatSelectModule, MatSidenavModule, MatCheckboxModule, MatTab, MatTabsModule } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -18,6 +18,7 @@ import { ProfileComponent } from './profile/profile.component';
 
 import { AccountService } from './services/account.service';
 import { ProfileService } from './services/profile.service';
+import { ErrorInterceptor } from './services/error.interceptor';
 
 @NgModule({
   declarations: [
@@ -60,9 +61,10 @@ import { ProfileService } from './services/profile.service';
       { path: 'profile', component: ProfileComponent },
       { path: 'learn', component: GettingStartedComponent },
       { path: 'learn-more', component: LearnMoreComponent },
+      { path: '**', redirectTo: '/home' }
     ])
   ],
-  providers: [AccountService, ProfileService],
+  providers: [AccountService, ProfileService, { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
