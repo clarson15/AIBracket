@@ -1,5 +1,10 @@
 <div class="container">
   <h1 class="header">Featured Game</h1>
   <game-pacman [SpectatorId]="SpectatorId" [ActiveGameId]="ActiveGameId" *ngIf="ActiveGame == true"></game-pacman>
+  <div style="height: 550px; width: 600px; display: flex; flex-direction: column; align-content: center; text-align:center;" *ngIf="ActiveGame == false">
+    <mat-icon style="margin-left: auto; margin-right: auto; font-size:48px; width: 48px; height: 48px;">mood_bad</mat-icon><br />
+    There is no active game being played. <br />
+    Why don't you change that?
+  </div>
   <h1 class="header">News</h1>
 </div>
