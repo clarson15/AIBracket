@@ -78,7 +78,6 @@ export class ProfileComponent implements OnInit {
   }
 
   deleteBot(id: string) {
-    console.log(id);
     this.profileService.deleteBot(id).subscribe(data => {
       this.updateBots();
     }, err => {

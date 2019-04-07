@@ -46,6 +46,7 @@
     <None Remove="ClientApp\src\app\models\BotsResponseModel.ts" />
     <None Remove="ClientApp\src\app\models\CreateAccountResponseModel.ts" />
     <None Remove="ClientApp\src\app\models\LoginResponseModel.ts" />
+    <None Remove="ClientApp\src\app\models\PacmanGhost.ts" />
     <None Remove="ClientApp\src\app\models\ProfileResponseModel.ts" />
     <None Remove="ClientApp\src\app\services\error.interceptor.ts" />
   </ItemGroup>
@@ -55,6 +56,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\app\models\PacmanGhost.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\models\BotHistoryResponseModel.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\models\CreateAccountResponseModel.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\models\BotsResponseModel.ts" />

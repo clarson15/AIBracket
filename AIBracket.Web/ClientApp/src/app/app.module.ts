@@ -15,6 +15,7 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
 import { CreateAccountComponent } from './create-account/create-account.component';
 import { ProfileComponent } from './profile/profile.component';
+import { GamePacmanComponent } from './game-pacman/game-pacman.component';
 
 import { AccountService } from './services/account.service';
 import { ProfileService } from './services/profile.service';
@@ -29,7 +30,8 @@ import { ErrorInterceptor } from './services/error.interceptor';
     LoginComponent,
     ProfileComponent,
     LearnMoreComponent,
-    GettingStartedComponent
+    GettingStartedComponent,
+    GamePacmanComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
