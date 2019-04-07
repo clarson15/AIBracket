@@ -108,6 +108,16 @@ namespace AIBracket.Web.Managers
                         Games.Add(game);
                     }
                     break;
+                case "4":
+                    for(var i = 1; i+1 < elements.Length; i += 2)
+                    {
+                        var newgame = Games.FirstOrDefault(x => x.GameId == elements[i]);
+                        if(newgame != null)
+                        {
+                            newgame.Score = int.Parse(elements[i + 1]);
+                        }
+                    }
+                    break;
                 default:
                     Console.WriteLine("Received OP code " + elements[0]);
                     break;

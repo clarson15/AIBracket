@@ -19,6 +19,7 @@ namespace AIBracket.API
         private static List<ISocket> spectators; 
         private static bool isRunning;
         private static AIBracketContext context;
+        private static DateTime refreshScoreCounter = DateTime.Now;
         private static object lockobj = new object();
 
         public static void Initialize() { // constructor for our games list and players
@@ -87,7 +88,6 @@ namespace AIBracket.API
                             continue;
                         }
                     }
-                    Console.WriteLine("Added pacman game");
                     return;
                 }
                 waiting_players.Add(player);
@@ -106,13 +106,22 @@ namespace AIBracket.API
             while (isRunning) {
                 lock (lockobj)
                 {
-                    var current_time = DateTime.UtcNow;
+                    var shouldUpdate = (DateTime.Now - refreshScoreCounter).Seconds > 5;
+                    var updateString = "4 ";
                     foreach (var g in games)
                     {
                         g.GetUserInput();
                         g.UpdateGame();
+                        if (shouldUpdate)
+                        {
+                            updateString += $"{g.Id.ToString()} {g.Game.Score} ";
+                        }
                     }
-
+                    if (shouldUpdate)
+                    {
+                        updateString = updateString.Remove(updateString.Length - 1);
+                        refreshScoreCounter = DateTime.Now;
+                    }
                     for (var i = 0; i < games.Count; i++)
                     {
                         if (!games[i].IsRunning && games[i].User.Socket.IsConnected)
@@ -127,6 +136,11 @@ namespace AIBracket.API
                                 Difficulty = 1
                             });
                             var ret = "3 " + games[i].Id.ToString() + " ";
+                            if(context.PacmanGames.Count(g => g.BotId == games[i].User.Bot.Id) > 100)
+                            {
+                                var minScore = context.PacmanGames.Where(x => x.BotId == games[i].User.Bot.Id).Min(x => x.Score);
+                                context.PacmanGames.Remove(context.PacmanGames.Where(g => g.BotId == games[i].User.Bot.Id && g.Score == minScore).First());
+                            }
                             context.SaveChanges();
                             games[i].Game = new PacmanGame();
                             games[i].Id = Guid.NewGuid();
@@ -178,6 +192,10 @@ namespace AIBracket.API
                             spectators.RemoveAt(i);
                             i--;
                             continue;
+                        }
+                        if (shouldUpdate && updateString.Length > 2)
+                        {
+                            spectators[i].WriteData(updateString);
                         }
                         if (spectators[i].IsReady)
                         {
