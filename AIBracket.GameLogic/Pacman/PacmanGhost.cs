@@ -21,7 +21,7 @@ namespace AIBracket.GameLogic.Pacman.Ghost
             IsDead = true;
             IsVulnerable = false;
             DeadCounter = 10 * number;
-            Location = new PacmanCoordinate(13, 10);
+            Location = new PacmanCoordinate(13, 12);
         }
 
         public PacmanCoordinate GetPosition()
@@ -92,7 +92,6 @@ namespace AIBracket.GameLogic.Pacman.Ghost
             }
             if (chanceForRandomMove >= chance)
             {
-                Console.WriteLine($"Randomizing {score} move");
                 return possible[random.Next(0, possible.Count)];
             }
             if (possible.Count > 0)

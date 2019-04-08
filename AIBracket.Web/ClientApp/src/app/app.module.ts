@@ -1,9 +1,9 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router'
-import { MatCardModule, MatToolbarModule, MatExpansionModule, MatButtonModule, MatInputModule, MatFormFieldModule, MatIconModule, MatMenuModule, MatDividerModule, MatSelectModule, MatSidenavModule, MatCheckboxModule, MatTab, MatTabsModule } from '@angular/material';
+import { MatCardModule, MatToolbarModule, MatExpansionModule, MatButtonModule, MatInputModule, MatFormFieldModule, MatIconModule, MatMenuModule, MatDividerModule, MatSelectModule, MatSidenavModule, MatCheckboxModule, MatTab, MatTabsModule, MatListModule } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
 import { LearnMoreComponent } from './learn-more/learn-more.component';
@@ -15,9 +15,11 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
 import { CreateAccountComponent } from './create-account/create-account.component';
 import { ProfileComponent } from './profile/profile.component';
+import { GamePacmanComponent } from './game-pacman/game-pacman.component';
 
 import { AccountService } from './services/account.service';
 import { ProfileService } from './services/profile.service';
+import { ErrorInterceptor } from './services/error.interceptor';
 
 @NgModule({
   declarations: [
@@ -28,7 +30,8 @@ import { ProfileService } from './services/profile.service';
     LoginComponent,
     ProfileComponent,
     LearnMoreComponent,
-    GettingStartedComponent
+    GettingStartedComponent,
+    GamePacmanComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -51,6 +54,7 @@ import { ProfileService } from './services/profile.service';
     MatSelectModule,
     MatSidenavModule,
     MatTabsModule,
+    MatListModule,
     //Routes
     RouterModule.forRoot([
       { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -60,9 +64,10 @@ import { ProfileService } from './services/profile.service';
       { path: 'profile', component: ProfileComponent },
       { path: 'learn', component: GettingStartedComponent },
       { path: 'learn-more', component: LearnMoreComponent },
+      { path: '**', redirectTo: '/home' }
     ])
   ],
-  providers: [AccountService, ProfileService],
+  providers: [AccountService, ProfileService, { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

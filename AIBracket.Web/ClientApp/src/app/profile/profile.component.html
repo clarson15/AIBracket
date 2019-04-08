@@ -1,5 +1,5 @@
 <mat-card class="profile-card">
-  <h1>{{user.userName}}'s Profile</h1>
+  <h1 *ngIf="user != null">{{user.userName}}'s Profile</h1>
   <div class="section">
     <h2>Bots</h2>
     <mat-accordion class="bot-expander">
@@ -38,10 +38,9 @@
         <p>Private Key: <span *ngIf="bot.showSecret">{{bot.privateKey}}</span><span class="fake-anchor" (click)="showSecret(i)" *ngIf="!bot.showSecret">Show secret</span></p>
         <span style="margin-top:5px; font-size:20px;">History:</span><br />
         <div class="history" *ngIf="bot.history != null && bot.history.length > 0">
-          <div class="history-cell" *ngFor="let history of bot.history">
-            <span>Score: {{history.score}}</span>
-            <span>Date: {{history.startDate}} - {{history.endDate}}</span>
-          </div>
+          <mat-list dense *ngFor="let history of bot.history">
+            <mat-list-item style="font-size: 18px;">Score: {{history.score}} <div style="position: relative; right: 0; margin-left: auto;">{{history.startDate}} - {{history.endDate}}</div></mat-list-item>
+          </mat-list>
         </div>
         <div class="no-history" *ngIf="bot.history == null || bot.history.length == 0" style="text-align: center;">
           <span>This bot has not played a game yet.</span>

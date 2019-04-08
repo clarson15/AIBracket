@@ -173,7 +173,7 @@ namespace AIBracket.GameLogic.Pacman.Game
                         Ghosts[i].IsVulnerable = false;
                         Ghosts[i].StartDeathCounter();
                         Ghosts[i].Location.Xpos = 13;
-                        Ghosts[i].Location.Ypos = 11;
+                        Ghosts[i].Location.Ypos = 12;
                         Score += 200 * GhostScoreMultiplier;
                         CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.GhostDie, i + $" 1 {200 * GhostScoreMultiplier}"));
                     }

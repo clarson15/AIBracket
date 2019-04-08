@@ -1,10 +1,7 @@
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { Http, Response } from '@angular/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { LoginResponseModel } from '../models/LoginResponseModel';
 import { FormGroup } from '@angular/forms';
-import { catchError, map } from 'rxjs/operators';
-import { Observable, throwError, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { BotsResponseModel } from '../models/BotsResponseModel';
 import { BotHistoryResponseModel } from '../models/BotHistoryResponseModel';
 
@@ -20,9 +17,7 @@ export class ProfileService {
         'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
       })
     };
-    return this.http.get<BotsResponseModel[]>('/api/Bot/GetBotsByUser', httpOptions).pipe(map((res) => {
-      return res;
-    }), catchError((err, obs) => this.errorHandler(err, obs)));
+    return this.http.get<BotsResponseModel[]>('/api/Bot/GetBotsByUser', httpOptions);
   }
 
   getBotHistory(id: string): Observable<BotHistoryResponseModel[]> {
@@ -32,9 +27,7 @@ export class ProfileService {
         'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
       })
     };
-    return this.http.get<BotHistoryResponseModel[]>('/api/Bot/GetBotHistory?Id=' + id, httpOptions).pipe(map((res) => {
-      return res;
-    }), catchError((err, obs) => this.errorHandler(err, obs)));
+    return this.http.get<BotHistoryResponseModel[]>('/api/Bot/GetBotHistory?Id=' + id, httpOptions);
   }
 
   createBot(form: FormGroup): Observable<string> {
@@ -44,9 +37,7 @@ export class ProfileService {
         'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
       })
     };
-    return this.http.post<string>('/api/Bot/CreateBot', form.value, httpOptions).pipe(map((res) => {
-      return res;
-    }), catchError((err, obs) => this.errorHandler(err, obs)));
+    return this.http.post<string>('/api/Bot/CreateBot', form.value, httpOptions);
   }
 
   deleteBot(id: string): Observable<any> {
@@ -56,21 +47,7 @@ export class ProfileService {
         'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
       })
     };
-    return this.http.post<any>('/api/Bot/DeleteBot', "\"" + id + "\"", httpOptions).pipe(map((res) => {
-      return res;
-    }), catchError((err, obs) => this.errorHandler(err, obs)));
-  }
-
-  errorHandler(error: HttpErrorResponse, caught: Observable<any>) {
-    if (error.status == 401) {
-      localStorage.removeItem('auth_token');
-      return throwError(error);
-    }
-    console.log('error caught: ', error);
-    if (error.error != null && (error.error.status == "INVALID_TOKEN" || error.error.status == "MAX_TOKEN_ISSUE_REACHED")) {
-      console.log('token has expired');
-    }
-    return throwError(error);
+    return this.http.post<any>('/api/Bot/DeleteBot', "\"" + id + "\"", httpOptions);
   }
 
 }
