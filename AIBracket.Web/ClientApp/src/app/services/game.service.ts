@@ -35,4 +35,12 @@ export class GameService {
     return throwError(error);
   }
 
+  getPacmanLeaderboard(): Observable<any> {
+    let headers = new HttpHeaders({
+      'Content-Type': 'text/plain'
+    });
+    return this.http.get<any>('/api/Game/GetLeaderboard').pipe(map((res) => {
+      return res;
+    }), catchError((err, obs) => this.errorHandler(err, obs)));
+  }
 }

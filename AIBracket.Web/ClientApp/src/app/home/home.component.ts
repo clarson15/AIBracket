@@ -16,6 +16,7 @@ export class HomeComponent implements OnInit {
   private ActiveGameId: string;
   private SocketConnected: boolean;
   private chatbox: HTMLElement;
+  private leaderboard: any;
 
   private map: Array<Array<number>> = new Array<Array<number>>();
   private score: number;
@@ -61,41 +62,49 @@ export class HomeComponent implements OnInit {
     this.socket$.onmessage = (event) => {
       this.UpdateGame(event.data);
     };
+    this.gameservice.getPacmanLeaderboard().subscribe(
+      data => {
+        this.leaderboard = data;
+        console.log(this.leaderboard);
+      },
+      err => {
+        console.log(err.error);
+      });
     this.socket$.onerror = (event) => {
       if (this.SocketConnected == null) {
           this.ngZone.runOutsideAngular(() => this.paintLoop(ctx));
         }
         this.SocketConnected = false;
       };
-      this.socket$.onopen = (event) => {
-          this.SocketConnected = true;
-          this.gameservice.getFeaturedGame().subscribe(
-            data => {
-              if (data == '0') {
-                this.ActiveGame = false;
-                this.ngZone.runOutsideAngular(() => this.paintLoop(ctx));
+    this.socket$.onopen = (event) => {
+      this.SocketConnected = true;
+      this.gameservice.getFeaturedGame().subscribe(
+      data => {
+        if (data == '0') {
+          this.ActiveGame = false;
+          this.ngZone.runOutsideAngular(() => this.paintLoop(ctx));
+        }
+        else {
+          this.accountservice.getSpectatorId().subscribe(
+            data2 => {
+              console.log(data2);
+              this.ActiveGame = true;
+              this.ActiveGameId = data;
+              var msg = 'WATCH ' + this.ActiveGameId;
+              if (data2.spectatorId.length > 0) {
+                msg += ' ' + data2.spectatorId;
               }
-              else {
-                this.accountservice.getSpectatorId().subscribe(
-                  data2 => {
-                    console.log(data2);
-                    this.ActiveGame = true;
-                    this.ActiveGameId = data;
-                    var msg = 'WATCH ' + this.ActiveGameId;
-                    if (data2.spectatorId.length > 0) {
-                      msg += ' ' + data2.spectatorId;
-                    }
-                    this.send(msg);
-                    this.ngZone.runOutsideAngular(() => this.paintLoop(ctx));
-                  },
-                  err => {
-                  });
-              }
+              this.send(msg);
+              this.ngZone.runOutsideAngular(() => this.paintLoop(ctx));
             },
             err => {
-              console.log(err.error);
             });
-        };
+        }
+      },
+      err => {
+        console.log(err.error);
+      });
+      };
   }
 
   paintLoop(ctx: CanvasRenderingContext2D) {
@@ -306,4 +315,6 @@ export class HomeComponent implements OnInit {
     console.log('sending ' + message);
     this.socket$.send(message);
   }
+
+
 }

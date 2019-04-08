@@ -37,5 +37,18 @@ namespace AIBracket.Web.Controllers
             return Ok(game);
         }
 
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult GetLeaderboard()
+        {
+            var leaderboard = _appDbContext.PacmanGames.OrderBy(x => x.Score).Take(20);
+            return Ok(leaderboard.Select(x => new
+            {
+                x.Score,
+                x.Id,
+                x.StartDate,
+                _appDbContext.Bots.First(y => y.Id == x.BotId).Name
+            }));
+        }
     }
 }
