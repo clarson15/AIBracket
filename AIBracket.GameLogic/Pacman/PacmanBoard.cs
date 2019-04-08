@@ -102,20 +102,20 @@ namespace AIBracket.GameLogic.Pacman.Board
             {
                 return Tile.wall;
             }
-            return Board[p.Xpos, p.Ypos];
+            return Board[(int)p.Xpos, (int)p.Ypos];
         }
 
         // Called after pacman enters a consumable (fruit, dot, or powerup) tile
         public void UpdateTile(PacmanCoordinate pos)
         {
-            if (Board[pos.Xpos, pos.Ypos] == Tile.dot || Board[pos.Xpos, pos.Ypos] == Tile.powerUp)
+            if (Board[(int)pos.Xpos, (int)pos.Ypos] == Tile.dot || Board[(int)pos.Xpos, (int)pos.Ypos] == Tile.powerUp)
             {
                 DotCount--;
-                Board[pos.Xpos, pos.Ypos] = Tile.blank;
+                Board[(int)pos.Xpos, (int)pos.Ypos] = Tile.blank;
             }
-            else if (Board[pos.Xpos, pos.Ypos] == Tile.fruit)
+            else if (Board[(int)pos.Xpos, (int)pos.Ypos] == Tile.fruit)
             {
-                Board[pos.Xpos, pos.Ypos] = Tile.blank;
+                Board[(int)pos.Xpos, (int)pos.Ypos] = Tile.blank;
             }
             else
             {
@@ -152,13 +152,13 @@ namespace AIBracket.GameLogic.Pacman.Board
                 case PacmanPacman.Direction.start:
                     return true;
                 case PacmanPacman.Direction.up:
-                    return GetTile(pos.Xpos, pos.Ypos - 1) != PacmanBoard.Tile.wall;
+                    return GetTile((int)pos.Xpos, (int)pos.Ypos - 1) != Tile.wall;
                 case PacmanPacman.Direction.down:
-                    return GetTile(pos.Xpos, pos.Ypos + 1) != PacmanBoard.Tile.wall;
+                    return GetTile((int)pos.Xpos, (int)pos.Ypos + 1) != Tile.wall;
                 case PacmanPacman.Direction.left:
-                    return GetTile(pos.Xpos - 1, pos.Ypos) != PacmanBoard.Tile.wall;
+                    return GetTile((int)pos.Xpos - 1, (int)pos.Ypos) != Tile.wall;
                 case PacmanPacman.Direction.right:
-                    return GetTile(pos.Xpos + 1, pos.Ypos) != PacmanBoard.Tile.wall;
+                    return GetTile((int)pos.Xpos + 1, (int)pos.Ypos) != Tile.wall;
             }
             return false;
         }

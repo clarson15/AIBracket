@@ -36,16 +36,16 @@ namespace AIBracket.GameLogic.Pacman.Ghost
                 case PacmanPacman.Direction.start:
                     break;
                 case PacmanPacman.Direction.up:
-                    Location.Ypos--;
+                    Location.Ypos -= 0.2m;
                     break;
                 case PacmanPacman.Direction.down:
-                    Location.Ypos++;
+                    Location.Ypos += 0.2m;
                     break;
                 case PacmanPacman.Direction.left:
-                    Location.Xpos--;
+                    Location.Xpos -= 0.2m;
                     break;
                 case PacmanPacman.Direction.right:
-                    Location.Xpos++;
+                    Location.Xpos += 0.2m;
                     break;
                 default:
                     Console.Error.WriteLine("Error: entered PacmanEntity.move switch default");
@@ -80,13 +80,13 @@ namespace AIBracket.GameLogic.Pacman.Ghost
         /// <returns></returns>
         public PacmanPacman.Direction DetermineGhostMove(List<PacmanPacman.Direction> possible, PacmanCoordinate pos, int score)
         {
-            // f(x) = x / -150 + 100 
+            // f(x) = x / -250 + 100 
             // Dividend should change after testing
             var chance = (score / DividendForChanceOfHinderingMove) + StartingPercentage;
             var random = new Random();
             var chanceForRandomMove = random.Next(101);
             var difference = Location - pos;
-            if (possible.Contains(PacmanPacman.InverseDirection(Facing)))
+            if (possible.Count > 1 && possible.Contains(PacmanPacman.InverseDirection(Facing)))
             {
                 possible.Remove(PacmanPacman.InverseDirection(Facing));
             }

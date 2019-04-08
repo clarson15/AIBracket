@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -15,8 +15,6 @@ export class GameService {
     let headers = new HttpHeaders({
       'Content-Type': 'text/plain'
     });
-    return this.http.get<any>('/api/Game/GetLeaderboard').pipe(map((res) => {
-      return res;
-    }), catchError((err, obs) => this.errorHandler(err, obs)));
+    return this.http.get<any>('/api/Game/GetLeaderboard');
   }
 }

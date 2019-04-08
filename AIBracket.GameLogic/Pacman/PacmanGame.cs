@@ -165,7 +165,7 @@ namespace AIBracket.GameLogic.Pacman.Game
         {
             for (int i = 0; i < Ghosts.Length; i++)
             {
-                if (Ghosts[i].GetPosition() == Pacman.GetPosition())
+                if (Ghosts[i].GetPosition().Collide(Pacman.GetPosition()))
                 {
                     if (Ghosts[i].IsVulnerable)
                     {
@@ -210,7 +210,6 @@ namespace AIBracket.GameLogic.Pacman.Game
         /// <param name="i">Ghost Index</param>
         private void ProcessGhostMove(int i)
         {
-            PortalGhost(Ghosts[i].Location, i);
             var GhostTargetLocation = new PacmanCoordinate(Pacman.Location);
             switch (i)
             {
@@ -226,7 +225,12 @@ namespace AIBracket.GameLogic.Pacman.Game
                     GhostTargetLocation.Ypos += 3;
                     break;
             }
-            Ghosts[i].Facing = Ghosts[i].DetermineGhostMove(Board.PotentialDirections(Ghosts[i].Location), GhostTargetLocation, Score);
+            if (Ghosts[i].Location.Xpos % 1 == 0 && Ghosts[i].Location.Ypos % 1 == 0)
+            {
+                PortalGhost(Ghosts[i].Location, i);
+                Ghosts[i].Facing = Ghosts[i].DetermineGhostMove(Board.PotentialDirections(Ghosts[i].Location), GhostTargetLocation, Score);
+            }
+            
             Ghosts[i].Move();
         }
 
@@ -268,16 +272,34 @@ namespace AIBracket.GameLogic.Pacman.Game
             PacmanGhostCollide();
 
             // Move Pacman
-            if (Board.ValidMove(p, Pacman.GetPosition()))
+            if (Pacman.Location.Xpos % 1 != 0)
             {
-                Pacman.Facing = p;
+                if (p == PacmanPacman.Direction.left || p == PacmanPacman.Direction.right)
+                {
+                    Pacman.Facing = p;
+                    Pacman.Move();
+                }
             }
-            if (Board.ValidMove(Pacman.Facing, Pacman.GetPosition()))
+            else if (Pacman.Location.Ypos % 1 != 0)
             {
-                Pacman.Move();
-                CheckTile(Pacman.GetPosition());
+                if (p == PacmanPacman.Direction.up || p == PacmanPacman.Direction.down)
+                {
+                    Pacman.Facing = p;
+                    Pacman.Move();
+                }
             }
-
+            else if (Pacman.Location.Xpos % 1 == 0 && Pacman.Location.Ypos % 1 == 0)
+            {
+                if (Board.ValidMove(p, Pacman.GetPosition()))
+                {
+                    Pacman.Facing = p;
+                }
+                if (Board.ValidMove(Pacman.Facing, Pacman.GetPosition()))
+                {
+                    Pacman.Move();
+                    CheckTile(Pacman.GetPosition());
+                }
+            }
             PacmanGhostCollide();
 
             if (PoweredUpCounter == 0)
