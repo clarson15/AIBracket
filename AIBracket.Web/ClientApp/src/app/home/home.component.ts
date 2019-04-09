@@ -13,6 +13,7 @@ export class HomeComponent implements OnInit {
   ActiveGame: boolean = false;
   SpectatorId: string;
   ActiveGameId: string;
+  private leaderboard: any;
 
   constructor(private gameservice: GameService, private accountservice: AccountService) { }
 
@@ -26,7 +27,7 @@ export class HomeComponent implements OnInit {
           this.accountservice.getSpectatorId().subscribe(
             data2 => {
               this.ActiveGameId = data;
-              this.SpectatorId = data2;
+              this.SpectatorId = data2.spectatorId;
               this.ActiveGame = true;
             },
             err => {
@@ -35,6 +36,14 @@ export class HomeComponent implements OnInit {
       },
       err => {
         console.log(err.error);
-      });
+          });
+      this.gameservice.getPacmanLeaderboard().subscribe(
+          data => {
+              this.leaderboard = data;
+              console.log(this.leaderboard);
+          },
+          err => {
+              console.log(err.error);
+          });
   }
 }

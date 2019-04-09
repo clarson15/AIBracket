@@ -20,8 +20,8 @@ namespace AIBracket.GameLogic.Pacman.Ghost
             Facing = PacmanPacman.Direction.start;
             IsDead = true;
             IsVulnerable = false;
-            DeadCounter = 10 * number;
-            Location = new PacmanCoordinate(13, 12);
+            DeadCounter = 50 * number;
+            Location = new PacmanCoordinate(13m, 12m);
         }
 
         public PacmanCoordinate GetPosition()
@@ -36,20 +36,28 @@ namespace AIBracket.GameLogic.Pacman.Ghost
                 case PacmanPacman.Direction.start:
                     break;
                 case PacmanPacman.Direction.up:
-                    Location.Ypos--;
+                    Location.Ypos -= IsVulnerable ? 0.1m : 0.2m;
                     break;
                 case PacmanPacman.Direction.down:
-                    Location.Ypos++;
+                    Location.Ypos += IsVulnerable ? 0.1m : 0.2m;
                     break;
                 case PacmanPacman.Direction.left:
-                    Location.Xpos--;
+                    Location.Xpos -= IsVulnerable ? 0.1m : 0.2m;
                     break;
                 case PacmanPacman.Direction.right:
-                    Location.Xpos++;
+                    Location.Xpos += IsVulnerable ? 0.1m : 0.2m;
                     break;
                 default:
                     Console.Error.WriteLine("Error: entered PacmanEntity.move switch default");
                     break;
+            }
+            if(!IsVulnerable && (Location.Xpos % 0.2m) == 0.1m)
+            {
+                Location.Xpos -= 0.1m;
+            }
+            if (!IsVulnerable && (Location.Ypos % 0.2m) == 0.1m)
+            {
+                Location.Ypos -= 0.1m;
             }
         }
 
@@ -58,7 +66,7 @@ namespace AIBracket.GameLogic.Pacman.Ghost
         /// </summary>
         public void StartDeathCounter()
         {
-            DeadCounter = 10;
+            DeadCounter = 50;
         }
 
         /// <summary>
@@ -80,13 +88,13 @@ namespace AIBracket.GameLogic.Pacman.Ghost
         /// <returns></returns>
         public PacmanPacman.Direction DetermineGhostMove(List<PacmanPacman.Direction> possible, PacmanCoordinate pos, int score)
         {
-            // f(x) = x / -150 + 100 
+            // f(x) = x / -250 + 100 
             // Dividend should change after testing
             var chance = (score / DividendForChanceOfHinderingMove) + StartingPercentage;
             var random = new Random();
             var chanceForRandomMove = random.Next(101);
             var difference = Location - pos;
-            if (possible.Contains(PacmanPacman.InverseDirection(Facing)))
+            if (possible.Count > 1 && possible.Contains(PacmanPacman.InverseDirection(Facing)))
             {
                 possible.Remove(PacmanPacman.InverseDirection(Facing));
             }

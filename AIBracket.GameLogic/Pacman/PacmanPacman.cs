@@ -16,7 +16,7 @@ namespace AIBracket.GameLogic.Pacman.Pacman
         
         public PacmanPacman()
         {
-            Location = new PacmanCoordinate(13, 17);
+            Location = new PacmanCoordinate(13m, 17m);
             Facing = Direction.right;
             Lives = 3;
         }
@@ -25,7 +25,7 @@ namespace AIBracket.GameLogic.Pacman.Pacman
         {
             return Location;
         }
-        
+
         public void Move()
         {
             switch (Facing)
@@ -33,22 +33,23 @@ namespace AIBracket.GameLogic.Pacman.Pacman
                 case Direction.start:
                     break;
                 case Direction.up:
-                    Location.Ypos--;
+                    Location.Ypos -= 0.2m;
                     break;
                 case Direction.down:
-                    Location.Ypos++;
+                    Location.Ypos += 0.2m;
                     break;
                 case Direction.left:
-                    Location.Xpos--;
+                    Location.Xpos -= 0.2m;
                     break;
                 case Direction.right:
-                    Location.Xpos++;
+                    Location.Xpos += 0.2m;
                     break;
                 default:
-                    Console.Error.WriteLine("Error: entered PacmanEntity.Move switch default");
+                    Console.Error.WriteLine("Error: entered PacmanEntity.move switch default");
                     break;
             }
-        } 
+        }
+
         /// <summary>
         /// Returns the opposite direction
         /// </summary>

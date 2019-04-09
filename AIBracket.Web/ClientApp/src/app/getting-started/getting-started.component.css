@@ -27,3 +27,7 @@ p {
   text-wrap: none;
   overflow-x: auto;
 }
+
+.game-documentation-list {
+  height: 500px;
+}

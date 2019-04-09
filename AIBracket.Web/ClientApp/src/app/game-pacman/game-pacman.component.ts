@@ -80,6 +80,7 @@ export class GamePacmanComponent implements OnInit {
     this.socket$.onopen = (event) => {
       this.SocketConnected = true;
       var msg = 'WATCH ' + this.ActiveGameId;
+      console.log(this.SpectatorId);
       if (this.SpectatorId.length > 0) {
         msg += ' ' + this.SpectatorId;
       }
@@ -155,16 +156,16 @@ export class GamePacmanComponent implements OnInit {
         });
       }
       if (this.pacmanX - this.pacmanTargetX > 0) {
-        this.pacmanX -= frametime / 500;
+        this.pacmanX -= frametime / 100;
       }
       if (this.pacmanX - this.pacmanTargetX < 0) {
-        this.pacmanX += frametime / 500;
+        this.pacmanX += frametime / 100;
       }
       if (this.pacmanY - this.pacmanTargetY > 0) {
-        this.pacmanY -= frametime / 500;
+        this.pacmanY -= frametime / 100;
       }
       if (this.pacmanY - this.pacmanTargetY < 0) {
-        this.pacmanY += frametime / 500;
+        this.pacmanY += frametime / 100;
       }
       ctx.beginPath();
       ctx.arc((this.pacmanX * 16) + 8, (this.pacmanY * 16) + 88, 7, 0.75 * Math.PI, 1.8 * Math.PI, false);
@@ -187,16 +188,16 @@ export class GamePacmanComponent implements OnInit {
       this.ghosts.forEach(ghost => {
         ctx.fillStyle = 'blue';
         if (ghost.x - ghost.targetX > 0) {
-          ghost.x -= frametime / 500;
+          ghost.x -= frametime / 100;
         }
         if (ghost.x - ghost.targetX < 0) {
-          ghost.x += frametime / 500;
+          ghost.x += frametime / 100;
         }
         if (ghost.y - ghost.targetY > 0) {
-          ghost.y -= frametime / 500;
+          ghost.y -= frametime / 100;
         }
         if (ghost.y - ghost.targetY < 0) {
-          ghost.y += frametime / 500;
+          ghost.y += frametime / 100;
         }
         if (this.ghostImages[i].complete && ghost.vulnerable === false) {
           ctx.drawImage(this.ghostImages[i], ghost.x * 16 + 2, ghost.y * 16 + 82);
@@ -234,7 +235,6 @@ export class GamePacmanComponent implements OnInit {
   SubmitChat() {
     var chatinput = document.getElementById('chatinput') as HTMLTextAreaElement;
     var data = chatinput.value.trim();
-    console.log(data);
     if (data.length > 0) {
       this.send('CHAT ' + data);
     }
@@ -346,7 +346,6 @@ export class GamePacmanComponent implements OnInit {
   }
 
   send(message: string) {
-    console.log('sending ' + message);
     this.socket$.send(message);
   }
 

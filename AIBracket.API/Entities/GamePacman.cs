@@ -75,7 +75,7 @@ namespace AIBracket.API.Entities
 
         public void UpdateGame()
         {
-            if (DateTime.Now.Subtract(lastTick).TotalMilliseconds >= 500)
+            if (DateTime.Now.Subtract(lastTick).TotalMilliseconds >= 100)
             {
                 lastTick = DateTime.Now;
                 Game.UpdateGame(User.Direction);

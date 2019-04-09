@@ -7,10 +7,10 @@ namespace AIBracket.GameLogic.Pacman.Coordinate
 {
     public class PacmanCoordinate
     {
-        public int Xpos { get; set; }
-        public int Ypos { get; set; }
+        public decimal Xpos { get; set; }
+        public decimal Ypos { get; set; }
 
-        public PacmanCoordinate(int X = 0, int Y = 0)
+        public PacmanCoordinate(decimal X = 0m, decimal Y = 0m)
         {
             Xpos = X;
             Ypos = Y;
@@ -27,6 +27,11 @@ namespace AIBracket.GameLogic.Pacman.Coordinate
             return $"{Xpos} {Ypos}";
         }
 
+        public string FloorToString()
+        {
+            return $"{(int)Xpos} {(int)Ypos}";
+        }
+
         public static bool operator==(PacmanCoordinate lhs, PacmanCoordinate rhs)
         {
             return lhs.Xpos == rhs.Xpos && lhs.Ypos == rhs.Ypos;
@@ -40,6 +45,11 @@ namespace AIBracket.GameLogic.Pacman.Coordinate
         public static PacmanCoordinate operator-(PacmanCoordinate lhs, PacmanCoordinate rhs)
         {
             return new PacmanCoordinate(lhs.Xpos - rhs.Xpos, lhs.Ypos - rhs.Ypos);
+        }
+
+        public bool Collide(PacmanCoordinate rhs)
+        {
+            return (Xpos < rhs.Xpos + 1 && Xpos + 1 > rhs.Xpos && Ypos < rhs.Ypos + 1 && Ypos + 1 > rhs.Ypos);
         }
 
         public override bool Equals(object obj)
