@@ -7,32 +7,10 @@ namespace AIBracket.GameLogic.Pacman.Coordinate
 {
     public class PacmanCoordinate
     {
-        public decimal Xpos
-        {
-            get
-            {
-                return Math.Round(xpos, 1);
-            }
-            set
-            {
-                xpos = value;
-            }
-        }
-        public decimal Ypos
-        {
-            get
-            {
-                return Math.Round(ypos, 1);
-            }
-            set
-            {
-                ypos = value;
-            }
-        }
-        private decimal xpos;
-        private decimal ypos;
+        public decimal Xpos { get; set; }
+        public decimal Ypos { get; set; }
 
-        public PacmanCoordinate(decimal X = 0, decimal Y = 0)
+        public PacmanCoordinate(decimal X = 0m, decimal Y = 0m)
         {
             Xpos = X;
             Ypos = Y;
@@ -47,6 +25,11 @@ namespace AIBracket.GameLogic.Pacman.Coordinate
         public override string ToString()
         {
             return $"{Xpos} {Ypos}";
+        }
+
+        public string FloorToString()
+        {
+            return $"{(int)Xpos} {(int)Ypos}";
         }
 
         public static bool operator==(PacmanCoordinate lhs, PacmanCoordinate rhs)

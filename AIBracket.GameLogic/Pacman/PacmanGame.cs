@@ -23,7 +23,6 @@ namespace AIBracket.GameLogic.Pacman.Game
         private int GhostScoreMultiplier { get; set; }
         private int PoweredUpCounter { get; set; }
         private int FruitSpawnCounter { get; set; }
-        private bool SlowGhosts { get; set; }
         public bool GameRunning { get; private set; }
 
         public PacmanGame()
@@ -51,7 +50,6 @@ namespace AIBracket.GameLogic.Pacman.Game
             GhostScoreMultiplier = 1;
             PoweredUpCounter = 0;
             FruitSpawnCounter = 0;
-            SlowGhosts = false;
             TimeStarted = DateTime.Now;
             GameRunning = true;
         }
@@ -66,17 +64,17 @@ namespace AIBracket.GameLogic.Pacman.Game
             if(t == PacmanBoard.Tile.dot)
             {
                 Score += 10;
-                CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.Dot, pos.ToString() + " 10"));
+                CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.Dot, pos.FloorToString() + " 10"));
             }
             else if(t == PacmanBoard.Tile.fruit)
             {
                 Score += 100;
-                CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.Fruit, pos.ToString() + " 100"));
+                CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.Fruit, pos.FloorToString() + " 100"));
             }
             else if(t == PacmanBoard.Tile.powerUp)
             {
                 Score += 50;
-                CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.PowerUp, pos.ToString() + " 50"));
+                CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.PowerUp, pos.FloorToString() + " 50"));
             }
             return;
         }
@@ -113,7 +111,7 @@ namespace AIBracket.GameLogic.Pacman.Game
                         if(!g.IsVulnerable && !g.IsDead)
                         {
                             g.IsVulnerable = true;
-                            PoweredUpCounter = 30;
+                            PoweredUpCounter = 100;
                         }
                     }
                     UpdateScore(pos);
@@ -256,19 +254,8 @@ namespace AIBracket.GameLogic.Pacman.Game
                 {
                     continue;
                 }
-                if (Ghosts[i].IsVulnerable)
-                {
-                    if (!SlowGhosts)
-                    {
-                        ProcessGhostMove(i);
-                    }
-                }
-                else
-                {
-                    ProcessGhostMove(i);
-                }
+                ProcessGhostMove(i);
             }
-            SlowGhosts = !SlowGhosts;
             PacmanGhostCollide();
 
             // Move Pacman
@@ -277,16 +264,18 @@ namespace AIBracket.GameLogic.Pacman.Game
                 if (p == PacmanPacman.Direction.left || p == PacmanPacman.Direction.right)
                 {
                     Pacman.Facing = p;
-                    Pacman.Move();
                 }
+                Pacman.Move();
+                CheckTile(Pacman.GetPosition());
             }
             else if (Pacman.Location.Ypos % 1 != 0)
             {
                 if (p == PacmanPacman.Direction.up || p == PacmanPacman.Direction.down)
                 {
                     Pacman.Facing = p;
-                    Pacman.Move();
                 }
+                Pacman.Move();
+                CheckTile(Pacman.GetPosition());
             }
             else if (Pacman.Location.Xpos % 1 == 0 && Pacman.Location.Ypos % 1 == 0)
             {
