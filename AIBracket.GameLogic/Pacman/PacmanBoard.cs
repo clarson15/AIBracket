@@ -179,6 +179,8 @@ namespace AIBracket.GameLogic.Pacman.Board
         /// <returns>Coordinates to the other portal on the map</returns>
         public PacmanCoordinate GetCorrespondingPortal(PacmanCoordinate p)
         {
+            p.Xpos = (int)p.Xpos;
+            p.Ypos = (int)p.Ypos;
             if(p == Portals[0])
             {
                 return Portals[1];
@@ -189,7 +191,7 @@ namespace AIBracket.GameLogic.Pacman.Board
             }
             else
             {
-                Console.Error.WriteLine("Error: Coordinate {0}, {1} is not a designated portal");
+                Console.Error.WriteLine($"Error: Coordinate {p.Xpos}, {p.Ypos} is not a designated portal");
                 return p;
             }
         }
