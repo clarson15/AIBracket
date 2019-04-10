@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, NgZone, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, NgZone, Input } from '@angular/core';
 import { PacmanGhost } from '../models/PacmanGhost';
 import { multicast } from 'rxjs/operators';
 
@@ -8,7 +8,7 @@ import { multicast } from 'rxjs/operators';
   templateUrl: './game-pacman.component.html',
   styleUrls: ['./game-pacman.component.css']
 })
-export class GamePacmanComponent implements OnInit, OnDestroy {
+export class GamePacmanComponent implements OnInit {
 
   @ViewChild('myCanvas') canvasRef: ElementRef;
 
@@ -347,12 +347,6 @@ export class GamePacmanComponent implements OnInit, OnDestroy {
 
   send(message: string) {
     this.socket$.send(message);
-  }
-
-  ngOnDestroy() {
-    if (this.SocketConnected) {
-      this.socket$.close();
-    }
   }
 
 }
