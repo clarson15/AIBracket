@@ -239,7 +239,7 @@ namespace AIBracket.GameLogic.Pacman.Game
         public void UpdateGame(PacmanPacman.Direction p)
         {
             SpawnGhost();
-            if (FruitSpawnCounter == 60)
+            if (FruitSpawnCounter >= 300)
             {
                 CurrentGameEvent.Add(new KeyValuePair<EventType, string>(EventType.FruitSpawn, Board.SpawnFruit().ToString()));
                 FruitSpawnCounter = -1;
