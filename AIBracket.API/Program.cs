@@ -125,6 +125,13 @@ namespace AIBracket.API
                             i--;
                             continue;
                         }
+                        else
+                        {
+                            clients[i].WriteData("Incorrect Bot ID");
+                            clients.RemoveAt(i);
+                            i--;
+                            continue;
+                        }
                     }
                     else if (message.StartsWith("WATCH ", StringComparison.InvariantCultureIgnoreCase))
                     {
@@ -163,9 +170,7 @@ namespace AIBracket.API
                     }
                     else
                     {
-                        clients.RemoveAt(i);
-                        i--;
-                        continue;
+                        clients[i].WriteData("Unknown command.");
                     }
                 }
             }

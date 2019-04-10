@@ -14,7 +14,7 @@ namespace AIBracket.API.Sockets
 
         public bool IsReady => _payloads.Count > 0;
 
-        public bool IsConnected => _socket.Connected;
+        public bool IsConnected => _socket != null && _socket.Connected && _socket.Client.Connected;
 
         private bool _isWebsocket, _first;
 
@@ -91,6 +91,7 @@ namespace AIBracket.API.Sockets
             catch(Exception e)
             {
                 Console.WriteLine("Error writing data to socket: " + e.Message);
+                Console.WriteLine(e.StackTrace);
                 Disconnect();
             }
         }
@@ -185,6 +186,7 @@ namespace AIBracket.API.Sockets
             catch (Exception e)
             {
                 Console.WriteLine("Error writing data to socket: " + e.Message);
+                Console.WriteLine(e.StackTrace);
                 stream.Dispose();
             }
         }
@@ -292,6 +294,7 @@ namespace AIBracket.API.Sockets
             catch (Exception e)
             {
                 Console.WriteLine("Error reading data from socket: " + e.Message);
+                Console.WriteLine(e.StackTrace);
                 Disconnect();
                 return;
             }

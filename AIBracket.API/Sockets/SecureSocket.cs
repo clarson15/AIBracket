@@ -89,7 +89,8 @@ namespace AIBracket.API.Sockets
             }
             catch(Exception e)
             {
-                Console.WriteLine("Error receiving data from client: " + e.Message);
+                Console.WriteLine("Error receiving data from sslsocket: " + e.Message);
+                Console.WriteLine(e.StackTrace);
                 Disconnect();
             }
         }
@@ -182,7 +183,8 @@ namespace AIBracket.API.Sockets
                 stream.EndWrite(ar);
             }catch(Exception e)
             {
-                Console.WriteLine("Error writing data to socket: " + e.Message);
+                Console.WriteLine("Error writing data to sslsocket: " + e.Message);
+                Console.WriteLine(e.StackTrace);
                 Disconnect();
             }
         }
@@ -288,6 +290,7 @@ namespace AIBracket.API.Sockets
             catch (Exception e)
             {
                 Console.WriteLine("Error reading data from sslsocket: " + e.Message);
+                Console.WriteLine(e.StackTrace);
                 Disconnect();
                 return;
             }
