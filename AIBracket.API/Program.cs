@@ -34,7 +34,7 @@ namespace AIBracket.API
             }
             catch
             {
-                Console.WriteLine("No certificate found.");
+                Console.WriteLine(DateTime.Now.ToLongTimeString() + ": No certificate found.");
             }
             GameMaster.Initialize(); 
             Task.Run(() => GameMaster.Run());
@@ -52,7 +52,7 @@ namespace AIBracket.API
             var listener = (TcpListener) ar.AsyncState;
             var client = listener.EndAcceptTcpClient(ar);
             client.NoDelay = true;
-            Console.WriteLine("Client connected.");
+            Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Client connected.");
             clients.Add(new InsecureSocket(client));
             listener.BeginAcceptTcpClient(ConnectClient, listener);
         }
@@ -68,11 +68,11 @@ namespace AIBracket.API
                 sstream.AuthenticateAsServer(cert, false, SslProtocols.Tls12, false);
                 clients.Add(new SecureSocket(sstream));
                 client.NoDelay = true;
-                Console.WriteLine("Secure client connected.");
+                Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Secure client connected.");
             }
             catch(Exception e)
             {
-                Console.WriteLine("Error connecting secure client: " + e.Message);
+                Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Error connecting secure client: " + e.Message);
             }
             listener.BeginAcceptTcpClient(SslConnectClient, listener);
         }
@@ -85,7 +85,7 @@ namespace AIBracket.API
             }
             if(SslListener != null && Accept)
             {
-                Console.WriteLine("Listening for SSL connections");
+                Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Listening for SSL connections");
                 SslListener.BeginAcceptTcpClient(SslConnectClient, SslListener);
             }
             while (true)
@@ -168,9 +168,19 @@ namespace AIBracket.API
                             }
                         }
                     }
+                    else if (message.StartsWith("DEBUG", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        clients[i].WriteData(GameMaster.GetDebugInfo());
+                        clients.RemoveAt(i);
+                        i--;
+                        continue;
+                    }
                     else
                     {
                         clients[i].WriteData("Unknown command.");
+                        clients.RemoveAt(i);
+                        i--;
+                        continue;
                     }
                 }
             }

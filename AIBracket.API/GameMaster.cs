@@ -94,6 +94,20 @@ namespace AIBracket.API
             }
         }
 
+        public static string GetDebugInfo()
+        {
+            var ret = $"{games.Count} current games:\n";
+            lock (lockobj)
+            {
+                foreach(var game in games)
+                {
+                    ret += $"{game.Id.ToString()}: {game.Spectators.Count} spectators\n";
+                }
+                ret += $"{spectators.Count} gamemaster spectators";
+            }
+            return ret;
+        }
+
         public static int GetPlayerCount() {
             lock (lockobj)
             {
@@ -180,7 +194,7 @@ namespace AIBracket.API
                         if (client.Socket.IsReady)
                         {
                             var message = client.Socket.ReadData();
-                            Console.WriteLine("Game master read: " + message);
+                            Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Game master read: " + message);
                             client.Socket.WriteData("Hello world");
 
                         }
@@ -200,7 +214,7 @@ namespace AIBracket.API
                         if (spectators[i].IsReady)
                         {
                             var message = spectators[i].ReadData().Trim();
-                            Console.WriteLine("Spectator said " + message);
+                            Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Spectator said " + message);
                             if (message == "LIST GAMES")
                             {
                                 spectators[i].WriteData("Pacman: " + games.Count);
