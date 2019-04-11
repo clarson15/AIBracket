@@ -20,8 +20,8 @@ namespace AIBracket.GameLogic.Pacman.Ghost
             Facing = PacmanPacman.Direction.start;
             IsDead = true;
             IsVulnerable = false;
-            DeadCounter = 10 * number;
-            Location = new PacmanCoordinate(13, 12);
+            DeadCounter = 50 * number;
+            Location = new PacmanCoordinate(13m, 12m);
         }
 
         public PacmanCoordinate GetPosition()
@@ -36,20 +36,28 @@ namespace AIBracket.GameLogic.Pacman.Ghost
                 case PacmanPacman.Direction.start:
                     break;
                 case PacmanPacman.Direction.up:
-                    Location.Ypos -= 0.2m;
+                    Location.Ypos -= IsVulnerable ? 0.1m : 0.2m;
                     break;
                 case PacmanPacman.Direction.down:
-                    Location.Ypos += 0.2m;
+                    Location.Ypos += IsVulnerable ? 0.1m : 0.2m;
                     break;
                 case PacmanPacman.Direction.left:
-                    Location.Xpos -= 0.2m;
+                    Location.Xpos -= IsVulnerable ? 0.1m : 0.2m;
                     break;
                 case PacmanPacman.Direction.right:
-                    Location.Xpos += 0.2m;
+                    Location.Xpos += IsVulnerable ? 0.1m : 0.2m;
                     break;
                 default:
                     Console.Error.WriteLine("Error: entered PacmanEntity.move switch default");
                     break;
+            }
+            if(!IsVulnerable && (Location.Xpos % 0.2m) == 0.1m)
+            {
+                Location.Xpos -= 0.1m;
+            }
+            if (!IsVulnerable && (Location.Ypos % 0.2m) == 0.1m)
+            {
+                Location.Ypos -= 0.1m;
             }
         }
 
@@ -58,7 +66,7 @@ namespace AIBracket.GameLogic.Pacman.Ghost
         /// </summary>
         public void StartDeathCounter()
         {
-            DeadCounter = 10;
+            DeadCounter = 50;
         }
 
         /// <summary>

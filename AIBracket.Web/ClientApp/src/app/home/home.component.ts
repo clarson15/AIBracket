@@ -40,7 +40,7 @@ export class HomeComponent implements OnInit {
           this.accountservice.getSpectatorId().subscribe(
             data2 => {
               this.ActiveGameId = data;
-              this.SpectatorId = data2;
+              this.SpectatorId = data2.spectatorId;
               this.ActiveGame = true;
             },
             err => {

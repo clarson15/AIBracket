@@ -80,6 +80,7 @@ export class GamePacmanComponent implements OnInit {
     this.socket$.onopen = (event) => {
       this.SocketConnected = true;
       var msg = 'WATCH ' + this.ActiveGameId;
+      console.log(this.SpectatorId);
       if (this.SpectatorId.length > 0) {
         msg += ' ' + this.SpectatorId;
       }
@@ -234,7 +235,6 @@ export class GamePacmanComponent implements OnInit {
   SubmitChat() {
     var chatinput = document.getElementById('chatinput') as HTMLTextAreaElement;
     var data = chatinput.value.trim();
-    console.log(data);
     if (data.length > 0) {
       this.send('CHAT ' + data);
     }
@@ -346,7 +346,6 @@ export class GamePacmanComponent implements OnInit {
   }
 
   send(message: string) {
-    console.log('sending ' + message);
     this.socket$.send(message);
   }
 
