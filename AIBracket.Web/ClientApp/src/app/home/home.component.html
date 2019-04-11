@@ -1,4 +1,12 @@
 <div class="container">
+  <div *ngIf="user == null">
+    <h1 class="title">Welcome to AI Bracket</h1>
+    <p>
+      AI Bracket is geared towards anyone interested in AI for exectuting simple tasks really really well.
+      Use a programming language of your choice to design an AI and compete against others.
+    </p>
+    <a routerLink="/learn"> Learn More </a>
+  </div>
   <h1 class="header">Featured Game</h1>
   <game-pacman [SpectatorId]="SpectatorId" [ActiveGameId]="ActiveGameId" *ngIf="ActiveGame == true"></game-pacman>
   <div style="height: 550px; width: 600px; display: flex; flex-direction: column; align-content: center; text-align:center;" *ngIf="ActiveGame == false">
@@ -6,5 +14,35 @@
     There is no active game being played. <br />
     Why don't you change that?
   </div>
-  <h1 class="header">News</h1>
+  <h1 class="header">Leaderboard</h1>
+  <mat-table [dataSource]="leaderboard" class="mat-elevation-z8">
+    <!--- Note that these columns can be defined in any order.
+    The actual rendered columns are set as a property on the row definition" -->
+    <!-- Position Column -->
+    <ng-container matColumnDef="position">
+      <div mat-header-cell *matHeaderCellDef> # </div>
+      <div mat-cell *matCellDef="let element"> {{element.position}} </div>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <div mat-header-cell *matHeaderCellDef> Name </div>
+      <div mat-cell *matCellDef="let element"> {{element.name}} </div>
+    </ng-container>
+
+    <!-- Weight Column -->
+    <ng-container matColumnDef="score">
+      <div mat-header-cell *matHeaderCellDef> Score </div>
+      <div mat-cell *matCellDef="let element"> {{element.score}} </div>
+    </ng-container>
+
+    <!-- Symbol Column -->
+    <ng-container matColumnDef="date">
+      <div mat-header-cell *matHeaderCellDef> Time Played </div>
+      <div mat-cell *matCellDef="let element"> {{element.date}} </div>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
 </div>

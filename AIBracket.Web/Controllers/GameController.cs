@@ -41,7 +41,7 @@ namespace AIBracket.Web.Controllers
         [HttpGet]
         public IActionResult GetLeaderboard()
         {
-            var leaderboard = _appDbContext.PacmanGames.OrderBy(x => x.Score).Take(20);
+            var leaderboard = _appDbContext.PacmanGames.OrderByDescending(x => x.Score).Take(20);
             return Ok(leaderboard.Select(x => new
             {
                 x.Score,

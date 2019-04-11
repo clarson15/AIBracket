@@ -51,9 +51,9 @@ export class AppComponent implements OnInit {
     if (this.account == null && localStorage.getItem('auth_token') != null) {
       this.attemptLogin();
     }
-    if (document.location.pathname == '/profile') {
+    if (document.location.pathname === '/profile' || document.location.pathname === '/home') {
       $event.user = this.account;
-    }
+    } 
   }
 
   toggleNav($event) {
