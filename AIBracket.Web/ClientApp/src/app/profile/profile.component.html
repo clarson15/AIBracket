@@ -38,8 +38,11 @@
         <p>Private Key: <span *ngIf="bot.showSecret">{{bot.privateKey}}</span><span class="fake-anchor" (click)="showSecret(i)" *ngIf="!bot.showSecret">Show secret</span></p>
         <span style="margin-top:5px; font-size:20px;">History:</span><br />
         <div class="history" *ngIf="bot.history != null && bot.history.length > 0">
-          <mat-list dense *ngFor="let history of bot.history">
-            <mat-list-item style="font-size: 18px;">Score: {{history.score}} <div style="position: relative; right: 0; margin-left: auto;">{{history.startDate}} - {{history.endDate}}</div></mat-list-item>
+          <mat-list dense style="max-height: 500px; overflow-y: auto; overflow-x: hidden;">
+            <mat-list-item *ngFor="let history of bot.history" style="font-size: 18px; background-color:grey; border: 1px solid black; color: white;">
+              Score: {{history.score}} <div style="position: relative; right: 0; margin-left: auto;">{{history.startDate}} - {{history.endDate}}</div>
+              <mat-divider></mat-divider>
+            </mat-list-item>
           </mat-list>
         </div>
         <div class="no-history" *ngIf="bot.history == null || bot.history.length == 0" style="text-align: center;">

@@ -14,7 +14,7 @@ namespace AIBracket.API.Sockets
 
         public bool IsReady => _payloads.Count > 0;
 
-        public bool IsConnected => _socket.Connected;
+        public bool IsConnected => _socket != null && _socket.Connected && _socket.Client.Connected;
 
         private bool _isWebsocket, _first;
 
@@ -88,9 +88,9 @@ namespace AIBracket.API.Sockets
             {
                 _socket.Client.BeginSend(bytes, 0, bytes.Length, 0, new AsyncCallback(WriteCallback), _socket);
             }
-            catch(Exception e)
+            catch
             {
-                Console.WriteLine("Error writing data to socket: " + e.Message);
+                Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Client disconnected");
                 Disconnect();
             }
         }
@@ -182,10 +182,10 @@ namespace AIBracket.API.Sockets
             {
                 stream.Client.EndSend(ar);
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine("Error writing data to socket: " + e.Message);
-                stream.Dispose();
+                Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Client disconnected");
+                Disconnect();
             }
         }
 
@@ -242,14 +242,14 @@ namespace AIBracket.API.Sockets
                             case 0x09: // ping
                                 Buffer.BlockCopy(newbuff, 1, _writebuffer, 1, byteCount - 1);
                                 _writebuffer[0] = 0x8A;
-                                Console.WriteLine("Ping");
+                                Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Ping");
                                 stream.Client.BeginSend(_writebuffer, 0, byteCount, 0, new AsyncCallback(WriteCallback), stream);
                                 break;
                             case 0xA: // pong
-                                Console.WriteLine("Pong");
+                                Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Pong");
                                 break;
                             default:
-                                Console.WriteLine("Unknown opcode: " + (newbuff[0] & 0x0F));
+                                Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Unknown opcode: " + (newbuff[0] & 0x0F));
                                 stream.Dispose();
                                 return;
                         }
@@ -289,11 +289,10 @@ namespace AIBracket.API.Sockets
                 _first = false;
                 stream.Client.BeginReceive(_readbuffer, 0, buff_size, SocketFlags.None, new AsyncCallback(ReadCallback), stream);
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine("Error reading data from socket: " + e.Message);
+                Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Client disconnected");
                 Disconnect();
-                return;
             }
         }
     }
