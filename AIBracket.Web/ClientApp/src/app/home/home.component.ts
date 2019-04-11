@@ -1,6 +1,17 @@
-import { Component, ViewChild, ElementRef, OnInit, NgZone } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnInit, NgZone, Input } from '@angular/core';
 import { GameService } from '../services/game.service';
 import { AccountService } from '../services/account.service';
+import { ProfileResponseModel } from '../models/ProfileResponseModel'; 
+import { MatTableDataSource } from '@angular/material';
+import * as moment from 'moment';
+
+export interface LeaderboardEntry {
+
+  position: number;
+  name: string;
+  score: number;
+  startDate: string;
+}
 
 @Component({
   selector: 'app-home',
@@ -8,12 +19,15 @@ import { AccountService } from '../services/account.service';
   styleUrls: ['./home.component.css'],
   providers: [GameService]
 })
+
 export class HomeComponent implements OnInit {
 
   ActiveGame: boolean = false;
   SpectatorId: string;
   ActiveGameId: string;
-  private leaderboard: any;
+  public user: ProfileResponseModel;
+  public leaderboard: MatTableDataSource<LeaderboardEntry>;
+  displayedColumn = ['position', 'name', 'score', 'date'];
 
   constructor(private gameservice: GameService, private accountservice: AccountService) { }
 
@@ -38,12 +52,18 @@ export class HomeComponent implements OnInit {
         console.log(err.error);
           });
       this.gameservice.getPacmanLeaderboard().subscribe(
-          data => {
-              this.leaderboard = data;
-              console.log(this.leaderboard);
+        data => {
+          var counter = 1;
+          data.forEach(obj => {
+            obj.position = counter;
+            obj.startDate = moment.utc(obj.startDate).fromNow();
+            counter += 1;
+          });
+          this.leaderboard = new MatTableDataSource<LeaderboardEntry>(data);
           },
           err => {
               console.log(err.error);
           });
   }
 }
+

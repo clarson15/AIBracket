@@ -1,10 +1,48 @@
 <div class="container">
+  <div *ngIf="user == null">
+    <h1 class="title">Welcome to AI Bracket</h1>
+    <p>
+      AI Bracket is geared towards anyone interested in AI for exectuting simple tasks really really well.
+      Use a programming language of your choice to design an AI and compete against others.
+    </p>
+    <a routerLink="/learn"> Learn More </a>
+  </div>
   <h1 class="header">Featured Game</h1>
   <game-pacman [SpectatorId]="SpectatorId" [ActiveGameId]="ActiveGameId" *ngIf="ActiveGame == true"></game-pacman>
-  <div style="height: 550px; width: 600px; display: flex; flex-direction: column; align-content: center; text-align:center;" *ngIf="ActiveGame == false">
+  <div class="game-container" *ngIf="ActiveGame == false">
     <mat-icon style="margin-left: auto; margin-right: auto; font-size:48px; width: 48px; height: 48px;">mood_bad</mat-icon><br />
     There is no active game being played. <br />
     Why don't you change that?
   </div>
-  <h1 class="header">News</h1>
+  <h1 class="header">Leaderboard</h1>
+  <table mat-table [dataSource]="leaderboard" class="mat-elevation-z8">
+    <!--- Note that these columns can be defined in any order.
+    The actual rendered columns are set as a property on the row definition" -->
+    <!-- Position Column -->
+    <ng-container matColumnDef="position">
+      <th mat-header-cell *matHeaderCellDef> # </th>
+      <td mat-cell *matCellDef="let element"> {{element.position}} </td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Name </th>
+      <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+    </ng-container>
+
+    <!-- Weight Column -->
+    <ng-container matColumnDef="score">
+      <th mat-header-cell *matHeaderCellDef> Score </th>
+      <td mat-cell *matCellDef="let element"> {{element.score}} </td>
+    </ng-container>
+
+    <!-- Symbol Column -->
+    <ng-container matColumnDef="date">
+      <th mat-header-cell *matHeaderCellDef> Time Played </th>
+      <td mat-cell *matCellDef="let element"> {{element.startDate}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumn"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumn;"></tr>
+  </table>
 </div>

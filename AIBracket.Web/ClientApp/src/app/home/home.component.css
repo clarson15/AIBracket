@@ -11,3 +11,24 @@
   margin-left: auto;
   margin-right: auto;
 }
+
+table {
+  margin-left: auto;
+  margin-right: auto;
+  width: 70%;
+}
+
+.mat-column-date {
+  text-align: right;
+}
+
+.game-container {
+  height: 550px;
+  width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
