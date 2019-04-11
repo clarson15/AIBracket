@@ -3,6 +3,7 @@ import { GameService } from '../services/game.service';
 import { AccountService } from '../services/account.service';
 import { ProfileResponseModel } from '../models/ProfileResponseModel'; 
 import { MatTableDataSource } from '@angular/material';
+import * as moment from 'moment';
 
 export interface LeaderboardEntry {
 
@@ -26,7 +27,7 @@ export class HomeComponent implements OnInit {
   ActiveGameId: string;
   public user: ProfileResponseModel;
   public leaderboard: MatTableDataSource<LeaderboardEntry>;
-  public displayedColumn = ["position", "name", "score", "date"];
+  displayedColumn = ['position', 'name', 'score', 'date'];
 
   constructor(private gameservice: GameService, private accountservice: AccountService) { }
 
@@ -55,10 +56,10 @@ export class HomeComponent implements OnInit {
           var counter = 1;
           data.forEach(obj => {
             obj.position = counter;
+            obj.startDate = moment.utc(obj.startDate).fromNow();
             counter += 1;
           });
           this.leaderboard = new MatTableDataSource<LeaderboardEntry>(data);
-          console.log(this.leaderboard);
           },
           err => {
               console.log(err.error);
