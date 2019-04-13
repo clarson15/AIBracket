@@ -35,3 +35,20 @@ li {
 .game-documentation-list {
   height: 500px;
 }
+
+.code {
+  padding: 9px;
+  margin-bottom: 12px;
+  font-size: 18px;
+  line-height: normal;
+  background-color: #FFFFFF;
+  border: 1px solid #BBBBBB;
+}
+
+.highlight {
+  color: blue;
+}
+
+.bold {
+  font-weight: bold;
+}

@@ -26,10 +26,12 @@
     Everything that happens in the game will be sent to you using an event system.
     Each game has its own unique events specified by an enumeration as the first section delimeted by a space.
     Events are sent to you at even intervals so sometimes there will be multiple updates.
-    These updates are delimeted by an *.
+    These updates are delimeted by an <span class="highlight">*</span>.
   </p>
   <p>
-    Example: 3 25 2 10
+    <code class="code">
+      <span class="bold">Simple Game Update:</span> 3 25 2 10*
+    </code>
   </p>
   <p>
     In this example the 3 tell you what kind of event this is. In the case of Pacman this would mean it is an update telling that a dot was consumed.
