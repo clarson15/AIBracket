@@ -22,7 +22,7 @@ export class NavMenuComponent {
 
   Logout() {
     this.logout.emit(true);
-    this.router.navigate(['/login']);
+    this.router.navigate(['/home']);
   }
 
   OpenNav() {
