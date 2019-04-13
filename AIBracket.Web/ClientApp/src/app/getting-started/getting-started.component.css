@@ -12,6 +12,10 @@ p {
   font: 18px Verdana;
 }
 
+li {
+  font: 18px Verdana;
+}
+
 .info {
   width: 75%;
   margin-left: auto;
