@@ -4,12 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Threading.Tasks;
 using AIBracket.Web.Managers;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace AIBracket.Web
 {
@@ -25,7 +22,7 @@ namespace AIBracket.Web
         {
             return WebHost.CreateDefaultBuilder(args).UseKestrel(x =>
             {
-                if (System.IO.File.Exists("Cert.pfx"))
+                if (File.Exists("Cert.pfx"))
                 {
                     x.Listen(IPAddress.Any, 443, listenOptions =>
                     {

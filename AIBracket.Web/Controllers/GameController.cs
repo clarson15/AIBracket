@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using AIBracket.Data;
 using AIBracket.Data.Entities;
 using AIBracket.Web.Auth;

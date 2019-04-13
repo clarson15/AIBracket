@@ -8,11 +8,9 @@ using AIBracket.Web.Auth;
 using AIBracket.Data.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using AIBracket.Web.Models;
 
 namespace AIBracket.Web.Controllers
