@@ -26,8 +26,6 @@ export class GamePacmanComponent implements OnInit {
   private lives: number;
   private pacmanX: number = 0;
   private pacmanY: number = 0;
-  private pacmanTargetX: number = 0;
-  private pacmanTargetY: number = 0;
   private ghosts: PacmanGhost[];
   private lastFrame: Date;
   private ghostImages: HTMLImageElement[];
@@ -155,18 +153,6 @@ export class GamePacmanComponent implements OnInit {
           y = 0;
         });
       }
-      if (this.pacmanX - this.pacmanTargetX > 0) {
-        this.pacmanX -= frametime / 100;
-      }
-      if (this.pacmanX - this.pacmanTargetX < 0) {
-        this.pacmanX += frametime / 100;
-      }
-      if (this.pacmanY - this.pacmanTargetY > 0) {
-        this.pacmanY -= frametime / 100;
-      }
-      if (this.pacmanY - this.pacmanTargetY < 0) {
-        this.pacmanY += frametime / 100;
-      }
       ctx.beginPath();
       ctx.arc((this.pacmanX * 16) + 8, (this.pacmanY * 16) + 88, 7, 0.75 * Math.PI, 1.8 * Math.PI, false);
       ctx.fillStyle = "rgb(0, 0, 0)";
@@ -186,19 +172,6 @@ export class GamePacmanComponent implements OnInit {
 
       let i = 0;
       this.ghosts.forEach(ghost => {
-        ctx.fillStyle = 'blue';
-        if (ghost.x - ghost.targetX > 0) {
-          ghost.x -= frametime / 100;
-        }
-        if (ghost.x - ghost.targetX < 0) {
-          ghost.x += frametime / 100;
-        }
-        if (ghost.y - ghost.targetY > 0) {
-          ghost.y -= frametime / 100;
-        }
-        if (ghost.y - ghost.targetY < 0) {
-          ghost.y += frametime / 100;
-        }
         if (this.ghostImages[i].complete && ghost.vulnerable === false) {
           ctx.drawImage(this.ghostImages[i], ghost.x * 16 + 2, ghost.y * 16 + 82);
         }
@@ -271,22 +244,8 @@ export class GamePacmanComponent implements OnInit {
           break;
         case "1":
           var vals = payload.split(' ');
-          let newPX = Number(vals[0]);
-          let newPY = Number(vals[1]);
-          if (Math.abs(newPX - this.pacmanTargetX) > 1) {
-            this.pacmanX = newPX;
-            this.pacmanY = newPY;
-          }
-          else if (Math.abs(newPY - this.pacmanTargetY) > 1) {
-            this.pacmanX = newPX;
-            this.pacmanY = newPY;
-          }
-          else { 
-            this.pacmanX = this.pacmanTargetX;
-            this.pacmanY = this.pacmanTargetY;
-          }
-          this.pacmanTargetX = newPX;
-          this.pacmanTargetY = newPY;
+          this.pacmanX = Number(vals[0]);
+          this.pacmanY = Number(vals[1]);
           break;
         case "2":
           var vals = payload.split(' ');
@@ -294,20 +253,8 @@ export class GamePacmanComponent implements OnInit {
           if (index > 3) break;
           let newX = Number(vals[1]);
           let newY = Number(vals[2]);
-          if (Math.abs(newX - this.ghosts[index].targetX) > 1) {
-            this.ghosts[index].x = newX;
-            this.ghosts[index].y = newY;
-          }
-          else if (Math.abs(newY - this.ghosts[index].targetY) > 1){
-            this.ghosts[index].x = newX;
-            this.ghosts[index].y = newY;
-          }
-          else {
-            this.ghosts[index].x = this.ghosts[index].targetX;
-            this.ghosts[index].y = this.ghosts[index].targetY;
-          }
-          this.ghosts[index].targetX = newX;
-          this.ghosts[index].targetY = newY;
+          this.ghosts[index].x = newX;
+          this.ghosts[index].y = newY;
           var d = vals[3] === 'True' ? true : false;
           var v = vals[4] === 'True' ? true : false;
           this.ghosts[index].dead = d;

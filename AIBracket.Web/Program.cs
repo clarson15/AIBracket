@@ -30,7 +30,7 @@ namespace AIBracket.Web
                     });
                 }
                 x.Listen(IPAddress.Any, 80);
-            }).UseStartup<Startup>().UseContentRoot(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            }).UseStartup<Startup>();
         }
     }
 }
