@@ -1,5 +1,5 @@
 <div class="container">
-  <div *ngIf="user == null">
+  <div *ngIf="localStorage.getItem('auth_token') == null">
     <mat-card style="background-color: #D0D0D0;">
       <h1 class="title">Welcome to AIBracket</h1>
       <p>

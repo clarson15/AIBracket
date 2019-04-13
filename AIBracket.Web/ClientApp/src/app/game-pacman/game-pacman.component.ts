@@ -27,7 +27,6 @@ export class GamePacmanComponent implements OnInit {
   private pacmanX: number = 0;
   private pacmanY: number = 0;
   private ghosts: PacmanGhost[];
-  private lastFrame: Date;
   private ghostImages: HTMLImageElement[];
   private ghostV: HTMLImageElement;
 
@@ -92,11 +91,6 @@ export class GamePacmanComponent implements OnInit {
     if (ctx == null) {
       return;
     }
-    if (this.lastFrame == null) {
-      this.lastFrame = new Date();
-    }
-    let frametime = new Date().getTime() - this.lastFrame.getTime();
-    this.lastFrame = new Date();
 
     ctx.fillStyle = 'white';
     ctx.clearRect(0, 0, 550, 600);
