@@ -65,5 +65,9 @@ export class HomeComponent implements OnInit {
               console.log(err.error);
           });
   }
+
+  isLoggedIn() {
+    return localStorage.getItem('auth_token') == null;
+  }
 }
 
