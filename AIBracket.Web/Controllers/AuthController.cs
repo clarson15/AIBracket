@@ -36,6 +36,16 @@ namespace AIBracket.Web.Controllers
                 return BadRequest(ModelState);
             }
 
+            if(model.UserName.Length < 5)
+            {
+                var resp = IdentityResult.Failed(new IdentityError
+                {
+                    Code = "UsernameLength",
+                    Description = "Username must be at least 5 characters."
+                });
+                return new BadRequestObjectResult(Errors.AddErrorsToModelState(resp, ModelState));
+            }
+
             var userIdentity = new AppUser
             {
                 UserName = model.UserName,

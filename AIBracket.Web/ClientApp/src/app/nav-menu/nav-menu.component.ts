@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProfileResponseModel } from '../models/ProfileResponseModel';
+import { isEmpty } from 'rxjs/operators';
 
 @Component({
   selector: 'app-nav-menu',
@@ -18,6 +19,15 @@ export class NavMenuComponent {
 
   viewProfile() {
     this.router.navigate(['/profile']);
+  }
+
+  getDisplayName() {
+    if (this.account.firstName == '' && this.account.lastName == '') {
+      return this.account.userName;
+    }
+    else {
+      return this.account.firstName + ' ' + this.account.lastName;
+    }
   }
 
   Logout() {
