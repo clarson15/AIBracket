@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Threading.Tasks;
 using AIBracket.Web.Managers;
 using Microsoft.AspNetCore;
@@ -32,7 +33,7 @@ namespace AIBracket.Web
                     });
                 }
                 x.Listen(IPAddress.Any, 80);
-            }).UseStartup<Startup>();
+            }).UseStartup<Startup>().UseContentRoot(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
         }
     }
 }
