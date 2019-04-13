@@ -46,8 +46,8 @@ export class GamePacmanComponent implements OnInit {
     }
     var canvas = document.getElementsByTagName('canvas')[0];
     this.chatbox = document.getElementById('chat');
-    if (document.body.clientWidth < 550) {
-      let ratio = document.body.clientWidth / 550;
+    if (document.body.clientWidth < 448) {
+      let ratio = document.body.clientWidth / 448;
       canvas.style.width = document.body.clientWidth + 'px';
       canvas.style.height = 600 * ratio + 'px';
     }
@@ -93,7 +93,7 @@ export class GamePacmanComponent implements OnInit {
     }
 
     ctx.fillStyle = 'white';
-    ctx.clearRect(0, 0, 550, 600);
+    ctx.clearRect(0, 0, 448, 600);
     if (!this.SocketConnected) {
       ctx.fillStyle = 'black';
       ctx.textAlign = 'center';
@@ -102,7 +102,7 @@ export class GamePacmanComponent implements OnInit {
       ctx.stroke();
     }
     else if (this.activeGame) {
-      let x = 80, y = 0;
+      let x = 104, y = 0;
       if (this.map != null) {
         this.map.forEach(yd => {
           yd.forEach(xd => {
@@ -148,42 +148,55 @@ export class GamePacmanComponent implements OnInit {
         });
       }
       ctx.beginPath();
-      ctx.arc((this.pacmanX * 16) + 8, (this.pacmanY * 16) + 88, 7, 0.75 * Math.PI, 1.8 * Math.PI, false);
+      ctx.arc((this.pacmanX * 16) + 8, (this.pacmanY * 16) + 112, 7, 0.75 * Math.PI, 1.8 * Math.PI, false);
       ctx.fillStyle = "rgb(0, 0, 0)";
       ctx.fill();
       ctx.beginPath();
-      ctx.arc((this.pacmanX * 16) + 8, (this.pacmanY * 16) + 88, 7, 0.2 * Math.PI, 1.25 * Math.PI, false);
+      ctx.arc((this.pacmanX * 16) + 8, (this.pacmanY * 16) + 112, 7, 0.2 * Math.PI, 1.25 * Math.PI, false);
       ctx.fillStyle = "rgb(0, 0, 0)";
       ctx.fill();
       ctx.beginPath();
-      ctx.arc((this.pacmanX * 16) + 8, (this.pacmanY * 16) + 88, 6, 0.25 * Math.PI, 1.25 * Math.PI, false);
+      ctx.arc((this.pacmanX * 16) + 8, (this.pacmanY * 16) + 112, 6, 0.25 * Math.PI, 1.25 * Math.PI, false);
       ctx.fillStyle = "rgb(255, 255, 0)";
       ctx.fill();
       ctx.beginPath();
-      ctx.arc((this.pacmanX * 16) + 8, (this.pacmanY * 16) + 88, 6, 0.75 * Math.PI, 1.75 * Math.PI, false);
+      ctx.arc((this.pacmanX * 16) + 8, (this.pacmanY * 16) + 112, 6, 0.75 * Math.PI, 1.75 * Math.PI, false);
       ctx.fillStyle = "rgb(255, 255, 0)";
       ctx.fill();
 
       let i = 0;
       this.ghosts.forEach(ghost => {
         if (this.ghostImages[i].complete && ghost.vulnerable === false) {
-          ctx.drawImage(this.ghostImages[i], ghost.x * 16 + 2, ghost.y * 16 + 82);
+          ctx.drawImage(this.ghostImages[i], ghost.x * 16 + 2, ghost.y * 16 + 106);
         }
         else if (this.ghostV.complete && ghost.vulnerable === true) {
-          ctx.drawImage(this.ghostV, ghost.x * 16 + 2, ghost.y * 16 + 82);
+          ctx.drawImage(this.ghostV, ghost.x * 16 + 2, ghost.y * 16 + 106);
         }
         i++;
       });
 
       ctx.beginPath();
       ctx.fillStyle = 'black';
-      ctx.font = '30pt Verdana';
+      ctx.fillRect(0, 0, 448, 103);
+      ctx.fillStyle = 'white';
+      ctx.font = '42pt Verdana';
       ctx.textAlign = 'start';
       if (this.score != null) {
-        ctx.fillText('Score: ' + this.score, 10, 30);
+        ctx.fillText(String(this.score), 10, 80);
       }
-      if (this.lives != null) {
-        ctx.fillText('Lives: ' + this.lives, 10, 60);
+      if (this.lives != null && !isNaN(this.lives)) {
+        let x = 430;
+        for (let i = 0; i < this.lives; i++) {
+          ctx.beginPath();
+          ctx.arc(x, 60, 10, 0.25 * Math.PI, 1.25 * Math.PI, false);
+          ctx.fillStyle = "rgb(255, 255, 0)";
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(x, 60, 10, 0.75 * Math.PI, 1.75 * Math.PI, false);
+          ctx.fillStyle = "rgb(255, 255, 0)";
+          ctx.fill();
+          x -= 25;
+        }
       }
       ctx.stroke();
     }
@@ -191,7 +204,7 @@ export class GamePacmanComponent implements OnInit {
       ctx.fillStyle = 'black';
       ctx.textAlign = 'center';
       ctx.font = '30pt Verdana';
-      ctx.fillText('Error spectating game', 275, 300);
+      ctx.fillText('Error spectating game', 25, 300);
       ctx.stroke();
     }
 
