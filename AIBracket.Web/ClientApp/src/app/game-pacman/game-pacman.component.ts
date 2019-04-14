@@ -292,7 +292,7 @@ export class GamePacmanComponent implements OnInit {
           break;
         case "CHAT":
           var vals = payload.split(':');
-          this.chatbox.innerText = this.chatbox.innerText + "\n" + vals[0] + ': ' + vals[1];
+          this.chatbox.innerText = this.chatbox.innerText + vals[0] + ': ' + vals[1] + "\n";
         default:
           break;
       }
