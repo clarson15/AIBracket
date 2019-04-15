@@ -153,11 +153,10 @@ namespace AIBracket.API
                                 {
                                     clients[i].Name = user.UserName;
                                 }
-                                target = targets[1];
                             }
                             if (targets[0] == "GAME")
                             {
-                                if (GameMaster.WatchGame(clients[i], target))
+                                if (GameMaster.WatchGame(clients[i], targets[1]))
                                 {
                                     clients.RemoveAt(i);
                                     i--;
@@ -171,9 +170,9 @@ namespace AIBracket.API
                             }
                             else if(targets[0] == "BOT")
                             {
-                                if(context.Bots.Count(x => x.Id.ToString() == target) == 1)
+                                if(context.Bots.Count(x => x.Id.ToString() == targets[1]) == 1)
                                 {
-                                    GameMaster.WatchBot(clients[i], target);
+                                    GameMaster.WatchBot(clients[i], targets[1]);
                                     clients.RemoveAt(i);
                                     i--;
                                     continue;
