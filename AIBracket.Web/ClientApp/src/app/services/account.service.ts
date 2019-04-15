@@ -2,18 +2,25 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { LoginResponseModel } from '../models/LoginResponseModel';
 import { FormGroup } from '@angular/forms';
-import { Observable} from 'rxjs';
+import { Observable, BehaviorSubject} from 'rxjs';
 import { CreateAccountResponseModel,  } from '../models/CreateAccountResponseModel';
 import { ProfileResponseModel } from '../models/ProfileResponseModel';
 
 @Injectable()
 export class AccountService {
 
+  private accountSource = new BehaviorSubject<ProfileResponseModel>(null);
+  public currentAccount = this.accountSource.asObservable();
+
   private httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json'
     })
   };
+
+  setUser(profile: ProfileResponseModel) {
+    this.accountSource.next(profile);
+  }
 
   constructor(private http: HttpClient) { }
 

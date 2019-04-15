@@ -12,5 +12,6 @@ namespace AIBracket.API.Sockets
         bool IsReady { get; }
         bool IsConnected { get; }
         string Name { get; set; }
+        string Target { get; set; }
     }
 }

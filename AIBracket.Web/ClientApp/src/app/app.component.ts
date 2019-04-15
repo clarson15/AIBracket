@@ -5,7 +5,8 @@ import { ProfileResponseModel } from './models/ProfileResponseModel';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  providers: [AccountService]
 })
 export class AppComponent implements OnInit {
 
@@ -19,6 +20,9 @@ export class AppComponent implements OnInit {
     if (document.body.clientWidth >= 1920) {
       this.sideNavToggled = true;
     }
+    this.accountService.currentAccount.subscribe(acc => {
+      this.account = acc;
+    });
     if (localStorage.getItem('auth_token') != null) {
       this.attemptLogin();
     }
@@ -30,7 +34,7 @@ export class AppComponent implements OnInit {
   attemptLogin() {
     this.accountService.getProfile().subscribe(
       data => {
-        this.account = data;
+        this.accountService.setUser(data);
         if (document.location.pathname == '/profile' && this.account == null) {
           document.location.pathname = 'login';
         }
@@ -42,18 +46,10 @@ export class AppComponent implements OnInit {
       });
   }
 
-  onLogout() {
-    this.account = null;
-    localStorage.removeItem('auth_token');
-  }
-
   onActivate($event) {
     if (this.account == null && localStorage.getItem('auth_token') != null) {
       this.attemptLogin();
     }
-    if (document.location.pathname === '/profile' || document.location.pathname === '/home') {
-      $event.user = this.account;
-    } 
   }
 
   toggleNav($event) {

@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, NgZone, Input } from '@angular/core';
 import { PacmanGhost } from '../models/PacmanGhost';
-import { multicast } from 'rxjs/operators';
 
 
 @Component({
@@ -16,9 +15,12 @@ export class GamePacmanComponent implements OnInit {
   @Input()
   SpectatorId: string;
   @Input()
-  ActiveGameId: string;
+  Id: string;
+  @Input()
+  Mode: string;
 
-  private activeGame: boolean = true;
+  private activeGame: boolean = false;
+  private waiting: boolean = false;
   private SocketConnected: boolean;
   private chatbox: HTMLElement;
   private map: Array<Array<number>> = new Array<Array<number>>();
@@ -76,7 +78,7 @@ export class GamePacmanComponent implements OnInit {
     };
     this.socket$.onopen = (event) => {
       this.SocketConnected = true;
-      var msg = 'WATCH ' + this.ActiveGameId;
+      var msg = 'WATCH ' + this.Mode + ' ' + this.Id;
       console.log(this.SpectatorId);
       if (this.SpectatorId.length > 0) {
         msg += ' ' + this.SpectatorId;
@@ -94,11 +96,11 @@ export class GamePacmanComponent implements OnInit {
 
     ctx.fillStyle = 'white';
     ctx.clearRect(0, 0, 448, 600);
-    if (!this.SocketConnected) {
+    if (this.SocketConnected == false) {
       ctx.fillStyle = 'black';
-      ctx.textAlign = 'center';
+      ctx.textAlign = 'left';
       ctx.font = '20pt Verdana';
-      ctx.fillText('Error connecting to game server.', 275, 300);
+      ctx.fillText('Error connecting to server.', 25, 300);
       ctx.stroke();
     }
     else if (this.activeGame) {
@@ -200,10 +202,24 @@ export class GamePacmanComponent implements OnInit {
       }
       ctx.stroke();
     }
+    else if (this.waiting) {
+      ctx.fillStyle = 'black';
+      ctx.textAlign = 'left';
+      ctx.font = '20pt Verdana';
+      ctx.fillText('Waiting for bot to connect...', 25, 300);
+      ctx.stroke();
+    }
+    else if (this.SocketConnected == null) {
+      ctx.fillStyle = 'black';
+      ctx.textAlign = 'left';
+      ctx.font = '20pt Verdana';
+      ctx.fillText('Connecting...', 175, 300);
+      ctx.stroke();
+    }
     else {
       ctx.fillStyle = 'black';
-      ctx.textAlign = 'center';
-      ctx.font = '30pt Verdana';
+      ctx.textAlign = 'left';
+      ctx.font = '20pt Verdana';
       ctx.fillText('Error spectating game', 25, 300);
       ctx.stroke();
     }
@@ -225,6 +241,14 @@ export class GamePacmanComponent implements OnInit {
     if (data === "Game does not exist") {
       this.activeGame = false;
       return;
+    }
+    else if (data === "WAIT") {
+      this.waiting = true;
+      this.activeGame = false;
+    }
+    else if (data === "START") {
+      this.waiting = false;
+      this.activeGame = true;
     }
     var packets = data.split('*');
     if (packets == null) {

@@ -16,7 +16,8 @@ namespace AIBracket.API
     {
         private static List<GamePacman> games; // current games running (playing atm)
         private static List<IConnectedClient> waiting_players; // current connected players
-        private static List<ISocket> spectators; 
+        private static List<ISocket> spectators;
+        private static List<ISocket> waiting_spectators;
         private static bool isRunning;
         private static AIBracketContext context;
         private static DateTime refreshScoreCounter = DateTime.Now;
@@ -27,6 +28,7 @@ namespace AIBracket.API
             waiting_players = new List<IConnectedClient>();
             isRunning = false;
             spectators = new List<ISocket>();
+            waiting_spectators = new List<ISocket>();
             context = new AIBracketContext();
         }
 
@@ -37,11 +39,31 @@ namespace AIBracket.API
                 var game = games.FirstOrDefault(x => x.Id.ToString() == guid);
                 if (game != null)
                 {
+                    spectator.WriteData("START");
                     game.AddSpectator(spectator);
                     return true;
                 }
             }
             return false;
+        }
+
+        public static void WatchBot(ISocket spectator, string guid)
+        {
+            spectator.Target = guid;
+            lock (lockobj)
+            {
+                var game = games.FirstOrDefault(x => x.User.Bot.Id.ToString() == guid);
+                if (game != null)
+                {
+                    spectator.WriteData("START");
+                    game.AddSpectator(spectator);
+                }
+                else
+                {
+                    spectator.WriteData("WAIT");
+                    waiting_spectators.Add(spectator);
+                }
+            }
         }
 
         public static void AddSpectator(ISocket spectator)
@@ -76,6 +98,13 @@ namespace AIBracket.API
                         Game = new PacmanGame(),
                         User = (PacmanClient)player
                     };
+                    var specs = waiting_spectators.Where(x => x.Target == player.Bot.Id.ToString()).ToList();
+                    foreach (var spec in specs)
+                    {
+                        spec.WriteData("START");
+                        game.Spectators.Add(spec);
+                        waiting_spectators.Remove(spec);
+                    }
                     games.Add(game);
                     string ret = "0 " + game.Id.ToString() + " 1 " + game.User.Bot.Id.ToString() + " " + game.Game.Score;
                     for (var i = 0; i < spectators.Count; i++)

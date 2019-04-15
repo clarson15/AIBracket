@@ -17,7 +17,7 @@ export interface LeaderboardEntry {
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
-  providers: [GameService]
+  providers: [GameService, AccountService]
 })
 
 export class HomeComponent implements OnInit {

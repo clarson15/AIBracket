@@ -1,6 +1,6 @@
 <body class="background max-height">
   <div class="max-height" *ngIf="isReady">
-    <app-nav-menu [Account]="account" (logout)="onLogout()" (sidenav)="toggleNav()"></app-nav-menu>
+    <app-nav-menu (sidenav)="toggleNav()"></app-nav-menu>
     <div class="container">
       <mat-sidenav-container class="example-container">
         <mat-sidenav #sidenav mode="side" [(opened)]="sideNavToggled">

@@ -10,18 +10,19 @@ import * as moment from 'moment';
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.css']
+  styleUrls: ['./profile.component.css'],
+  providers: [ProfileService]
 })
 export class ProfileComponent implements OnInit {
 
-  constructor(private profileService: ProfileService, private router: Router) { }
+  constructor(private profileService: ProfileService, private router: Router, private accountService: AccountService) { }
 
   bots: BotsResponseModel[];
   CreationExpanded: boolean;
   newId: string;
   tournaments: any;
 
-  public user: ProfileResponseModel;
+  user: ProfileResponseModel;
 
   newBotForm = new FormGroup({
     Name: new FormControl(''),
@@ -86,6 +87,9 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.accountService.currentAccount.subscribe(acc => {
+      this.user = acc;
+    })
     this.CreationExpanded = false;
     this.updateBots();
   }

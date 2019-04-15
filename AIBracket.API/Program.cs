@@ -146,25 +146,43 @@ namespace AIBracket.API
                         else
                         {
                             var targets = target.Split(' ');
-                            if (targets.Length > 1)
+                            if (targets.Length > 2)
                             {
-                                var user = context.Users.FirstOrDefault(x => x.SpectatorId == targets[1]);
+                                var user = context.Users.FirstOrDefault(x => x.SpectatorId == targets[2]);
                                 if (user != null)
                                 {
                                     clients[i].Name = user.UserName;
                                 }
-                                target = targets[0];
+                                target = targets[1];
                             }
-                            if (GameMaster.WatchGame(clients[i], target))
+                            if (targets[0] == "GAME")
                             {
-                                clients.RemoveAt(i);
-                                i--;
-                                continue;
+                                if (GameMaster.WatchGame(clients[i], target))
+                                {
+                                    clients.RemoveAt(i);
+                                    i--;
+                                    continue;
+                                }
+                                else
+                                {
+                                    clients[i].WriteData("Game does not exist");
+                                    continue;
+                                }
                             }
-                            else
+                            else if(targets[0] == "BOT")
                             {
-                                clients[i].WriteData("Game does not exist");
-                                continue;
+                                if(context.Bots.Count(x => x.Id.ToString() == target) == 1)
+                                {
+                                    GameMaster.WatchBot(clients[i], target);
+                                    clients.RemoveAt(i);
+                                    i--;
+                                    continue;
+                                }
+                                else
+                                {
+                                    clients[i].WriteData("Bot does not exist");
+                                    continue;
+                                }
                             }
                         }
                     }
