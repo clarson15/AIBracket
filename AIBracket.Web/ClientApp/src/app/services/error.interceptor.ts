@@ -13,9 +13,7 @@ export class ErrorInterceptor implements HttpInterceptor {
         localStorage.removeItem('auth_token');
         document.location.href = '/login';
       }
-
-      const error = err.error.message || err.statusText;
-      return throwError(error);
+      return throwError(err);
     }))
   }
 }

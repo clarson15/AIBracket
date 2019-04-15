@@ -102,20 +102,20 @@ namespace AIBracket.GameLogic.Pacman.Board
             {
                 return Tile.wall;
             }
-            return Board[(int)p.Xpos, (int)p.Ypos];
+            return Board[p.XRoundPos, p.YRoundPos];
         }
 
         // Called after pacman enters a consumable (fruit, dot, or powerup) tile
         public void UpdateTile(PacmanCoordinate pos)
         {
-            if (Board[(int)pos.Xpos, (int)pos.Ypos] == Tile.dot || Board[(int)pos.Xpos, (int)pos.Ypos] == Tile.powerUp)
+            if (Board[pos.XRoundPos, pos.YRoundPos] == Tile.dot || Board[pos.XRoundPos, pos.YRoundPos] == Tile.powerUp)
             {
                 DotCount--;
-                Board[(int)pos.Xpos, (int)pos.Ypos] = Tile.blank;
+                Board[pos.XRoundPos, pos.YRoundPos] = Tile.blank;
             }
-            else if (Board[(int)pos.Xpos, (int)pos.Ypos] == Tile.fruit)
+            else if (Board[pos.XRoundPos, pos.YRoundPos] == Tile.fruit)
             {
-                Board[(int)pos.Xpos, (int)pos.Ypos] = Tile.blank;
+                Board[pos.XRoundPos, pos.YRoundPos] = Tile.blank;
             }
             else
             {
@@ -152,13 +152,13 @@ namespace AIBracket.GameLogic.Pacman.Board
                 case PacmanPacman.Direction.start:
                     return true;
                 case PacmanPacman.Direction.up:
-                    return GetTile((int)pos.Xpos, (int)pos.Ypos - 1) != Tile.wall;
+                    return GetTile(pos.XRoundPos, pos.YRoundPos - 1) != Tile.wall;
                 case PacmanPacman.Direction.down:
-                    return GetTile((int)pos.Xpos, (int)pos.Ypos + 1) != Tile.wall;
+                    return GetTile(pos.XRoundPos, pos.YRoundPos + 1) != Tile.wall;
                 case PacmanPacman.Direction.left:
-                    return GetTile((int)pos.Xpos - 1, (int)pos.Ypos) != Tile.wall;
+                    return GetTile(pos.XRoundPos - 1, pos.YRoundPos) != Tile.wall;
                 case PacmanPacman.Direction.right:
-                    return GetTile((int)pos.Xpos + 1, (int)pos.Ypos) != Tile.wall;
+                    return GetTile(pos.XRoundPos + 1, pos.YRoundPos) != Tile.wall;
             }
             return false;
         }
@@ -179,15 +179,15 @@ namespace AIBracket.GameLogic.Pacman.Board
         /// <returns>Coordinates to the other portal on the map</returns>
         public PacmanCoordinate GetCorrespondingPortal(PacmanCoordinate p)
         {
-            p.Xpos = (int)p.Xpos;
-            p.Ypos = (int)p.Ypos;
+            p.Xpos = p.XRoundPos;
+            p.Ypos = p.YRoundPos;
             if(p == Portals[0])
             {
-                return Portals[1];
+                return Portals[1] - new PacmanCoordinate(1, 0);
             }
             else if(p == Portals[1])
             {
-                return Portals[0];
+                return Portals[0] + new PacmanCoordinate(1, 0);
             }
             else
             {

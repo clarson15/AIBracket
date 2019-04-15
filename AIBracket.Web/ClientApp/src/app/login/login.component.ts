@@ -30,7 +30,6 @@ export class LoginComponent implements OnInit {
         this.router.navigate(['/home']);
       },
       err => {
-        console.log(err.error);
         if (err.error.login_failure) {
           this.profileForm.get('Password').setErrors({ password: 'incorrect password' });
         }

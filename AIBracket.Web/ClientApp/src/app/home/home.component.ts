@@ -17,7 +17,7 @@ export interface LeaderboardEntry {
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
-  providers: [GameService]
+  providers: [GameService, AccountService]
 })
 
 export class HomeComponent implements OnInit {
@@ -64,6 +64,10 @@ export class HomeComponent implements OnInit {
           err => {
               console.log(err.error);
           });
+  }
+
+  isLoggedIn() {
+    return localStorage.getItem('auth_token') == null;
   }
 }
 

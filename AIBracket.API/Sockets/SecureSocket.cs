@@ -22,7 +22,7 @@ namespace AIBracket.API.Sockets
 
         private List<string> _payloads = new List<string>();
 
-        private string _name, _ppayload;
+        private string _name, _ppayload, _target;
 
         private int readCount;
 
@@ -40,6 +40,12 @@ namespace AIBracket.API.Sockets
                     _name = value;
                 }
             }
+        }
+
+        public string Target
+        {
+            get => _target;
+            set => _target = value;
         }
 
         public SecureSocket(SslStream client)

@@ -8,7 +8,6 @@ using AIBracket.Web.Auth;
 using AIBracket.Data.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -35,6 +34,16 @@ namespace AIBracket.Web.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            if(model.UserName.Length < 5)
+            {
+                var resp = IdentityResult.Failed(new IdentityError
+                {
+                    Code = "UsernameLength",
+                    Description = "Username must be at least 5 characters."
+                });
+                return new BadRequestObjectResult(Errors.AddErrorsToModelState(resp, ModelState));
             }
 
             var userIdentity = new AppUser

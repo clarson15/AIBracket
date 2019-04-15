@@ -111,7 +111,7 @@ namespace AIBracket.GameLogic.Pacman.Game
                         if(!g.IsVulnerable && !g.IsDead)
                         {
                             g.IsVulnerable = true;
-                            PoweredUpCounter = 100;
+                            PoweredUpCounter = 150;
                         }
                     }
                     UpdateScore(pos);

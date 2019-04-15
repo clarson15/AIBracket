@@ -8,7 +8,7 @@
     <div>
       <button *ngIf="account == null" color="primary" routerLink="/login" mat-raised-button>Login</button>
       <div *ngIf="account != null">
-        <button mat-button [matMenuTriggerFor]="menu"><div class="user-button">{{account.firstName}} {{account.lastName}}<mat-icon inline=true>person</mat-icon></div></button>
+        <button mat-button [matMenuTriggerFor]="menu"><div class="user-button">{{ getDisplayName() }}<mat-icon inline=true>person</mat-icon></div></button>
         <mat-menu #menu="matMenu">
           <button mat-menu-item (click)="viewProfile()">View Profile</button>
           <button mat-menu-item (click)="Logout()">Logout</button>

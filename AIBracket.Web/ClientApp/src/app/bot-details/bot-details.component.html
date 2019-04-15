@@ -1,0 +1,6 @@
+<div class="container">
+  <game-pacman [SpectatorId]="SpectatorId" [Mode]="'BOT'" [Id]="BotId" *ngIf="ready"></game-pacman>
+  <div *ngIf="!ready">
+    Loading...
+  </div>
+</div>

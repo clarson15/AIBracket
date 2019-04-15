@@ -29,7 +29,7 @@
       <mat-expansion-panel *ngFor="let bot of bots; let i = index" [expanded]="newId == bot.id" (closed)="newId = null;">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <p>{{bot.name}}</p>
+            <a class="bot-title" [routerLink]="['/bot-details', bot.id]">{{bot.name}}</a>
           </mat-panel-title>
           <mat-panel-description>
             <p>{{mapGameName(bot.game)}}</p>

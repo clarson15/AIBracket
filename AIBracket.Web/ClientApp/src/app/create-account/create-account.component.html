@@ -5,18 +5,21 @@
       <div class="login-credentials">
         <mat-form-field>
           <input matInput placeholder="Username" formControlName="UserName" required />
-          <mat-error *ngIf="createForm.get('UserName').hasError('username')">Username is already taken.</mat-error>
-          <mat-error *ngIf="createForm.get('UserName').hasError('required')">Username is required.</mat-error>
+          <mat-error *ngIf="createForm.get('UserName').hasError('taken')">{{createForm.get('UserName').getError('taken')}}</mat-error>
+          <mat-error *ngIf="createForm.get('UserName').hasError('length')">{{createForm.get('UserName').getError('length')}}</mat-error>
+          <mat-error *ngIf="createForm.get('UserName').hasError('required')">{{createForm.get('UserName').getError('required')}}</mat-error>
         </mat-form-field>
         <mat-form-field>
           <input matInput placeholder="Password" formControlName="Password" type="password" required />
-          <mat-error *ngIf="createForm.get('Password').hasError('password')">Passwords do not match.</mat-error>
-          <mat-error *ngIf="createForm.get('Password').hasError('required')">Password is required.</mat-error>
+          <mat-error *ngIf="createForm.get('Password').hasError('mismatch')">{{createForm.get('Password').getError('mismatch')}}</mat-error>
+          <mat-error *ngIf="createForm.get('Password').hasError('length')">{{createForm.get('Password').getError('length')}}</mat-error>
+          <mat-error *ngIf="createForm.get('Password').hasError('required')">{{createForm.get('Password').getError('required')}}</mat-error>
         </mat-form-field>
         <mat-form-field>
           <input matInput placeholder="Password Confirmation" formControlName="Confirm" type="password" (keydown.enter)="onSubmit()" required />
-          <mat-error *ngIf="createForm.get('Confirm').hasError('password')">Passwords do not match.</mat-error>
-          <mat-error *ngIf="createForm.get('Confirm').hasError('required')">Password confirmation is required.</mat-error>
+          <mat-error *ngIf="createForm.get('Confirm').hasError('mismatch')">{{createForm.get('Confirm').getError('mismatch')}}</mat-error>
+          <mat-error *ngIf="createForm.get('Confirm').hasError('length')">{{createForm.get('Confirm').getError('length')}}</mat-error>
+          <mat-error *ngIf="createForm.get('Confirm').hasError('required')">{{createForm.get('Confirm').getError('required')}}</mat-error>
         </mat-form-field>
         <mat-form-field>
           <input matInput placeholder="First Name" formControlName="FirstName" (keydown.enter)="onSubmit()" />

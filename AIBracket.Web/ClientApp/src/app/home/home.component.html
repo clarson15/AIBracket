@@ -1,14 +1,16 @@
 <div class="container">
-  <div *ngIf="user == null">
-    <h1 class="title">Welcome to AI Bracket</h1>
-    <p>
-      AI Bracket is geared towards anyone interested in AI for exectuting simple tasks really really well.
-      Use a programming language of your choice to design an AI and compete against others.
-    </p>
-    <a routerLink="/learn"> Learn More </a>
+  <div *ngIf="isLoggedIn()">
+    <mat-card style="background-color: #D0D0D0;">
+      <h1 class="title">Welcome to AIBracket</h1>
+      <p>
+        AIBracket is a tool for developers to practice their strategic and problem solving skills in a competitive and fun environment.<br />
+        We recommend Pacman for new players to get comfortable with how everything works before jumping into more competitive games.
+        Choose your favorite programming language and connect to <a routerLink="/learn">our API</a> to start playing!
+      </p>
+    </mat-card>
   </div>
   <h1 class="header">Featured Game</h1>
-  <game-pacman [SpectatorId]="SpectatorId" [ActiveGameId]="ActiveGameId" *ngIf="ActiveGame == true"></game-pacman>
+  <game-pacman [SpectatorId]="SpectatorId" [Mode]="'GAME'" [Id]="ActiveGameId" *ngIf="ActiveGame == true"></game-pacman>
   <div class="game-container" *ngIf="ActiveGame == false">
     <mat-icon style="margin-left: auto; margin-right: auto; font-size:48px; width: 48px; height: 48px;">mood_bad</mat-icon><br />
     There is no active game being played. <br />

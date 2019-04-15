@@ -12,6 +12,11 @@
   margin-right: auto;
 }
 
+.title{
+  text-align: center;
+  font-size: 56px;
+}
+
 table {
   margin-left: auto;
   margin-right: auto;

@@ -29,8 +29,8 @@ export class CreateAccountComponent implements OnInit {
 
   onSubmit() {
     if (this.createForm.get('Confirm').value != this.createForm.get('Password').value) {
-      this.createForm.get('Password').setErrors({ password: "password mismatch" });
-      this.createForm.get('Confirm').setErrors({ password: "password mismatch" });
+      this.createForm.get('Password').setErrors({ mismatch: "password mismatch" });
+      this.createForm.get('Confirm').setErrors({ mismatch: "password mismatch" });
     }
     else {
       this.createForm.get('Confirm').disable();
@@ -46,14 +46,20 @@ export class CreateAccountComponent implements OnInit {
               this.router.navigate(['/home']);
             },
             err => {
-              console.log(err.error);
-              this.router.navigate(['/home']);
+              console.log(err);
             });
         },
         err => {
           console.log(err.error);
           if (err.error.DuplicateUserName) {
-            this.createForm.get('UserName').setErrors({ username: 'duplicate username' });
+            this.createForm.get('UserName').setErrors({ taken: 'Username already in use.' });
+          }
+          if (err.error.UsernameLength) {
+            this.createForm.get('UserName').setErrors({ length: 'Username must be at least 5 characters.' });
+          }
+          if (err.error.PasswordTooShort) {
+            this.createForm.get('Password').setErrors({ length: "Password must be at least 6 characters." });
+            this.createForm.get('Confirm').setErrors({ length: "Password must be at least 6 characters." });
           }
         });
       this.createForm.get('Confirm').enable();

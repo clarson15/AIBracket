@@ -16,6 +16,7 @@ import { HomeComponent } from './home/home.component';
 import { CreateAccountComponent } from './create-account/create-account.component';
 import { ProfileComponent } from './profile/profile.component';
 import { GamePacmanComponent } from './game-pacman/game-pacman.component';
+import { BotDetailsComponent } from './bot-details/bot-details.component';
 
 import { AccountService } from './services/account.service';
 import { ProfileService } from './services/profile.service';
@@ -31,7 +32,8 @@ import { ErrorInterceptor } from './services/error.interceptor';
     ProfileComponent,
     LearnMoreComponent,
     GettingStartedComponent,
-    GamePacmanComponent
+    GamePacmanComponent,
+    BotDetailsComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -64,6 +66,7 @@ import { ErrorInterceptor } from './services/error.interceptor';
       { path: 'profile', component: ProfileComponent },
       { path: 'learn', component: GettingStartedComponent },
       { path: 'learn-more', component: LearnMoreComponent },
+      { path: 'bot-details/:Id', component: BotDetailsComponent },
       { path: '**', redirectTo: '/home' }
     ])
   ],

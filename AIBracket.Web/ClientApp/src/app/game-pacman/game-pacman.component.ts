@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, NgZone, Input } from '@angular/core';
 import { PacmanGhost } from '../models/PacmanGhost';
-import { multicast } from 'rxjs/operators';
 
 
 @Component({
@@ -16,9 +15,12 @@ export class GamePacmanComponent implements OnInit {
   @Input()
   SpectatorId: string;
   @Input()
-  ActiveGameId: string;
+  Id: string;
+  @Input()
+  Mode: string;
 
-  private activeGame: boolean = true;
+  private activeGame: boolean = false;
+  private waiting: boolean = false;
   private SocketConnected: boolean;
   private chatbox: HTMLElement;
   private map: Array<Array<number>> = new Array<Array<number>>();
@@ -26,10 +28,7 @@ export class GamePacmanComponent implements OnInit {
   private lives: number;
   private pacmanX: number = 0;
   private pacmanY: number = 0;
-  private pacmanTargetX: number = 0;
-  private pacmanTargetY: number = 0;
   private ghosts: PacmanGhost[];
-  private lastFrame: Date;
   private ghostImages: HTMLImageElement[];
   private ghostV: HTMLImageElement;
 
@@ -49,8 +48,8 @@ export class GamePacmanComponent implements OnInit {
     }
     var canvas = document.getElementsByTagName('canvas')[0];
     this.chatbox = document.getElementById('chat');
-    if (document.body.clientWidth < 550) {
-      let ratio = document.body.clientWidth / 550;
+    if (document.body.clientWidth < 448) {
+      let ratio = document.body.clientWidth / 448;
       canvas.style.width = document.body.clientWidth + 'px';
       canvas.style.height = 600 * ratio + 'px';
     }
@@ -79,7 +78,7 @@ export class GamePacmanComponent implements OnInit {
     };
     this.socket$.onopen = (event) => {
       this.SocketConnected = true;
-      var msg = 'WATCH ' + this.ActiveGameId;
+      var msg = 'WATCH ' + this.Mode + ' ' + this.Id;
       console.log(this.SpectatorId);
       if (this.SpectatorId.length > 0) {
         msg += ' ' + this.SpectatorId;
@@ -94,23 +93,18 @@ export class GamePacmanComponent implements OnInit {
     if (ctx == null) {
       return;
     }
-    if (this.lastFrame == null) {
-      this.lastFrame = new Date();
-    }
-    let frametime = new Date().getTime() - this.lastFrame.getTime();
-    this.lastFrame = new Date();
 
     ctx.fillStyle = 'white';
-    ctx.clearRect(0, 0, 550, 600);
-    if (!this.SocketConnected) {
+    ctx.clearRect(0, 0, 448, 600);
+    if (this.SocketConnected == false) {
       ctx.fillStyle = 'black';
-      ctx.textAlign = 'center';
+      ctx.textAlign = 'left';
       ctx.font = '20pt Verdana';
-      ctx.fillText('Error connecting to game server.', 275, 300);
+      ctx.fillText('Error connecting to server.', 25, 300);
       ctx.stroke();
     }
     else if (this.activeGame) {
-      let x = 80, y = 0;
+      let x = 104, y = 0;
       if (this.map != null) {
         this.map.forEach(yd => {
           yd.forEach(xd => {
@@ -155,76 +149,78 @@ export class GamePacmanComponent implements OnInit {
           y = 0;
         });
       }
-      if (this.pacmanX - this.pacmanTargetX > 0) {
-        this.pacmanX -= frametime / 100;
-      }
-      if (this.pacmanX - this.pacmanTargetX < 0) {
-        this.pacmanX += frametime / 100;
-      }
-      if (this.pacmanY - this.pacmanTargetY > 0) {
-        this.pacmanY -= frametime / 100;
-      }
-      if (this.pacmanY - this.pacmanTargetY < 0) {
-        this.pacmanY += frametime / 100;
-      }
       ctx.beginPath();
-      ctx.arc((this.pacmanX * 16) + 8, (this.pacmanY * 16) + 88, 7, 0.75 * Math.PI, 1.8 * Math.PI, false);
+      ctx.arc((this.pacmanX * 16) + 8, (this.pacmanY * 16) + 112, 7, 0.75 * Math.PI, 1.8 * Math.PI, false);
       ctx.fillStyle = "rgb(0, 0, 0)";
       ctx.fill();
       ctx.beginPath();
-      ctx.arc((this.pacmanX * 16) + 8, (this.pacmanY * 16) + 88, 7, 0.2 * Math.PI, 1.25 * Math.PI, false);
+      ctx.arc((this.pacmanX * 16) + 8, (this.pacmanY * 16) + 112, 7, 0.2 * Math.PI, 1.25 * Math.PI, false);
       ctx.fillStyle = "rgb(0, 0, 0)";
       ctx.fill();
       ctx.beginPath();
-      ctx.arc((this.pacmanX * 16) + 8, (this.pacmanY * 16) + 88, 6, 0.25 * Math.PI, 1.25 * Math.PI, false);
+      ctx.arc((this.pacmanX * 16) + 8, (this.pacmanY * 16) + 112, 6, 0.25 * Math.PI, 1.25 * Math.PI, false);
       ctx.fillStyle = "rgb(255, 255, 0)";
       ctx.fill();
       ctx.beginPath();
-      ctx.arc((this.pacmanX * 16) + 8, (this.pacmanY * 16) + 88, 6, 0.75 * Math.PI, 1.75 * Math.PI, false);
+      ctx.arc((this.pacmanX * 16) + 8, (this.pacmanY * 16) + 112, 6, 0.75 * Math.PI, 1.75 * Math.PI, false);
       ctx.fillStyle = "rgb(255, 255, 0)";
       ctx.fill();
 
       let i = 0;
       this.ghosts.forEach(ghost => {
-        ctx.fillStyle = 'blue';
-        if (ghost.x - ghost.targetX > 0) {
-          ghost.x -= frametime / 100;
-        }
-        if (ghost.x - ghost.targetX < 0) {
-          ghost.x += frametime / 100;
-        }
-        if (ghost.y - ghost.targetY > 0) {
-          ghost.y -= frametime / 100;
-        }
-        if (ghost.y - ghost.targetY < 0) {
-          ghost.y += frametime / 100;
-        }
         if (this.ghostImages[i].complete && ghost.vulnerable === false) {
-          ctx.drawImage(this.ghostImages[i], ghost.x * 16 + 2, ghost.y * 16 + 82);
+          ctx.drawImage(this.ghostImages[i], ghost.x * 16 + 2, ghost.y * 16 + 106);
         }
         else if (this.ghostV.complete && ghost.vulnerable === true) {
-          ctx.drawImage(this.ghostV, ghost.x * 16 + 2, ghost.y * 16 + 82);
+          ctx.drawImage(this.ghostV, ghost.x * 16 + 2, ghost.y * 16 + 106);
         }
         i++;
       });
 
       ctx.beginPath();
       ctx.fillStyle = 'black';
-      ctx.font = '30pt Verdana';
+      ctx.fillRect(0, 0, 448, 103);
+      ctx.fillStyle = 'white';
+      ctx.font = '42pt Verdana';
       ctx.textAlign = 'start';
       if (this.score != null) {
-        ctx.fillText('Score: ' + this.score, 10, 30);
+        ctx.fillText(String(this.score), 10, 80);
       }
-      if (this.lives != null) {
-        ctx.fillText('Lives: ' + this.lives, 10, 60);
+      if (this.lives != null && !isNaN(this.lives)) {
+        let x = 430;
+        for (let i = 0; i < this.lives; i++) {
+          ctx.beginPath();
+          ctx.arc(x, 60, 10, 0.25 * Math.PI, 1.25 * Math.PI, false);
+          ctx.fillStyle = "rgb(255, 255, 0)";
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(x, 60, 10, 0.75 * Math.PI, 1.75 * Math.PI, false);
+          ctx.fillStyle = "rgb(255, 255, 0)";
+          ctx.fill();
+          x -= 25;
+        }
       }
+      ctx.stroke();
+    }
+    else if (this.waiting) {
+      ctx.fillStyle = 'black';
+      ctx.textAlign = 'left';
+      ctx.font = '20pt Verdana';
+      ctx.fillText('Waiting for bot to connect...', 25, 300);
+      ctx.stroke();
+    }
+    else if (this.SocketConnected == null) {
+      ctx.fillStyle = 'black';
+      ctx.textAlign = 'left';
+      ctx.font = '20pt Verdana';
+      ctx.fillText('Connecting...', 175, 300);
       ctx.stroke();
     }
     else {
       ctx.fillStyle = 'black';
-      ctx.textAlign = 'center';
-      ctx.font = '30pt Verdana';
-      ctx.fillText('Error spectating game', 275, 300);
+      ctx.textAlign = 'left';
+      ctx.font = '20pt Verdana';
+      ctx.fillText('Error spectating game', 25, 300);
       ctx.stroke();
     }
 
@@ -245,6 +241,14 @@ export class GamePacmanComponent implements OnInit {
     if (data === "Game does not exist") {
       this.activeGame = false;
       return;
+    }
+    else if (data === "WAIT") {
+      this.waiting = true;
+      this.activeGame = false;
+    }
+    else if (data === "START") {
+      this.waiting = false;
+      this.activeGame = true;
     }
     var packets = data.split('*');
     if (packets == null) {
@@ -271,22 +275,8 @@ export class GamePacmanComponent implements OnInit {
           break;
         case "1":
           var vals = payload.split(' ');
-          let newPX = Number(vals[0]);
-          let newPY = Number(vals[1]);
-          if (Math.abs(newPX - this.pacmanTargetX) > 1) {
-            this.pacmanX = newPX;
-            this.pacmanY = newPY;
-          }
-          else if (Math.abs(newPY - this.pacmanTargetY) > 1) {
-            this.pacmanX = newPX;
-            this.pacmanY = newPY;
-          }
-          else { 
-            this.pacmanX = this.pacmanTargetX;
-            this.pacmanY = this.pacmanTargetY;
-          }
-          this.pacmanTargetX = newPX;
-          this.pacmanTargetY = newPY;
+          this.pacmanX = Number(vals[0]);
+          this.pacmanY = Number(vals[1]);
           break;
         case "2":
           var vals = payload.split(' ');
@@ -294,20 +284,8 @@ export class GamePacmanComponent implements OnInit {
           if (index > 3) break;
           let newX = Number(vals[1]);
           let newY = Number(vals[2]);
-          if (Math.abs(newX - this.ghosts[index].targetX) > 1) {
-            this.ghosts[index].x = newX;
-            this.ghosts[index].y = newY;
-          }
-          else if (Math.abs(newY - this.ghosts[index].targetY) > 1){
-            this.ghosts[index].x = newX;
-            this.ghosts[index].y = newY;
-          }
-          else {
-            this.ghosts[index].x = this.ghosts[index].targetX;
-            this.ghosts[index].y = this.ghosts[index].targetY;
-          }
-          this.ghosts[index].targetX = newX;
-          this.ghosts[index].targetY = newY;
+          this.ghosts[index].x = newX;
+          this.ghosts[index].y = newY;
           var d = vals[3] === 'True' ? true : false;
           var v = vals[4] === 'True' ? true : false;
           this.ghosts[index].dead = d;
@@ -338,7 +316,7 @@ export class GamePacmanComponent implements OnInit {
           break;
         case "CHAT":
           var vals = payload.split(':');
-          this.chatbox.innerText = this.chatbox.innerText + "\n" + vals[0] + ': ' + vals[1];
+          this.chatbox.innerText = this.chatbox.innerText + vals[0] + ': ' + vals[1] + "\n";
         default:
           break;
       }

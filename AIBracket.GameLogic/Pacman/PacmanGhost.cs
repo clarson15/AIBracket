@@ -7,7 +7,7 @@ namespace AIBracket.GameLogic.Pacman.Ghost
 {
     public class PacmanGhost
     {
-        const int DividendForChanceOfHinderingMove = -250;
+        const int DividendForChanceOfHinderingMove = -350;
         const int StartingPercentage = 100;
         public enum Ghost { Blue, Pink, Red, Orange };
         public bool IsDead, IsVulnerable;
