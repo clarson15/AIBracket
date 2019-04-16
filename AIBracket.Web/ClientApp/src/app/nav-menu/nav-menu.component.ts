@@ -24,7 +24,7 @@ export class NavMenuComponent implements OnInit {
   }
 
   viewProfile() {
-    this.router.navigate(['/profile']);
+    this.router.navigate(['/profile', this.account.id]);
   }
 
   getDisplayName() {
