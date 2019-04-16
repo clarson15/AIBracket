@@ -90,14 +90,19 @@ namespace AIBracket.Web.Controllers
         }
         
         [HttpGet]
-        public async Task<IActionResult> GetProfileData()
+        public async Task<IActionResult> GetProfileData(string Id)
         {
-            var data = await _userManager.FindByIdAsync(User.Claims.First(x => x.Type == "id").Value);
-            if(data == null)
+            if (Id == null || Id == "")
             {
-                return Unauthorized();
+                var data = await _userManager.FindByIdAsync(User.Claims.First(x => x.Type == "id").Value);
+                if (data == null)
+                {
+                    return Unauthorized();
+                }
+                return Ok(new { data.Id, data.FirstName, data.LastName, data.UserName });
             }
-            return Ok(new { data.UserName, data.FirstName, data.LastName, Location = "Test"});
+            var acc = await _userManager.FindByIdAsync(Id);
+            return Ok(new { acc.UserName, acc.FirstName, acc.LastName, acc.Id});
         }
 
         [AllowAnonymous]

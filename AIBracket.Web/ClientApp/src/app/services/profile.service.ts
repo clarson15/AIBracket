@@ -10,14 +10,14 @@ export class ProfileService {
 
   constructor(private http: HttpClient) { }
 
-  getBots(): Observable<BotsResponseModel[]>{
+  getBots(id: string): Observable<BotsResponseModel[]>{
     let httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
       })
     };
-    return this.http.get<BotsResponseModel[]>('/api/Bot/GetBotsByUser', httpOptions);
+    return this.http.get<BotsResponseModel[]>('/api/Bot/GetBotsByUser?Id=' + id, httpOptions);
   }
 
   getBotHistory(id: string): Observable<BotHistoryResponseModel[]> {

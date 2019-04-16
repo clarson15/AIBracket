@@ -26,12 +26,13 @@ namespace AIBracket.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetBotsByUser()
+        public async Task<IActionResult> GetBotsByUser(string Id)
         {
             var data = await _userManager.FindByIdAsync(User.Claims.First(x => x.Type == "id").Value);
-            if (data == null)
+            if (data == null || data.Id.ToString() != Id)
             {
-                return Unauthorized();
+                var bots1 = _appDbContext.Bots.Where(x => x.IdentityId.ToString() == Id).OrderBy(x => x.Game).Select(x => new { x.Id, x.Name, x.Game });
+                return Ok(bots1);
             }
             var bots = _appDbContext.Bots.Where(x => x.IdentityId == data.Id).OrderBy(x => x.Game);
             return Ok(bots);

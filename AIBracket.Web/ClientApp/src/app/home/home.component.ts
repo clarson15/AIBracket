@@ -11,6 +11,7 @@ export interface LeaderboardEntry {
   name: string;
   score: number;
   startDate: string;
+  id: string;
 }
 
 @Component({

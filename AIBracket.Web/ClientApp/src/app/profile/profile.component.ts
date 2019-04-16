@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { AccountService } from '../services/account.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { ProfileService } from '../services/profile.service';
 import { BotsResponseModel } from '../models/BotsResponseModel';
 import { ProfileResponseModel } from '../models/ProfileResponseModel';
@@ -15,14 +15,16 @@ import * as moment from 'moment';
 })
 export class ProfileComponent implements OnInit {
 
-  constructor(private profileService: ProfileService, private router: Router, private accountService: AccountService) { }
+  constructor(private profileService: ProfileService, private router: Router, private accountService: AccountService, private route: ActivatedRoute) { }
 
   bots: BotsResponseModel[];
   CreationExpanded: boolean;
+  Id: string;
   newId: string;
   tournaments: any;
 
   user: ProfileResponseModel;
+  currentUser: ProfileResponseModel;
 
   newBotForm = new FormGroup({
     Name: new FormControl(''),
@@ -31,7 +33,7 @@ export class ProfileComponent implements OnInit {
 
   updateBots() {
     this.CreationExpanded = false;
-    this.profileService.getBots().subscribe(
+    this.profileService.getBots(this.Id).subscribe(
       data => {
         this.bots = data;
         data.forEach(x => {
@@ -51,6 +53,10 @@ export class ProfileComponent implements OnInit {
       err => {
         console.log(err);
       });
+  }
+
+  isOwnProfile() {
+    return this.currentUser != null && this.user != null && this.currentUser.id == this.user.id;
   }
 
   showSecret(i: number) {
@@ -87,8 +93,17 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.accountService.currentAccount.subscribe(acc => {
-      this.user = acc;
+    this.accountService.currentAccount.subscribe(cur => {
+      this.currentUser = cur;
+    })
+    this.route.params.subscribe(data => {
+      this.Id = data['Id'];
+      if (this.Id == '' || this.Id == null) {
+        this.router.navigate(['/home']);
+      }
+      this.accountService.getProfile(this.Id).subscribe(prof => {
+        this.user = prof;
+      })
     })
     this.CreationExpanded = false;
     this.updateBots();

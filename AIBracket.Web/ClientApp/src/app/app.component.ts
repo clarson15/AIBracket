@@ -32,7 +32,7 @@ export class AppComponent implements OnInit {
   }
 
   attemptLogin() {
-    this.accountService.getProfile().subscribe(
+    this.accountService.getProfile('').subscribe(
       data => {
         this.accountService.setUser(data);
         if (document.location.pathname == '/profile' && this.account == null) {

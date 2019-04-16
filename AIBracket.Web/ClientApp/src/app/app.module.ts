@@ -63,7 +63,7 @@ import { ErrorInterceptor } from './services/error.interceptor';
       { path: 'home', component: HomeComponent, pathMatch: 'full' },
       { path: 'create-account', component: CreateAccountComponent },
       { path: 'login', component: LoginComponent },
-      { path: 'profile', component: ProfileComponent },
+      { path: 'profile/:Id', component: ProfileComponent },
       { path: 'learn', component: GettingStartedComponent },
       { path: 'learn-more', component: LearnMoreComponent },
       { path: 'bot-details/:Id', component: BotDetailsComponent },

@@ -32,12 +32,12 @@ export class AccountService {
     return this.http.post<CreateAccountResponseModel>('/api/Auth/Register', data.value, this.httpOptions);
   }
 
-  getProfile(): Observable<ProfileResponseModel> {
+  getProfile(id: string): Observable<ProfileResponseModel> {
     let headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
     });
-    return this.http.get<ProfileResponseModel>('/api/Auth/GetProfileData', { headers });
+    return this.http.get<ProfileResponseModel>('/api/Auth/GetProfileData?Id=' + id, { headers });
   }
 
   getSpectatorId(): Observable<any> {
