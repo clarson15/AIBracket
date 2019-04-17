@@ -1,49 +1,45 @@
 <div class="info">
   <h1>Getting Started With AI Bracket</h1>
   <p>
-    AI Bracket is designed around writing bots to play simple games.
+    AIBracket is designed around writing bots to play easy to understand and competitive games.
   </p>
   <p>
-    Based on what's going on in the game, you can design a simple AI to compete on a leaderboard for the highest score.
+    We provide an easy to understand API for you to connect a program in your choice of language to compete against other bots.
   </p>
   <h2>Creating a Bot</h2>
   <p>
-    You can create your bot using any language.
-  </p>
-  <p>
-    Once you are ready to test your bot, create an account and log in to access your profile.
+    Before you can connect a bot you must create an account and log in to access your profile.
   </p>
   <p>
     Select the new bot + and enter the required fields to recieve a private key for your bot.
   </p>
   <p>
-    Statistics for every bot any bot you own can be seen on your profile along with your match history.
+    Statistics for every bot you control can be seen on your profile along with your match history.
   </p>
   <h2>Connecting a Bot</h2>
   <p>
     Connect to AIBracket.com:8000 and send the message BOT followed by your private key to get your bot started.
   </p>
-  <p>
-    This will allow you to send and recieve data to the server about your match and your bot can process it.
-  </p>
-  <p>
-    The recommended recieve buffer size is 2 kilobytes.
-  </p>
   <div class="code">
     BOT myprivatekey54
   </div>
+  <p>
+    This identifies you with the game server so we know which bot is connecting. Treat this like a password, and don&rsquo;t give it to anyone. This can be found under your bot&rsquo;s name on your profile.
+  </p>
   <p>
     Here is an example of TCP socket implementation in Python:
   </p>
   <div class="code">
     <span class="py-reserved">import</span>&nbsp;socket<br /> <br />
-    url = <span class="py-string">"AIBracket.com"</span><br />
-    port = <span class="py-literal">8000</span><br />
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)<br />
-    sock.connect((url, port))<br />
-    data = sock.recv(<span class="py-literal">2048</span>)  <span class="py-comment"># Recieving 2 kilobytes of data</span><br />
+    <span>url = </span><span class="py-string">"AIBracket.com"</span><br />
+    <span>port = </span><span class="py-literal">8000</span><br />
+    <span>sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</span><br />
+    <span>sock.connect((url, port))</span><br />
+    <span>data = sock.recv(<span class="py-literal">2048</span>)  </span><span class="py-comment"># Recieving 2 kilobytes of data</span><br />
   </div>
-  <br />
+  <p>
+    The recommended recieve buffer size is 2KB, as some packets can exceed 1KB in length.
+  </p>
   <h2>Game Events Documentation</h2>
   <p>
     Everything that happens in the game will be sent to you using an event system.
@@ -59,17 +55,15 @@
   </p>
   <div class="code">
     <span class="bold">Simple Game Update:</span>&nbsp;&nbsp;
-    1&nbsp;
-    <span class="highlight-blue">13 11</span>
+    <span class="highlight-blue">1</span>&nbsp;13 11
     <span class="highlight-yellow">*</span>
-    3&nbsp;
-    <span class="highlight-blue">25 2 10</span>
+    <span class="highlight-blue">2</span>&nbsp;2 5 2 False False
   </div>
   <p>
-    The number before the payload indicates what type of event it is, in this case the numbers 1 and 3 represent different events.
+    The highlighted blue indicates the what type of event it is. In this case, the events we recieved were events 1 and 2. See the table below for a full description of the events.
   </p>
   <p>
-    The highlighted blue indicates the payload following the event. This can be different data based on what the corresponding event is.
+    The numbers after the payload indicates payload following the event. This can be different data based on what the corresponding event is.
   </p>
   <p>
     The yellow highlighted asterix * is the delimeter for events. There can be any number of events per update depending on the game.
@@ -86,12 +80,15 @@
   </p>
   <div class="code">
     <span class="py-reserved">import</span>&nbsp;socket<br /> <br />
-    url = <span class="py-string">"AIBracket.com"</span><br />
-    port = <span class="py-literal">8000</span><br />
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)<br />
-    sock.connect((url, port))<br />
-    data = sock.send(str.encode(<span class="py-string">"UP"</span>))  <span class="py-comment"># The string must be encoded to send</span><br />
-    sock.close() <span class="py-comment"># Disconnecting your bot will mean games are no longer created</span><br />
+    <span>url = <span class="py-string">"AIBracket.com"</span></span><br />
+    <span>port = <span class="py-literal">8000</span></span><br />
+    <span>sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</span><br />
+    <span>sock.connect((url, port))</span><br />
+    <span>data = sock.send(str.encode(<span class="py-string">"BOT myprivatekey54"</span>))</span> <span class="py-comment"># The string must be encoded to send</span><br />
+    <span class="py-reserved">while true:</span><br />
+    <span class="py-comment">&nbsp;&nbsp;# Game loop to process game events</span><br />
+    &nbsp;<br />
+    <span>sock.close()</span> <span class="py-comment"># Disconnecting your bot will terminate the game</span><br />
   </div>
   <br />
   <p>
