@@ -12,6 +12,7 @@ export interface LeaderboardEntry {
   score: number;
   startDate: string;
   id: string;
+  botId: string;
 }
 
 @Component({

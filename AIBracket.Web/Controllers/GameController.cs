@@ -49,7 +49,8 @@ namespace AIBracket.Web.Controllers
                 x.Score,
                 x.Id,
                 x.StartDate,
-                _appDbContext.Bots.First(y => y.Id == x.BotId).Name
+                _appDbContext.Bots.First(y => y.Id == x.BotId).Name,
+                x.BotId
             }));
         }
     }
