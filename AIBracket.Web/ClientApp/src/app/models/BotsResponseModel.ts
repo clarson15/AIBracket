@@ -6,5 +6,6 @@ export class BotsResponseModel {
   game: number;
   privateKey: string;
   showSecret: boolean;
+  active: boolean;
   history: BotHistoryResponseModel[];
 }

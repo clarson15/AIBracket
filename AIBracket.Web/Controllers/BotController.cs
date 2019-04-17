@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using AIBracket.Web.Models;
+using AIBracket.Web.Managers;
 
 namespace AIBracket.Web.Controllers
 {
@@ -31,10 +32,10 @@ namespace AIBracket.Web.Controllers
             var data = await _userManager.FindByIdAsync(User.Claims.First(x => x.Type == "id").Value);
             if (data == null || data.Id.ToString() != Id)
             {
-                var bots1 = _appDbContext.Bots.Where(x => x.IdentityId.ToString() == Id).OrderBy(x => x.Game).Select(x => new { x.Id, x.Name, x.Game });
+                var bots1 = _appDbContext.Bots.Where(x => x.IdentityId.ToString() == Id).OrderBy(x => x.Game).Select(x => new { x.Id, x.Name, x.Game, Active = GameCacheManager.IsBotActive(x.Id.ToString()) });
                 return Ok(bots1);
             }
-            var bots = _appDbContext.Bots.Where(x => x.IdentityId == data.Id).OrderBy(x => x.Game);
+            var bots = _appDbContext.Bots.Where(x => x.IdentityId == data.Id).OrderBy(x => x.Game).Select(x => new { x.Id, x.Name, x.PrivateKey, x.Game, Active = GameCacheManager.IsBotActive(x.Id.ToString()) });
             return Ok(bots);
         }
 
