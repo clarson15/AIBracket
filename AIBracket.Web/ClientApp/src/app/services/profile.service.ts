@@ -20,6 +20,15 @@ export class ProfileService {
     return this.http.get<BotsResponseModel[]>('/api/Bot/GetBotsByUser?Id=' + id, httpOptions);
   }
 
+  getBotDetails(id: string): Observable<BotsResponseModel> {
+    let httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      })
+    };
+    return this.http.get<BotsResponseModel>('/api/Bot/GetBotDetails?Id=' + id, httpOptions);
+  }
+
   getBotHistory(id: string): Observable<BotHistoryResponseModel[]> {
     let httpOptions = {
       headers: new HttpHeaders({

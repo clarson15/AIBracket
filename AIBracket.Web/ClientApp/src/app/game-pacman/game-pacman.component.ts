@@ -79,7 +79,6 @@ export class GamePacmanComponent implements OnInit {
     this.socket$.onopen = (event) => {
       this.SocketConnected = true;
       var msg = 'WATCH ' + this.Mode + ' ' + this.Id;
-      console.log(this.SpectatorId);
       if (this.SpectatorId.length > 0) {
         msg += ' ' + this.SpectatorId;
       }

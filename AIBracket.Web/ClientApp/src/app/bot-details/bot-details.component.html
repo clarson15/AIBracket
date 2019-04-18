@@ -1,6 +1,25 @@
 <div class="container">
-  <game-pacman [SpectatorId]="SpectatorId" [Mode]="'BOT'" [Id]="BotId" *ngIf="ready"></game-pacman>
-  <div *ngIf="!ready">
-    Loading...
-  </div>
+  <mat-card style="background-color:#C0C0C0">
+    <button mat-raised-button *ngIf="bot != null" routerLink="/profile/{{bot.identityId}}"><mat-icon>navigate_before</mat-icon>Back to profile</button>
+    <h1 *ngIf="bot != null" style="text-align:center;">{{bot.name}}</h1>
+    <div style="margin-top: 10px;">
+      <game-pacman [SpectatorId]="SpectatorId" [Mode]="'BOT'" [Id]="BotId" *ngIf="ready"></game-pacman>
+      <div *ngIf="!ready">
+        Loading...
+      </div>
+    </div>
+    <br />
+    <span style="margin-top:5px; font-size:20px;">History:</span><br />
+    <div class="history" *ngIf="bot != null && bot.history != null && bot.history.length > 0">
+      <mat-list dense style="max-height: 500px; overflow-y: auto; overflow-x: hidden;">
+        <mat-list-item *ngFor="let history of bot.history" style="font-size: 18px; background-color:grey; border: 1px solid black; color: white;">
+          Score: {{history.score}} <div style="position: relative; right: 0; margin-left: auto;">{{history.startDate}} - {{history.endDate}}</div>
+          <mat-divider></mat-divider>
+        </mat-list-item>
+      </mat-list>
+    </div>
+    <div class="no-history" *ngIf="bot == null || bot.history == null || bot.history.length == 0" style="text-align: center;">
+      <span>This bot has not played a game yet.</span>
+    </div>
+  </mat-card>
 </div>

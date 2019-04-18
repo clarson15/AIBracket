@@ -145,138 +145,149 @@ namespace AIBracket.API
         }
 
         public static void Run() {
-            isRunning = true;
-            while (isRunning) {
-                lock (lockobj)
+            try
+            {
+                isRunning = true;
+                while (isRunning)
                 {
-                    var shouldUpdate = (DateTime.Now - refreshScoreCounter).Seconds > 5;
-                    var updateString = "4 ";
-                    foreach (var g in games)
+                    lock (lockobj)
                     {
-                        g.GetUserInput();
-                        g.UpdateGame();
+                        var shouldUpdate = (DateTime.Now - refreshScoreCounter).Seconds > 5;
+                        var updateString = "4 ";
+                        foreach (var g in games)
+                        {
+                            g.GetUserInput();
+                            g.UpdateGame();
+                            if (shouldUpdate)
+                            {
+                                updateString += $"{g.Id.ToString()} {g.Game.Score} ";
+                            }
+                        }
                         if (shouldUpdate)
                         {
-                            updateString += $"{g.Id.ToString()} {g.Game.Score} ";
+                            updateString = updateString.Remove(updateString.Length - 1);
+                            refreshScoreCounter = DateTime.Now;
                         }
-                    }
-                    if (shouldUpdate)
-                    {
-                        updateString = updateString.Remove(updateString.Length - 1);
-                        refreshScoreCounter = DateTime.Now;
-                    }
-                    for (var i = 0; i < games.Count; i++)
-                    {
-                        if (!games[i].IsRunning && games[i].User.Socket.IsConnected)
+                        for (var i = 0; i < games.Count; i++)
                         {
-                            context.PacmanGames.Add(new PacmanGames
+                            if (!games[i].IsRunning && games[i].User.Socket.IsConnected)
                             {
-                                Id = games[i].Id,
-                                BotId = games[i].User.Bot.Id,
-                                StartDate = games[i].Game.TimeStarted,
-                                EndDate = games[i].Game.TimeEnded,
-                                Score = games[i].Game.Score,
-                                Difficulty = 1
-                            });
-                            var ret = "3 " + games[i].Id.ToString() + " ";
-                            if(context.PacmanGames.Count(g => g.BotId == games[i].User.Bot.Id) > 100)
-                            {
-                                var minScore = context.PacmanGames.Where(x => x.BotId == games[i].User.Bot.Id).Min(x => x.Score);
-                                context.PacmanGames.Remove(context.PacmanGames.Where(g => g.BotId == games[i].User.Bot.Id && g.Score == minScore).First());
-                            }
-                            context.SaveChanges();
-                            games[i].Game = new PacmanGame();
-                            games[i].Id = Guid.NewGuid();
-                            ret += games[i].Id.ToString() + " 1 " + games[i].Game.Score;
-                            for (int j = 0; j < spectators.Count; j++)
-                            {
-                                spectators[j].WriteData(ret);
-                                if (!spectators[j].IsConnected)
+                                context.PacmanGames.Add(new PacmanGames
                                 {
-                                    spectators.RemoveAt(j);
-                                    j--;
-                                    continue;
-                                }
-                            }
-                            games[i].IsRunning = true;
-                        }
-                        else if (!games[i].IsRunning)
-                        {
-                            var ret = "1 " + games[i].Id.ToString() + " 1";
-                            for (var j = 0; j < spectators.Count; j++)
-                            {
-                                spectators[j].WriteData(ret);
-                                if (!spectators[j].IsConnected)
+                                    Id = games[i].Id,
+                                    BotId = games[i].User.Bot.Id,
+                                    StartDate = games[i].Game.TimeStarted,
+                                    EndDate = games[i].Game.TimeEnded,
+                                    Score = games[i].Game.Score,
+                                    Difficulty = 1
+                                });
+                                var ret = "3 " + games[i].Id.ToString() + " ";
+                                if (context.PacmanGames.Count(g => g.BotId == games[i].User.Bot.Id) > 100)
                                 {
-                                    spectators.RemoveAt(j);
-                                    j--;
-                                    continue;
+                                    var minScore = context.PacmanGames.Where(x => x.BotId == games[i].User.Bot.Id).Min(x => x.Score);
+                                    context.PacmanGames.Remove(context.PacmanGames.Where(g => g.BotId == games[i].User.Bot.Id && g.Score == minScore).First());
                                 }
+                                context.SaveChanges();
+                                games[i].Game = new PacmanGame();
+                                games[i].Id = Guid.NewGuid();
+                                ret += games[i].Id.ToString() + " 1 " + games[i].Game.Score;
+                                for (int j = 0; j < spectators.Count; j++)
+                                {
+                                    spectators[j].WriteData(ret);
+                                    if (!spectators[j].IsConnected)
+                                    {
+                                        spectators.RemoveAt(j);
+                                        j--;
+                                        continue;
+                                    }
+                                }
+                                games[i].IsRunning = true;
                             }
-                            spectators.AddRange(games[i].Spectators);
-                            games.RemoveAt(i);
-                            i--;
+                            else if (!games[i].IsRunning)
+                            {
+                                var ret = "1 " + games[i].Id.ToString() + " 1";
+                                for (var j = 0; j < spectators.Count; j++)
+                                {
+                                    spectators[j].WriteData(ret);
+                                    if (!spectators[j].IsConnected)
+                                    {
+                                        spectators.RemoveAt(j);
+                                        j--;
+                                        continue;
+                                    }
+                                }
+                                spectators.AddRange(games[i].Spectators);
+                                games.RemoveAt(i);
+                                i--;
+                            }
                         }
-                    }
-                    foreach (var client in waiting_players)
-                    {
-                        if (client.Socket.IsReady)
+                        foreach (var client in waiting_players)
                         {
-                            var message = client.Socket.ReadData();
-                            Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Game master read: " + message);
-                            client.Socket.WriteData("Hello world");
+                            if (client.Socket.IsReady)
+                            {
+                                var message = client.Socket.ReadData();
+                                Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Game master read: " + message);
+                                client.Socket.WriteData("Hello world");
 
+                            }
+                        }
+                        for (var i = 0; i < spectators.Count; i++)
+                        {
+                            if (!spectators[i].IsConnected)
+                            {
+                                spectators.RemoveAt(i);
+                                i--;
+                                continue;
+                            }
+                            if (shouldUpdate && updateString.Length > 2)
+                            {
+                                spectators[i].WriteData(updateString);
+                            }
+                            if (spectators[i].IsReady)
+                            {
+                                var message = spectators[i].ReadData().Trim();
+                                Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Spectator said " + message);
+                                if (message == "LIST GAMES")
+                                {
+                                    spectators[i].WriteData("Pacman: " + games.Count);
+                                }
+                                else if (message == "LIST PACMAN")
+                                {
+                                    var buffer = "";
+                                    foreach (var game in games)
+                                    {
+                                        buffer += game.Id.ToString() + " " + game.Game.Score + "\n";
+                                    }
+                                    Console.WriteLine("Sending " + buffer);
+                                    spectators[i].WriteData(buffer);
+                                }
+                                else if (message.StartsWith("WATCH "))
+                                {
+                                    var guid = message.Substring(6);
+                                    var game = games.FirstOrDefault(x => x.Id.ToString() == guid);
+                                    if (game == null)
+                                    {
+                                        spectators[i].WriteData("Failed to find game");
+                                    }
+                                    else
+                                    {
+                                        game.AddSpectator(spectators[i]);
+                                        spectators.RemoveAt(i);
+                                        i--;
+                                    }
+                                }
+                            }
                         }
                     }
-                    for (var i = 0; i < spectators.Count; i++)
-                    {
-                        if (!spectators[i].IsConnected)
-                        {
-                            spectators.RemoveAt(i);
-                            i--;
-                            continue;
-                        }
-                        if (shouldUpdate && updateString.Length > 2)
-                        {
-                            spectators[i].WriteData(updateString);
-                        }
-                        if (spectators[i].IsReady)
-                        {
-                            var message = spectators[i].ReadData().Trim();
-                            Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Spectator said " + message);
-                            if (message == "LIST GAMES")
-                            {
-                                spectators[i].WriteData("Pacman: " + games.Count);
-                            }
-                            else if (message == "LIST PACMAN")
-                            {
-                                var buffer = "";
-                                foreach (var game in games)
-                                {
-                                    buffer += game.Id.ToString() + " " + game.Game.Score + "\n";
-                                }
-                                Console.WriteLine("Sending " + buffer);
-                                spectators[i].WriteData(buffer);
-                            }
-                            else if (message.StartsWith("WATCH "))
-                            {
-                                var guid = message.Substring(6);
-                                var game = games.FirstOrDefault(x => x.Id.ToString() == guid);
-                                if (game == null)
-                                {
-                                    spectators[i].WriteData("Failed to find game");
-                                }
-                                else
-                                {
-                                    game.AddSpectator(spectators[i]);
-                                    spectators.RemoveAt(i);
-                                    i--;
-                                }
-                            }
-                        }
-                    }
+                    Thread.Sleep(1);
                 }
-                Thread.Sleep(1);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("GameMaster crashed with exception: " + e.Message);
+                Console.WriteLine(e.InnerException?.Message);
+                Console.WriteLine(e.StackTrace);
+                isRunning = false;
             }
         }
     }

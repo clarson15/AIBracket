@@ -56,7 +56,14 @@ namespace AIBracket.API.Sockets
             _writebuffer = new byte[buff_size];
             readCount = 0;
             lastCheck = DateTime.Now;
-            _socket.BeginRead(_readbuffer, 0, buff_size, new AsyncCallback(ReadCallback), _socket);
+            try { 
+                _socket.BeginRead(_readbuffer, 0, buff_size, new AsyncCallback(ReadCallback), _socket);
+            }
+            catch
+            {
+                Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Client disconnected");
+                Disconnect();
+            }
         }
 
         public void Disconnect()
@@ -81,16 +88,17 @@ namespace AIBracket.API.Sockets
         public void WriteData(string data)
         {
             byte[] bytes;
-            if (_isWebsocket)
-            {
-                bytes = EncodeMessageToSend(data);
-            }
-            else
-            {
-                bytes = Encoding.ASCII.GetBytes(data);
-            }
+            
             try
             {
+                if (_isWebsocket)
+                {
+                    bytes = EncodeMessageToSend(data);
+                }
+                else
+                {
+                    bytes = Encoding.ASCII.GetBytes(data);
+                }
                 _socket.BeginWrite(bytes, 0, bytes.Length, new AsyncCallback(WriteCallback), _socket);
             }
             catch

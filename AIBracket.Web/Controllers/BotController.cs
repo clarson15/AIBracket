@@ -39,6 +39,18 @@ namespace AIBracket.Web.Controllers
             return Ok(bots);
         }
 
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult GetBotDetails(string Id)
+        {
+            var bot = _appDbContext.Bots.FirstOrDefault(x => x.Id.ToString() == Id);
+            if(bot != null)
+            {
+                return Ok(new { bot.Id, bot.IdentityId, bot.Game, bot.Name });
+            }
+            return Ok();
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateBot(BotCreateViewModel bot)
         {
@@ -102,12 +114,7 @@ namespace AIBracket.Web.Controllers
         [HttpGet]
         public IActionResult GetBotHistory(string Id)
         {
-            var success = Guid.TryParse(Id, out Guid guid);
-            if (!success)
-            {
-                return BadRequest("Invalid Bot Id");
-            }
-            var games = _appDbContext.PacmanGames.Where(x => x.BotId == guid).ToList();
+            var games = _appDbContext.PacmanGames.Where(x => x.BotId.ToString() == Id).ToList();
             return Ok(games);
         }
     }

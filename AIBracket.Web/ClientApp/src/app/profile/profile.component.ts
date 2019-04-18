@@ -38,13 +38,6 @@ export class ProfileComponent implements OnInit {
         this.bots = data;
         data.forEach(x => {
           x.showSecret = false;
-          this.profileService.getBotHistory(x.id).subscribe(history => {
-            history.forEach(h => {
-              h.endDate = moment.duration(moment(h.endDate).diff(moment(h.startDate))).humanize();
-              h.startDate = moment.utc(h.startDate).fromNow();
-            });
-            this.bots.find(b => b.id == x.id).history = history;
-          })
         });
         if (this.bots.length == 0) {
           this.CreationExpanded = true;

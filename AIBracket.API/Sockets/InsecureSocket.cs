@@ -57,7 +57,15 @@ namespace AIBracket.API.Sockets
             _writebuffer = new byte[buff_size];
             lastCheck = DateTime.Now;
             readCount = 0;
-            _socket.Client.BeginReceive(_readbuffer, 0, buff_size, 0, new AsyncCallback(ReadCallback), _socket);
+            try
+            {
+                _socket.Client.BeginReceive(_readbuffer, 0, buff_size, 0, new AsyncCallback(ReadCallback), _socket);
+            }
+            catch
+            {
+                Console.WriteLine(DateTime.Now.ToLongTimeString() + ": Client disconnected");
+                Disconnect();
+            }
         }
 
         public void Disconnect()

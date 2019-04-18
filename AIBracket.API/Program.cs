@@ -23,6 +23,7 @@ namespace AIBracket.API
         private static TcpListener SslListener { get; set; }
         private static bool Accept { get; set; } = false;
         private static X509Certificate2 cert;
+        private static Task GameMasterThread;
         private static List<ISocket> clients = new List<ISocket>();
 
         public static void StartServer(int port, int sslport) {
@@ -37,7 +38,7 @@ namespace AIBracket.API
                 Console.WriteLine(DateTime.Now.ToLongTimeString() + ": No certificate found.");
             }
             GameMaster.Initialize(); 
-            Task.Run(() => GameMaster.Run());
+            GameMasterThread = Task.Run(() => GameMaster.Run());
             Listener = new TcpListener(address, port);
             SslListener = new TcpListener(address, sslport);
             Listener.Start();
@@ -92,6 +93,11 @@ namespace AIBracket.API
             {
                 DiscoverIntentions();
                 Thread.Sleep(10);
+                if(GameMasterThread.Status != TaskStatus.Running)
+                {
+                    GameMasterThread.Start();
+                    Console.WriteLine("Restarting GameMaster main thread");
+                }
             }
         }
         
