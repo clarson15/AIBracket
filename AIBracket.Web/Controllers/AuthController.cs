@@ -89,6 +89,7 @@ namespace AIBracket.Web.Controllers
             return new OkObjectResult(json);
         }
         
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetProfileData(string Id)
         {

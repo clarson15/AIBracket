@@ -52,6 +52,7 @@ export class GamePacmanComponent implements OnInit {
       let ratio = document.body.clientWidth / 448;
       canvas.style.width = document.body.clientWidth + 'px';
       canvas.style.height = 600 * ratio + 'px';
+      this.chatbox.style.height = 600 * ratio + 'px';
     }
     canvas.width = 448;
     canvas.height = 600;

@@ -8,5 +8,6 @@ export class BotsResponseModel {
   showSecret: boolean;
   active: boolean;
   identityId: string;
+  highScore: number;
   history: BotHistoryResponseModel[];
 }

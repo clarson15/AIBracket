@@ -1,9 +1,23 @@
 <mat-card class="profile-card">
-  <h1 *ngIf="user != null">{{user.userName}}'s Profile</h1>
+  <h1>{{user?.userName}}'s Profile</h1>
   <div class="section">
     <h2>Bots</h2>
-    <mat-accordion class="bot-expander">
-      <mat-expansion-panel [expanded]="CreationExpanded" (opened)="CreationExpanded = true" *ngIf="isOwnProfile()">
+    <div *ngIf="!isOwnProfile()">
+      <div *ngIf="bots == null || bots.length == 0">
+        <p style="text-align: center;">This user hasn't created any bots yet.</p>
+      </div>
+      <div *ngIf="bots != null && bots.length > 0">
+        <mat-list style="background-color: white; padding-top: 0px; border-bottom: solid black 1px;">
+          <mat-list-item *ngFor="let bot of bots; let i = index" style="border: solid black 1px; border-bottom: none;">
+            <span [className]="bot.active ? 'dot-active' : 'dot-inactive'"></span><a class="bot-title" [routerLink]="['/bot-details', bot.id]">{{bot.name}}</a>
+            <div style="position: absolute; left: 50%;">{{mapGameName(bot.game)}}</div>
+            <div style="position: absolute; right: 10px;">{{bot.highScore}}</div>
+          </mat-list-item>
+        </mat-list>
+      </div>
+    </div>
+    <mat-accordion class="bot-expander" *ngIf="isOwnProfile()">
+      <mat-expansion-panel [expanded]="CreationExpanded" (opened)="CreationExpanded = true">
         <mat-expansion-panel-header style="padding-left: 10px; background-color: #A9F5A9">
           <mat-panel-title>
             <div class="add-bot-title">
@@ -30,6 +44,7 @@
         <mat-expansion-panel-header>
           <mat-panel-title>
             <span [className]="bot.active ? 'dot-active' : 'dot-inactive'"></span><a class="bot-title" [routerLink]="['/bot-details', bot.id]">{{bot.name}}</a>
+            <span style="float: right;">{{bot.highScore}}</span>
           </mat-panel-title>
           <mat-panel-description>
             <p>{{mapGameName(bot.game)}}</p>
@@ -46,13 +61,17 @@
   </div>
   <div class="section">
     <h2>Tournaments</h2>
-    <div style="text-align: center;" *ngIf="tournaments == null">
+    <div style="text-align: center;" *ngIf="tournaments == null && isOwnProfile()">
       <p>You haven't participated in any tournaments</p>
       <p>:(</p>
     </div>
-    <mat-divider></mat-divider>
+    <div style="text-align: center;" *ngIf="tournaments == null && !isOwnProfile()">
+      <p>{{user?.userName}} hasn't participated in any tournaments</p>
+      <p>:(</p>
+    </div>
   </div>
   <div class="section" *ngIf="isOwnProfile()">
+    <mat-divider></mat-divider>
     <h2>Preferences</h2>
   </div>
 </mat-card>
