@@ -49,6 +49,11 @@ export class AppComponent implements OnInit {
   onActivate($event) {
   }
 
+  clickDiscord() {
+    var win = window.open('https://discord.gg/gYSgucu', '_blank');
+    win.focus();
+  }
+
   toggleNav($event) {
     this.sideNavToggled = !this.sideNavToggled;
   }

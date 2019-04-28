@@ -95,7 +95,7 @@ namespace AIBracket.Web.Controllers
         {
             if (Id == null || Id == "")
             {
-                var data = await _userManager.FindByIdAsync(User.Claims.First(x => x.Type == "id").Value);
+                var data = await _userManager.FindByIdAsync(User.Claims.FirstOrDefault(x => x.Type == "id")?.Value);
                 if (data == null)
                 {
                     return Unauthorized();
@@ -103,7 +103,11 @@ namespace AIBracket.Web.Controllers
                 return Ok(new { data.Id, data.FirstName, data.LastName, data.UserName });
             }
             var acc = await _userManager.FindByIdAsync(Id);
-            return Ok(new { acc.UserName, acc.FirstName, acc.LastName, acc.Id});
+            if (acc != null)
+            {
+                return Ok(new { acc.UserName, acc.FirstName, acc.LastName, acc.Id });
+            }
+            return null;
         }
 
         [AllowAnonymous]

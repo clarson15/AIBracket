@@ -26,7 +26,12 @@ export class LoginComponent implements OnInit {
   onSubmit() {
     this.loginService.login(this.profileForm).subscribe(
       data => {
-        localStorage.setItem('auth_token', data.auth_token);
+        this.loginService.getProfile(data.id).subscribe(profile => {
+          this.loginService.setUser(profile);
+          localStorage.setItem('auth_token', data.auth_token);
+        }, err => {
+          console.log('error getting profile for user.');
+        });
         this.router.navigate(['/home']);
       },
       err => {
