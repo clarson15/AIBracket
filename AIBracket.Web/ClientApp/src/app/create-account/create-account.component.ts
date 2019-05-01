@@ -15,6 +15,7 @@ export class CreateAccountComponent implements OnInit {
     UserName: new FormControl(''),
     Password: new FormControl(''),
     Confirm: new FormControl(''),
+    Email: new FormControl(''),
     FirstName: new FormControl(''),
     LastName: new FormControl('')
   })
@@ -29,8 +30,8 @@ export class CreateAccountComponent implements OnInit {
 
   onSubmit() {
     if (this.createForm.get('Confirm').value != this.createForm.get('Password').value) {
-      this.createForm.get('Password').setErrors({ mismatch: "password mismatch" });
-      this.createForm.get('Confirm').setErrors({ mismatch: "password mismatch" });
+      this.createForm.get('Password').setErrors({ mismatch: "Password do not match." });
+      this.createForm.get('Confirm').setErrors({ mismatch: "Password do not match." });
     }
     else {
       this.createForm.get('Confirm').disable();
@@ -42,8 +43,14 @@ export class CreateAccountComponent implements OnInit {
           })
           this.createService.login(loginForm).subscribe(
             data2 => {
-              localStorage.setItem('auth_token', data2.auth_token);
-              this.router.navigate(['/home']);
+              this.createService.getProfile(data2.id).subscribe(prof => {
+                localStorage.setItem('auth_token', data2.auth_token);
+                this.createService.setUser(prof);
+                this.router.navigate(['/home']);
+              }, err => {
+                console.log(err);
+              })
+              
             },
             err => {
               console.log(err);
